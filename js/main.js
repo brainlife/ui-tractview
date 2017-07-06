@@ -7,13 +7,17 @@
 (()=>{
 
 var config = {
-    wf_api: '/api/wf'
+    wf: '/api/wf',
+    jwt: localStorage.getItem('jwt')
 };
 
 $(document).ready(() => {
     // element.on('$destroy', function() {
     //     scope.destroyed = true;
     // });
+    
+    if (!config.jwt)
+        throw "Error: jwt not set";
     
     // get the url and wrap it in a URL object, for getting GET params later
     var url = new URL(window.location.href);
@@ -25,15 +29,49 @@ $(document).ready(() => {
         afq: url.searchParams.get('afq')
     };
     
+    var tasks = {
+        freesurfer: null,
+        afq: null
+    };
+    
+    function getTask(taskid, success, error) {
+        $.ajax({
+            url: config.wf+'/task',
+            data: {
+                find: JSON.stringify({_id:taskid})
+            },
+            beforeSend: xhr => xhr.setRequestHeader('Authorization', 'Bearer '+config.jwt),
+            error: err => {
+                if (error)
+                    error(err);
+            },
+            success: data => {
+                var _tasks = data.tasks;
+                if (_tasks.length == 1)  // good
+                    success(_tasks[0]);
+                else                    // bad
+                    console.error("Error: Invalid tasks returned: ", _tasks);
+            }
+        });
+    }
+    
     // get task for freesurfer + afq
     if (taskids.freesurfer) {
-        $.get(config.wf_api
-            +'?find='+JSON.stringify({_id:taskids.freesurfer}),
-            data => {
-                console.log(data);
-            }
-        )
+        getTask(taskids.freesurfer, task => {
+            tasks.freesurfer = task;
+        }, err => {
+            console.error(err);
+        });
     }
+    if (taskids.afq) {
+        getTask(taskids.afq, task => {
+            tasks.afq = task;
+        }, err => {
+            console.error(err);
+        });
+    }
+    
+    
     
     // 
     
