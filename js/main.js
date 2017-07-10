@@ -1,5 +1,5 @@
 /**
- * UI to display output tracts from AFQ using THREE.js
+ * UI to display output surface from Freesurfer using THREE.js
  */
 
 'use strict';
@@ -7,7 +7,7 @@
 (()=>{
 
 var config = {
-    wf: '/api/wf',
+    wf_api: '/api/wf',
     jwt: localStorage.getItem('jwt')
 };
 
@@ -24,65 +24,32 @@ $(document).ready(() => {
     
     // first thing to do, retrieve instance ids from tasks by getting tasks from given task ids in the url
     // get freesurfer task id
-    var taskids = {
-        freesurfer: url.searchParams.get('free'),
-        afq: url.searchParams.get('afq')
-    };
+    var task = null;
+    var subdir = url.searchParams.get('sdir');
     
-    var tasks = {
-        freesurfer: null,
-        afq: null
-    };
-    
-    function getTask(taskid, success, error) {
-        $.ajax({
-            url: config.wf+'/task',
-            data: {
-                find: JSON.stringify({_id:taskid})
-            },
-            beforeSend: xhr => xhr.setRequestHeader('Authorization', 'Bearer '+config.jwt),
-            error: err => {
-                if (error)
-                    error(err);
-            },
-            success: data => {
-                var _tasks = data.tasks;
-                if (_tasks.length == 1)  // good
-                    success(_tasks[0]);
-                else                    // bad
-                    console.error("Error: Invalid tasks returned: ", _tasks);
-            }
-        });
-    }
-    
-    // get task for freesurfer + afq
-    if (taskids.freesurfer) {
-        getTask(taskids.freesurfer, task => {
-            tasks.freesurfer = task;
-        }, err => {
-            console.error(err);
-        });
-    }
-    if (taskids.afq) {
-        getTask(taskids.afq, task => {
-            tasks.afq = task;
-        }, err => {
-            console.error(err);
-        });
-    }
-    
-    
-    
-    // 
+    $.ajax({
+        beforeSend: xhr => xhr.setRequestHeader('Authorization', 'Bearer '+config.jwt),
+        url: config.wf_api+'/task',
+        data: {
+            find: JSON.stringify({
+                _id: url.searchParams.get('afq')
+            })
+        },
+        success: data => {
+            task = data.tasks[0];
+            init_conview();
+        },
+    });
     
     function init_conview() {
         var view = $("#conview");
         var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+        //renderer.setClearColor(0xffffff, 0);
 
         //scenes - back scene for brain siluet
-        var scene_back = new THREE.Scene();
-        //scene_back.background = new THREE.Color(0x333333);
         var scene = new THREE.Scene();
+        
+        //scene_back.background = new THREE.Color(0x333333);
         
         //camera
         var camera = new THREE.PerspectiveCamera( 45, view.width() / view.height(), 1, 5000);
@@ -94,48 +61,54 @@ $(document).ready(() => {
             camera.updateProjectionMatrix();
             renderer.setSize(view.width(), view.height());
         });
-
+        
+        // lighting
+        var ambLight = new THREE.AmbientLight(0x303030);
+        scene.add(ambLight);
+        var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+        directionalLight.position.set( 0, 1, 0 );
+        scene.add( directionalLight );
+        var camlight = new THREE.PointLight(0xffffff);
+        camlight.position.copy(camera.position);
+        scene.add(camlight);
+        
         //load vtk brain model from freesurfer
-        
-        var rid = url.searchParams.get('r');
-        if (!rid)
-            throw "No resource id given in url (specified as ?r)";
-        
-        var jwt = localStorage.getItem('jwt');
-        if (!jwt)
-            throw "No jwt discovered in localStorage. Please authenticate."
-        
-        var base = url.searchParams.get('b');
-        if (!base)
-            throw "No base path given in url (specified as ?b)"
+        var rid = task.resource_id;
+        var base = task.instance_id + '/' + task._id;
+        if (subdir) base += '/' + subdir;
         
         //load left
-        // var base = scope.freesurfer.instance_id+"/"+scope.freesurfer._id;
-        var path = encodeURIComponent(base+"/lh.10.vtk");
-        vtk.get(appconf.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+jwt).then(function(geometry) {
-            //var material = new THREE.MeshLambertMaterial({color: 0xffcc99, transparent: true, opacity: 0.5});
-            var material = new THREE.MeshBasicMaterial();
-            var mesh = new THREE.Mesh( geometry, material );
-            mesh.rotation.x = -Math.PI/2;
-            scene_back.add(mesh);
-        });
-        //load right
-        var path = encodeURIComponent(base+"/rh.10.vtk");
-        vtk.get(appconf.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+jwt).then(function(geometry) {
-            //var material = new THREE.MeshLambertMaterial({color: 0xffcc99, transparent: true, opacity: 0.5});
-            var material = new THREE.MeshBasicMaterial();
-            var mesh = new THREE.Mesh( geometry, material );
-            mesh.rotation.x = -Math.PI/2;
-            scene_back.add(mesh);
-        });
+        // var path = encodeURIComponent(base+"/lh.10.vtk");
+        // var vtk = new THREE.VTKLoader();
+        
+        // vtk.load(config.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+config.jwt, geometry => {
+        //     var material = new THREE.MeshLambertMaterial({color: 0xcc9966});
+        //     //var material = new THREE.MeshBasicMaterial();
+        //     var mesh = new THREE.Mesh( geometry, material );
+        //     mesh.rotation.x = -Math.PI/2;
+        //     scene.add(mesh);
+        // });
+        // //load right
+        // var path = encodeURIComponent(base+"/rh.10.vtk");
+        
+        // vtk.load(config.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+config.jwt, geometry => {
+        //     var material = new THREE.MeshLambertMaterial({color: 0xcc9966});
+        //     //var material = new THREE.MeshBasicMaterial();
+        //     var mesh = new THREE.Mesh( geometry, material );
+        //     mesh.rotation.x = -Math.PI/2;
+        //     scene.add(mesh);
+            
+        //     console.log("loaded mesh: ", mesh);
+        // });
         
         //TODO - 21 might not be the correct number of tracts
-        var afq_rid = scope.afq.resource_id;
-        var afq_base = scope.afq.instance_id+"/"+scope.afq._id;
+        // var afq_rid = scope.afq.resource_id;
+        // var afq_base = scope.afq.instance_id+"/"+scope.afq._id;
+        
         for(var i = 1;i < 21;++i) {
             //load_tract("tracts/tracts_110411/tracts."+i+".json", function(err, mesh) {
-            var path = encodeURIComponent(afq_base+"/tracts/"+i+".json");
-            load_tract(appconf.wf_api+"/resource/download?r="+afq_rid+"&p="+path+"&at="+jwt, function(err, mesh) {
+            var path = encodeURIComponent(base+"/tracts/"+i+".json");
+            load_tract(config.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+config.jwt, function(err, mesh) {
                 scene.add(mesh);
             });
         }
@@ -158,25 +131,23 @@ $(document).ready(() => {
             controls.update();
 
             renderer.clear();
-            renderer.render( scene_back, camera );
             renderer.clearDepth();
             renderer.render( scene, camera );
+            //renderer.render( scene, camera );
 
             requestAnimationFrame( animate_conview );
         }
+        
         animate_conview();
     }
     
     function load_tract(path, cb) {
         //console.log("loading tract "+path);
         //$scope.loading = true;
-        $http.get(path)
-        .then(function(res) {
-            if(scope.destroyed) return;
-
-            var name = res.data.name;
-            var color = res.data.color;
-            var bundle = res.data.coords;
+        $.get(path, res => {
+            var name = res.name;
+            var color = res.color;
+            var bundle = res.coords;
 
             var threads_pos = [];
             //bundle = [bundle[0]];
