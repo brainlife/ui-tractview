@@ -74,17 +74,6 @@
                     height:64px;
                 }
                 
-                /*.num_fibers {
-                    position:absolute;
-                    left:70px;
-                    bottom:2px;
-                    white-space:nowrap;
-                    color:rgba(255, 255, 255, .6);
-                    font-family:Roboto;
-                    font-size:12px;
-                    pointer-events:none;
-                }*/
-                
                 .controls {
                     display:inline-block;
                     position:absolute;
@@ -145,7 +134,7 @@
                 
                 .container_toggles {
                     display:inline-block;
-                    max-width:500px;
+                    max-width:600px;
                     width:auto;
                     height:auto;
                     padding-top:2px;
@@ -166,15 +155,15 @@
                 }
                 
                 li.table {
-                    overflow:hidden;
+                    vertical-align:top;
                 }
                 li.table .identifier {
-                    max-width:160px;
-                    padding-left:5px;
+                    max-width:147px;
                     text-overflow:ellipsis;
                 }
                 li.table tr {
-                    max-height:17px;
+                    max-height:13px;
+                    overflow:hidden;
                 }
                 
                 .toggle-switch {
@@ -194,9 +183,8 @@
                 }
                 
                 .toggle-switch .identifier {
-                    max-width:250px;
-                    width:250px;
-                    padding-left:3px;
+                    max-width:340px;
+                    width:340px;
                     overflow:hidden;
                     text-overflow:ellipsis;
                     cursor:pointer;
@@ -213,6 +201,10 @@
                     white-space:nowrap;
                 }
                 
+                .material-switch {
+                    display:inline-block;
+                    padding-left:3px;
+                }
                 .material-switch > input[type="checkbox"] {
                     display: none;
                 }
@@ -231,11 +223,11 @@
                     border-radius: 8px;
                     content: '';
                     height: 8px;
-                    margin-top: -2px;
                     position:absolute;
                     opacity: 0.3;
                     transition: all 0.4s ease-in-out;
                     width: 30px;
+                    top:-8px;
                     vertical-align:middle;
                 }
                 .material-switch > label::after {
@@ -245,9 +237,8 @@
                     content: '';
                     height: 14px;
                     left: -4px;
-                    margin-top: -8px;
+                    margin-top: -12px;
                     position: absolute;
-                    top: 3px;
                     transition: all 0.3s ease-in-out;
                     width: 14px;
                 }

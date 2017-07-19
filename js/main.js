@@ -257,7 +257,7 @@ $(document).ready(() => {
         wrapper.on("mouseenter", e => {
             label.addClass("active");
             if (tractName != "All") {
-                config.tracts[tractName].material._restore = {
+                config.tracts[tractName]._restore = {
                     color: config.tracts[tractName].material.color,
                     visible: config.tracts[tractName].visible
                 };
@@ -269,8 +269,8 @@ $(document).ready(() => {
         wrapper.on("mouseleave", e => {
             label.removeClass("active");
             if (tractName != "All") {
-                config.tracts[tractName].material.color = config.tracts[tractName].material._restore.color;
-                config.tracts[tractName].visible = config.tracts[tractName].material._restore.visible;
+                config.tracts[tractName].material.color = config.tracts[tractName]._restore.color;
+                config.tracts[tractName].visible = config.tracts[tractName]._restore.visible;
             }
         });
         
@@ -283,7 +283,7 @@ $(document).ready(() => {
         label.addClass("identifier");
         
         // the toggle switch itself
-        switch_el.addClass("material-switch pull-right");
+        switch_el.addClass("material-switch");
         input.attr({'type': 'checkbox','id': tractName, 'checked': true});
         input.on('change', e => {
             if (e.target.checked) wrapper.removeClass("disabled");
@@ -304,9 +304,10 @@ $(document).ready(() => {
                     if (checkboxRight.checked != e.target.checked) checkboxRight.click();
                 }
             } );
-            else config.tracts[tractName].visible = e.target.checked;
-            
-            config.tracts[tractName].material._restore.visible = e.target.checked;
+            else {
+                config.tracts[tractName].visible = e.target.checked;
+                config.tracts[tractName]._restore.visible = e.target.checked;
+            }
         });
         input_label.addClass("label-default");
         input_label.attr('for', tractName);
