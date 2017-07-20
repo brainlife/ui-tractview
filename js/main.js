@@ -46,7 +46,7 @@ $(function() {
         tract_toggles_el = $("#tract_toggles"),
         hide_show_el = $("#hide_show"),
         hide_show_text_el = $("#hide_show_text");
-    
+
     $.ajax({
         beforeSend: xhr => xhr.setRequestHeader('Authorization', 'Bearer '+config.jwt),
         url: config.wf_api+'/task',
@@ -185,47 +185,124 @@ $(function() {
         });
         
         // group together tract names in the following way:
-        // tractName -> { left: tractNameLeft, right: tractNameRight }
-        // or tractName -> {} if there are no children
-        LRtractNames['All'] = {};
+        // tractName -> { left: {tractNameLeft, mesh}, right: {tractNameRight, mesh} }
+        // or tractName -> {mesh} if there are no children
         keys.forEach(tractName => {
             var rawName = tractName.replace(/ [LR]/g, "");
             if (rawName != tractName) {
                 LRtractNames[rawName] = LRtractNames[rawName] || {};
-                if (tractName.endsWith(" L")) LRtractNames[rawName].left = { name: tractName };
-                else LRtractNames[rawName].right = { name: tractName };
+                if (tractName.endsWith(" L")) LRtractNames[rawName].left = { name: tractName, mesh: config.tracts[tractName] };
+                else LRtractNames[rawName].right = { name: tractName, mesh: config.tracts[tractName] };
             }
-            else LRtractNames[rawName] = {};   // standalone, not left or right
+            else LRtractNames[rawName] = { mesh: config.tracts[tractName] };   // standalone, not left or right
         });
         
-        // add the toggles to controls
-        for (var tractName in LRtractNames) {
-            var subTracts = LRtractNames[tractName], li;
-            if (!Object.keys(subTracts).length) {
-                li = makeToggle(tractName);
-                LRtractNames[tractName].checkbox = li.checkbox;
+        // make 'All' button that toggles everything on/off
+        var checkbox_all = $('<input type="checkbox" id="checkbox_all" checked />');
+        checkbox_all.on('change', e => {
+            for (let tractName in LRtractNames) {
+                let toggle = LRtractNames[tractName];
+                if (toggle.left) {
+                    if (toggle.left.checkbox[0].checked != e.target.checked) toggle.left.checkbox.click();
+                    if (toggle.right.checkbox[0].checked != e.target.checked) toggle.right.checkbox.click();
+                }
+                else {
+                    if (toggle.checkbox[0].checked != e.target.checked) toggle.checkbox.click();
+                }
             }
+        });
+        
+        // add header toggles to controls
+        tract_toggles_el.append(
+            $('<tr/>').addClass('header').append([
+                $('<td><label class="all" for="checkbox_all">All</label></td>').append(
+                    checkbox_all),
+                $('<td><label>Left</label></td>'),
+                $('<td><label>Right</label></td>')
+        ]));
+        
+        // add tract toggles to controls
+        for (let tractName in LRtractNames) {
+            let subTracts = LRtractNames[tractName], row;
+            
+            // toggles that only have a name and a single checkbox
+            if (!~Object.keys(subTracts).indexOf('left')) {
+                row = makeToggle(tractName, {
+                    hideRightToggle: true,
+                    onchange_left: (left_checked) => {
+                        // set up restore variables for hiding/showing later
+                        LRtractNames[tractName].mesh.visible = left_checked;
+                        LRtractNames[tractName]._restore.visible = left_checked;
+                        
+                        if (!left_checked) row.addClass('disabled');
+                        else row.removeClass('disabled');
+                    },
+                    onmouseenter: e => {
+                        LRtractNames[tractName].mesh.visible = true;
+                        LRtractNames[tractName].mesh.material.color = new THREE.Color(1, 1, 1);
+                    },
+                    onmouseleave: e => {
+                        var restore = LRtractNames[tractName]._restore;
+                        LRtractNames[tractName].mesh.visible = restore.visible;
+                        LRtractNames[tractName].mesh.material.color = restore.color;
+                    }
+                });
+                
+                LRtractNames[tractName].checkbox = row.checkbox_left;
+                LRtractNames[tractName]._restore = {
+                    visible: subTracts.mesh.visible,
+                    color: subTracts.mesh.material.color
+                };
+            }
+            // toggles that have both L + R checkboxes, almost the same as code above, just done twice
             else {
-                let li_left = makeToggle(subTracts.left.name);
-                let li_right = makeToggle(subTracts.right.name);
-                let tr = $("<tr/>"),
-                    left_cell = $("<td/>"),
-                    right_cell = $("<td/>");
-                li = $("<li/>"),
+                row = makeToggle(tractName, {
+                    onchange_left: (left_checked, none_checked) => {
+                        LRtractNames[tractName].left.mesh.visible = left_checked;
+                        LRtractNames[tractName].left._restore.visible = left_checked;
+                        
+                        if (none_checked) row.addClass('disabled');
+                        else row.removeClass('disabled');
+                    },
+                    onchange_right: (right_checked, none_checked) => {
+                        LRtractNames[tractName].right.mesh.visible = right_checked;
+                        LRtractNames[tractName].right._restore.visible = right_checked;
+                        
+                        if (none_checked) row.addClass('disabled');
+                        else row.removeClass('disabled');
+                    },
+                    onmouseenter: e => {
+                        LRtractNames[tractName].left.mesh.visible = true;
+                        LRtractNames[tractName].left.mesh.material.color = new THREE.Color(1, 1, 1);
+                        
+                        LRtractNames[tractName].right.mesh.visible = true;
+                        LRtractNames[tractName].right.mesh.material.color = new THREE.Color(1, 1, 1);
+                    },
+                    onmouseleave: e => {
+                        var restore_left = LRtractNames[tractName].left._restore,
+                            restore_right = LRtractNames[tractName].right._restore;
+                        
+                        LRtractNames[tractName].left.mesh.visible = restore_left.visible;
+                        LRtractNames[tractName].left.mesh.material.color = restore_left.color;
+                        
+                        LRtractNames[tractName].right.mesh.visible = restore_right.visible;
+                        LRtractNames[tractName].right.mesh.material.color = restore_right.color;
+                    }
+                });
                 
-                li.addClass("parent table");
-                li_left.wrapper.addClass("toggle-switch");
-                li_right.wrapper.addClass("toggle-switch");
+                LRtractNames[tractName].left.checkbox = row.checkbox_left;
+                LRtractNames[tractName].left._restore = {
+                    visible: subTracts.left.mesh.visible,
+                    color: subTracts.left.mesh.material.color
+                };
                 
-                left_cell.append(li_left.wrapper);
-                right_cell.append(li_right.wrapper);
-                tr.append([left_cell, right_cell])
-                li.append(tr)
-                
-                LRtractNames[tractName].left.checkbox = li_left.checkbox;
-                LRtractNames[tractName].right.checkbox = li_right.checkbox;
+                LRtractNames[tractName].right.checkbox = row.checkbox_right;
+                LRtractNames[tractName].right._restore = {
+                    visible: subTracts.right.mesh.visible,
+                    color: subTracts.right.mesh.material.color
+                };
             }
-            tract_toggles_el.append(li);
+            tract_toggles_el.append(row);
         }
         
         // configure hiding/showing the panel
@@ -245,94 +322,62 @@ $(function() {
         });
     }
     
+    // helper method for making toggles
     function makeToggle(tractName, options) {
         options = options || {};
         
-            // parents
-        let li = $("<li/>"),
-            wrapper = $("<span/>"),
-            switch_el = $("<span/>"),
-            // text next to the checkbox
+        // row that contains the text of the toggle, as well as the left/right checkboxes
+        let row = $("<tr/>"),
+            td_label = $("<td/>"),
             label = $("<label/>"),
-            // checkbox
-            input = $("<input/>"),
-            input_label = $("<label/>");
+            td_left = $("<td/>"),
+            checkbox_left = $("<input/>").attr({ 'type': 'checkbox', 'checked': true }),
+            td_right = $("<td/>"),
+            checkbox_right = $("<input/>").attr({ 'type': 'checkbox', 'checked': true });
         
-        li.addClass("parent");
+        label.text(tractName);
         
-        // item that contains the name of the tract as well as the toggle
-        wrapper.addClass("toggle-switch");
-        wrapper.on("mouseenter", e => {
-            label.addClass("active");
-            if (tractName != "All") {
-                config.tracts[tractName]._restore = {
-                    color: config.tracts[tractName].material.color,
-                    visible: config.tracts[tractName].visible
-                };
-                // make the tract white and visible
-                config.tracts[tractName].material.color = new THREE.Color(1, 1, 1);
-                config.tracts[tractName].visible = true;
-            }
+        // mouse events
+        row.on('mouseenter', e => {
+            row.addClass('active');
+            if (options.onmouseenter)
+                options.onmouseenter(e);
         });
-        wrapper.on("mouseleave", e => {
-            label.removeClass("active");
-            if (tractName != "All") {
-                config.tracts[tractName].material.color = config.tracts[tractName]._restore.color;
-                config.tracts[tractName].visible = config.tracts[tractName]._restore.visible;
-            }
+        row.on('mouseleave', e => {
+            row.removeClass('active');
+            if (options.onmouseleave)
+                options.onmouseleave(e);
         });
         
-        // text that appears beside the toggle switch
-        var switchText = tractName;
-        if (switchText == 'All')
-            switchText += ` (Fibers: ${config.num_fibers})`;
-        label.text(switchText);
-        label.attr({'title': tractName, 'for': tractName});
-        label.addClass("identifier");
-        
-        // the toggle switch itself
-        switch_el.addClass("material-switch");
-        input.attr({'type': 'checkbox','id': tractName, 'checked': true});
-        input.on('change', e => {
-            if (e.target.checked) wrapper.removeClass("disabled");
-            else wrapper.addClass("disabled");
+        checkbox_left.on('change', e => {
+            var left_checked = checkbox_left[0].checked,
+                right_checked = checkbox_right[0].checked || options.hideRightToggle;
             
-            if (tractName == "All") Object.keys(LRtractNames).forEach(key =>  {
-                if (key == 'All') return;
-                var subTracts = LRtractNames[key];
-                
-                if (subTracts.checkbox) {
-                    if (subTracts.checkbox.checked != e.target.checked) subTracts.checkbox.click();
-                }
-                else {
-                    var checkboxLeft = LRtractNames[key].left.checkbox,
-                        checkboxRight = LRtractNames[key].right.checkbox;
-                    
-                    if (checkboxLeft.checked != e.target.checked) checkboxLeft.click();
-                    if (checkboxRight.checked != e.target.checked) checkboxRight.click();
-                }
-            } );
-            else {
-                config.tracts[tractName].visible = e.target.checked;
-                config.tracts[tractName]._restore = config.tracts[tractName]._restore || {};
-                config.tracts[tractName]._restore.visible = e.target.checked;
-            }
+            if (options.onchange_left)
+                options.onchange_left(left_checked, !left_checked && !right_checked);
         });
-        input_label.addClass("label-default");
-        input_label.attr('for', tractName);
+        checkbox_right.on('change', e => {
+            var left_checked = checkbox_left[0].checked,
+                right_checked = checkbox_right[0].checked || options.hideRightToggle;
+            
+            if (options.onchange_right)
+                options.onchange_right(right_checked, !left_checked && !right_checked);
+        });
         
-        switch_el.append([input, input_label]);
+        // add everything
+        td_label.addClass('label').append(label);
+        td_left.addClass('left').append(checkbox_left);
+        td_right.addClass('right');
+        if (!options.hideRightToggle)
+            td_right.append(checkbox_right)
         
-        // wrapper div to avoid word wrap issues
-        wrapper.addClass("wrapper");
+        row.addClass('row');
+        row.append([td_label, td_left, td_right]);
         
-        wrapper.append([label, switch_el]);
-        li.append(wrapper);
+        row.checkbox_left = checkbox_left;
+        row.checkbox_right = checkbox_right;
         
-        if (tractName == 'all') li.addClass("all");
-        li.checkbox = input[0];
-        li.wrapper = wrapper;
-        return li;
+        return row;
     }
     
     function load_tract(path, cb) {
