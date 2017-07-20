@@ -16,6 +16,13 @@ $(function() {
         debug: true,
     };
     
+    // element.on('$destroy', function() {
+    //     scope.destroyed = true;
+    // });
+    
+    if (!config.jwt)
+        throw "Error: jwt not set";
+    
     // get the url and wrap it in a URL object, for getting GET params later
     var url = new URL(window.location.href);
     var task_id = url.searchParams.get('afq');
@@ -176,13 +183,6 @@ $(function() {
             if (a == b) return 0;
             return -1;
         });
-        for (var i = 0; i < keys.length; ++i) {
-            var name = keys[i];
-            if (!name.endsWith(" L") && !name.endsWith(" R")) {
-                keys.splice(boundary, 0, keys.splice(i, 1)[0]);
-                ++boundary;
-            }
-        }
         
         // group together tract names in the following way:
         // tractName -> { left: tractNameLeft, right: tractNameRight }
@@ -314,6 +314,7 @@ $(function() {
             } );
             else {
                 config.tracts[tractName].visible = e.target.checked;
+                config.tracts[tractName]._restore = config.tracts[tractName]._restore || {};
                 config.tracts[tractName]._restore.visible = e.target.checked;
             }
         });
@@ -378,6 +379,4 @@ $(function() {
             cb(null, mesh, res);
         });
     }
-    
 });
-
