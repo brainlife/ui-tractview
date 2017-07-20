@@ -13,7 +13,7 @@ $(function() {
         // to be set later
         num_fibers: 0,
         tracts: {},     // toggle on/off fascicles
-        debug: true,
+        debug: false,
     };
     
     // element.on('$destroy', function() {
