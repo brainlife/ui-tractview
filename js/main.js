@@ -4,19 +4,18 @@
 
 'use strict';
 
-(()=>{
+$(()=>{
 
-var config = {
-    wf_api: '/api/wf',
-    jwt: localStorage.getItem('jwt'),
-    num_tracts: 20,
+    var config = {
+        wf_api: '/api/wf',
+        jwt: localStorage.getItem('jwt'),
+        num_tracts: 20,
+        
+        // to be set later
+        num_fibers: 0,
+        tracts: {},     // toggle on/off fascicles
+    };
     
-    // to be set later
-    num_fibers: 0,
-    tracts: {},     // toggle on/off fascicles
-};
-
-$(document).ready(() => {
     // element.on('$destroy', function() {
     //     scope.destroyed = true;
     // });
@@ -376,5 +375,3 @@ $(document).ready(() => {
     }
     
 });
-
-}).call(window);
