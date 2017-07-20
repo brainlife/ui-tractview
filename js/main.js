@@ -83,12 +83,13 @@ $(document).ready(() => {
         var tinyBrainScene, brainlight;
         loader.load('models/brain.json', _scene => {
             tinyBrainScene = _scene;
+            var brainMesh = tinyBrainScene.children[1], unnecessaryDirectionalLight = tinyBrainScene.children[2];
             // align the tiny brain with the model displaying fascicles
             
-            tinyBrainScene.children[1].rotation.z += Math.PI / 2;
-            tinyBrainScene.children[1].material = new THREE.MeshLambertMaterial({color: 0xffcc99});
+            brainMesh.rotation.z += Math.PI / 2;
+            brainMesh.material = new THREE.MeshLambertMaterial({color: 0xffcc99});
             
-            tinyBrainScene.remove(tinyBrainScene.children[2]);
+            tinyBrainScene.remove(unnecessaryDirectionalLight);
             
             var amblight = new THREE.AmbientLight(0x101010);
             tinyBrainScene.add(amblight);
@@ -166,8 +167,17 @@ $(document).ready(() => {
     // add tract toggles to side panel
     function makeTractToggles() {
         // sort + make non-LR based tracts appear first
-        var keys = Object.keys(config.tracts).sort();
-        var boundary = 0;
+        var keys = Object.keys(config.tracts).sort((a, b) => {
+            var a_has_lr = a.endsWith(" L") || a.endsWith(" R");
+            var b_has_lr = b.endsWith(" L") || b.endsWith(" R");
+            
+            if (a_has_lr && !b_has_lr) return 1;
+            if (!a_has_lr && b_has_lr) return -1;
+            
+            if (a > b) return 1;
+            if (a == b) return 0;
+            return -1;
+        });
         for (var i = 0; i < keys.length; ++i) {
             var name = keys[i];
             if (!name.endsWith(" L") && !name.endsWith(" R")) {
