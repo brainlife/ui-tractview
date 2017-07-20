@@ -3,35 +3,35 @@
  */
 
 'use strict';
+$(function() {
 
-(()=>{
-
-var config = {
-    wf_api: '/api/wf',
-    jwt: localStorage.getItem('jwt'),
-    num_tracts: 20,
-    
-    // to be set later
-    num_fibers: 0,
-    tracts: {},     // toggle on/off fascicles
-};
-
-$(document).ready(() => {
-    // element.on('$destroy', function() {
-    //     scope.destroyed = true;
-    // });
-    
-    if (!config.jwt)
-        throw "Error: jwt not set";
+    var config = {
+        wf_api: '/api/wf',
+        jwt: localStorage.getItem('jwt'),
+        num_tracts: 20,
+        
+        // to be set later
+        num_fibers: 0,
+        tracts: {},     // toggle on/off fascicles
+        debug: true,
+    };
     
     // get the url and wrap it in a URL object, for getting GET params later
     var url = new URL(window.location.href);
-    
-    // first thing to do, retrieve instance ids from tasks by getting tasks from given task ids in the url
-    // get freesurfer task id
-    var task = null, LRtractNames = {};
+    var task_id = url.searchParams.get('afq');
     var subdir = url.searchParams.get('sdir');
+
+    var task = null, LRtractNames = {};
+ 
+	if(config.debug) {
+        task_id = "59651c4ea7d3861d94eec67e";
+        //subdir = "output";
+        config.wf_api = "https://dev1.soichi.us/api/wf";
+	}
     
+    if (!config.jwt)
+        throw "Error: jwt not set";
+   
     var view = $("#conview"),
         tinyBrain = $("#tinybrain"),
         controls_el = $("#controls"),
@@ -44,9 +44,7 @@ $(document).ready(() => {
         beforeSend: xhr => xhr.setRequestHeader('Authorization', 'Bearer '+config.jwt),
         url: config.wf_api+'/task',
         data: {
-            find: JSON.stringify({
-                _id: url.searchParams.get('afq')
-            })
+            find: JSON.stringify({ _id: task_id, })
         },
         success: data => {
             task = data.tasks[0];
@@ -383,4 +381,3 @@ $(document).ready(() => {
     
 });
 
-}).call(window);
