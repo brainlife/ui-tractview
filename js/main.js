@@ -4,19 +4,18 @@
 
 'use strict';
 
-(()=>{
+$(()=>{
 
-var config = {
-    wf_api: '/api/wf',
-    jwt: localStorage.getItem('jwt'),
-    num_tracts: 20,
+    var config = {
+        wf_api: '/api/wf',
+        jwt: localStorage.getItem('jwt'),
+        num_tracts: 20,
+        
+        // to be set later
+        num_fibers: 0,
+        tracts: {},     // toggle on/off fascicles
+    };
     
-    // to be set later
-    num_fibers: 0,
-    tracts: {},     // toggle on/off fascicles
-};
-
-$(document).ready(() => {
     // element.on('$destroy', function() {
     //     scope.destroyed = true;
     // });
@@ -178,13 +177,6 @@ $(document).ready(() => {
             if (a == b) return 0;
             return -1;
         });
-        for (var i = 0; i < keys.length; ++i) {
-            var name = keys[i];
-            if (!name.endsWith(" L") && !name.endsWith(" R")) {
-                keys.splice(boundary, 0, keys.splice(i, 1)[0]);
-                ++boundary;
-            }
-        }
         
         // group together tract names in the following way:
         // tractName -> { left: tractNameLeft, right: tractNameRight }
@@ -316,6 +308,7 @@ $(document).ready(() => {
             } );
             else {
                 config.tracts[tractName].visible = e.target.checked;
+                config.tracts[tractName]._restore = config.tracts[tractName]._restore || {};
                 config.tracts[tractName]._restore.visible = e.target.checked;
             }
         });
@@ -382,5 +375,3 @@ $(document).ready(() => {
     }
     
 });
-
-}).call(window);
