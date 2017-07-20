@@ -173,8 +173,8 @@ $(function() {
     function makeTractToggles() {
         // sort + make non-LR based tracts appear first
         var keys = Object.keys(config.tracts).sort((a, b) => {
-            var a_has_lr = a.endsWith(" L") || a.endsWith(" R");
-            var b_has_lr = b.endsWith(" L") || b.endsWith(" R");
+            var a_has_lr = isLeftTract(a) || isRightTract(a);
+            var b_has_lr = isLeftTract(b) || isRightTract(b);
             
             if (a_has_lr && !b_has_lr) return 1;
             if (!a_has_lr && b_has_lr) return -1;
@@ -188,10 +188,10 @@ $(function() {
         // tractName -> { left: {tractNameLeft, mesh}, right: {tractNameRight, mesh} }
         // or tractName -> {mesh} if there are no children
         keys.forEach(tractName => {
-            var rawName = tractName.replace(/ [LR]/g, "");
+            var rawName = tractName.replace(/ [LR]$|^(Left|Right) /g, "");
             if (rawName != tractName) {
                 LRtractNames[rawName] = LRtractNames[rawName] || {};
-                if (tractName.endsWith(" L")) LRtractNames[rawName].left = { name: tractName, mesh: config.tracts[tractName] };
+                if (isLeftTract(tractName)) LRtractNames[rawName].left = { name: tractName, mesh: config.tracts[tractName] };
                 else LRtractNames[rawName].right = { name: tractName, mesh: config.tracts[tractName] };
             }
             else LRtractNames[rawName] = { mesh: config.tracts[tractName] };   // standalone, not left or right
@@ -424,4 +424,14 @@ $(function() {
             cb(null, mesh, res);
         });
     }
+    
+    // returns whether or not the tractName is considered to be a left tract
+    function isLeftTract(tractName) {
+        return tractName.startsWith('Left ') || tractName.endsWith(' L');
+    }
+    // returns whether or not the tractName is considered to be a right tract
+    function isRightTract(tractName) {
+        return tractName.startsWith('Right ') || tractName.endsWith(' R');
+    }
+    
 });
