@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/brain-life/ui-tractview/issues"
   },
-  "homepage": "https://github.com/brain-life/ui-tractview#readme"
+  "homepage": "https://github.com/brain-life/ui-tractview#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "three": "^0.86.0"
+  }
 }

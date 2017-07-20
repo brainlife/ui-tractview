@@ -8,7 +8,12 @@
 
 var config = {
     wf_api: '/api/wf',
-    jwt: localStorage.getItem('jwt')
+    jwt: localStorage.getItem('jwt'),
+    num_tracts: 20,
+    
+    // to be set later
+    num_fibers: 0,
+    tracts: {},     // toggle on/off fascicles
 };
 
 $(document).ready(() => {
@@ -24,8 +29,16 @@ $(document).ready(() => {
     
     // first thing to do, retrieve instance ids from tasks by getting tasks from given task ids in the url
     // get freesurfer task id
-    var task = null;
+    var task = null, LRtractNames = {};
     var subdir = url.searchParams.get('sdir');
+    
+    var view = $("#conview"),
+        tinyBrain = $("#tinybrain"),
+        controls_el = $("#controls"),
+        container_toggles = $("#container_toggles"),
+        tract_toggles_el = $("#tract_toggles"),
+        hide_show_el = $("#hide_show"),
+        hide_show_text_el = $("#hide_show_text");
     
     $.ajax({
         beforeSend: xhr => xhr.setRequestHeader('Authorization', 'Bearer '+config.jwt),
@@ -42,8 +55,8 @@ $(document).ready(() => {
     });
     
     function init_conview() {
-        var view = $("#conview");
         var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+        var brainRenderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
         //renderer.setClearColor(0xffffff, 0);
 
         //scenes - back scene for brain siluet
@@ -53,69 +66,66 @@ $(document).ready(() => {
         
         //camera
         var camera = new THREE.PerspectiveCamera( 45, view.width() / view.height(), 1, 5000);
+        var brainCam = new THREE.PerspectiveCamera( 45, tinyBrain.width() / tinyBrain.height(), 1, 5000 );
         camera.position.z = 200;
-
+        
         //resize view
-        $(window).on('resize', function() {
+        function resized() {
             camera.aspect = view.width() / view.height();
             camera.updateProjectionMatrix();
             renderer.setSize(view.width(), view.height());
+        }
+        $(window).on('resize', resized);
+        view.on('resize', resized);
+        
+        // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
+        var loader = new THREE.ObjectLoader();
+        var tinyBrainScene, brainlight;
+        loader.load('models/brain.json', _scene => {
+            tinyBrainScene = _scene;
+            var brainMesh = tinyBrainScene.children[1], unnecessaryDirectionalLight = tinyBrainScene.children[2];
+            // align the tiny brain with the model displaying fascicles
+            
+            brainMesh.rotation.z += Math.PI / 2;
+            brainMesh.material = new THREE.MeshLambertMaterial({color: 0xffcc99});
+            
+            tinyBrainScene.remove(unnecessaryDirectionalLight);
+            
+            var amblight = new THREE.AmbientLight(0x101010);
+            tinyBrainScene.add(amblight);
+            
+            brainlight = new THREE.PointLight(0xffffff, 1);
+            brainlight.radius = 20;
+            brainlight.position.copy(brainCam.position);
+            tinyBrainScene.add(brainlight);
         });
         
-        // lighting
-        var ambLight = new THREE.AmbientLight(0x303030);
-        scene.add(ambLight);
-        var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-        directionalLight.position.set( 0, 1, 0 );
-        scene.add( directionalLight );
-        var camlight = new THREE.PointLight(0xffffff);
-        camlight.position.copy(camera.position);
-        scene.add(camlight);
-        
-        //load vtk brain model from freesurfer
-        var rid = task.resource_id;
         var base = task.instance_id + '/' + task._id;
         if (subdir) base += '/' + subdir;
         
-        //load left
-        // var path = encodeURIComponent(base+"/lh.10.vtk");
-        // var vtk = new THREE.VTKLoader();
-        
-        // vtk.load(config.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+config.jwt, geometry => {
-        //     var material = new THREE.MeshLambertMaterial({color: 0xcc9966});
-        //     //var material = new THREE.MeshBasicMaterial();
-        //     var mesh = new THREE.Mesh( geometry, material );
-        //     mesh.rotation.x = -Math.PI/2;
-        //     scene.add(mesh);
-        // });
-        // //load right
-        // var path = encodeURIComponent(base+"/rh.10.vtk");
-        
-        // vtk.load(config.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+config.jwt, geometry => {
-        //     var material = new THREE.MeshLambertMaterial({color: 0xcc9966});
-        //     //var material = new THREE.MeshBasicMaterial();
-        //     var mesh = new THREE.Mesh( geometry, material );
-        //     mesh.rotation.x = -Math.PI/2;
-        //     scene.add(mesh);
-            
-        //     console.log("loaded mesh: ", mesh);
-        // });
-        
-        //TODO - 21 might not be the correct number of tracts
-        // var afq_rid = scope.afq.resource_id;
-        // var afq_base = scope.afq.instance_id+"/"+scope.afq._id;
-        
-        for(var i = 1;i < 21;++i) {
-            //load_tract("tracts/tracts_110411/tracts."+i+".json", function(err, mesh) {
+        for(var i = 1;i <= config.num_tracts;++i) {
+            // load the tract
             var path = encodeURIComponent(base+"/tracts/"+i+".json");
-            load_tract(config.wf_api+"/resource/download?r="+rid+"&p="+path+"&at="+config.jwt, function(err, mesh) {
+            load_tract(config.wf_api+"/resource/download?r="+task.resource_id+"&p="+path+"&at="+config.jwt, function(err, mesh, res) {
                 scene.add(mesh);
+                
+                config.num_fibers += res.coords.length;
+                
+                config.tracts[res.name] = mesh;
+                
+                // when all tracts are loaded, add the toggles to the side banner
+                if (Object.keys(config.tracts).length == config.num_tracts)
+                    makeTractToggles();
             });
         }
-
+        
         renderer.autoClear = false;
         renderer.setSize(view.width(), view.height());
         view.append(renderer.domElement);
+
+        brainRenderer.autoClear = false;
+        brainRenderer.setSize(tinyBrain.width(), tinyBrain.height());
+        tinyBrain.append(brainRenderer.domElement);
 
         //use OrbitControls and make camera light follow camera position
         var controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -129,16 +139,201 @@ $(document).ready(() => {
         });
         function animate_conview() {
             controls.update();
-
+            
             renderer.clear();
             renderer.clearDepth();
             renderer.render( scene, camera );
-            //renderer.render( scene, camera );
+            
+            // handle display of the tiny brain preview
+            if (tinyBrainScene) {
+                // normalize the main camera's position so that the tiny brain camera is always the same distance away from <0, 0, 0>
+                var pan = controls.getPanOffset();
+                var pos3 = new THREE.Vector3(camera.position.x - pan.x, camera.position.y - pan.y, camera.position.z - pan.z).normalize();
+                brainCam.position.set(pos3.x * 10, pos3.y * 10, pos3.z * 10);
+                brainCam.rotation.copy(camera.rotation);
+                
+                brainlight.position.copy(brainCam.position);
+                
+                brainRenderer.clear();
+                brainRenderer.render(tinyBrainScene, brainCam);
+            }
 
             requestAnimationFrame( animate_conview );
         }
         
         animate_conview();
+    }
+    
+    // add tract toggles to side panel
+    function makeTractToggles() {
+        // sort + make non-LR based tracts appear first
+        var keys = Object.keys(config.tracts).sort((a, b) => {
+            var a_has_lr = a.endsWith(" L") || a.endsWith(" R");
+            var b_has_lr = b.endsWith(" L") || b.endsWith(" R");
+            
+            if (a_has_lr && !b_has_lr) return 1;
+            if (!a_has_lr && b_has_lr) return -1;
+            
+            if (a > b) return 1;
+            if (a == b) return 0;
+            return -1;
+        });
+        for (var i = 0; i < keys.length; ++i) {
+            var name = keys[i];
+            if (!name.endsWith(" L") && !name.endsWith(" R")) {
+                keys.splice(boundary, 0, keys.splice(i, 1)[0]);
+                ++boundary;
+            }
+        }
+        
+        // group together tract names in the following way:
+        // tractName -> { left: tractNameLeft, right: tractNameRight }
+        // or tractName -> {} if there are no children
+        LRtractNames['All'] = {};
+        keys.forEach(tractName => {
+            var rawName = tractName.replace(/ [LR]/g, "");
+            if (rawName != tractName) {
+                LRtractNames[rawName] = LRtractNames[rawName] || {};
+                if (tractName.endsWith(" L")) LRtractNames[rawName].left = { name: tractName };
+                else LRtractNames[rawName].right = { name: tractName };
+            }
+            else LRtractNames[rawName] = {};   // standalone, not left or right
+        });
+        
+        // add the toggles to controls
+        for (var tractName in LRtractNames) {
+            var subTracts = LRtractNames[tractName], li;
+            if (!Object.keys(subTracts).length) {
+                li = makeToggle(tractName);
+                LRtractNames[tractName].checkbox = li.checkbox;
+            }
+            else {
+                let li_left = makeToggle(subTracts.left.name);
+                let li_right = makeToggle(subTracts.right.name);
+                let tr = $("<tr/>"),
+                    left_cell = $("<td/>"),
+                    right_cell = $("<td/>");
+                li = $("<li/>"),
+                
+                li.addClass("parent table");
+                li_left.wrapper.addClass("toggle-switch");
+                li_right.wrapper.addClass("toggle-switch");
+                
+                left_cell.append(li_left.wrapper);
+                right_cell.append(li_right.wrapper);
+                tr.append([left_cell, right_cell])
+                li.append(tr)
+                
+                LRtractNames[tractName].left.checkbox = li_left.checkbox;
+                LRtractNames[tractName].right.checkbox = li_right.checkbox;
+            }
+            tract_toggles_el.append(li);
+        }
+        
+        // configure hiding/showing the panel
+        hide_show_text_el.text('Hide Controls');
+        hide_show_el.on("click", e => {
+            if (container_toggles.css('opacity') == '0') {
+                container_toggles.css({ 'max-width': '500px', 'opacity': 1 });
+                controls_el.css({ 'overflow-y': 'auto' });
+                hide_show_text_el.text('Hide Controls');
+            }
+            else {
+                hide_show_el.css('min-height', container_toggles.height() + 'px');
+                container_toggles.css({ 'max-width': '0px', 'opacity': 0 });
+                controls_el.css({ 'overflow-y': 'hidden' });
+                hide_show_text_el.text('Show Controls');
+            }
+        });
+    }
+    
+    function makeToggle(tractName, options) {
+        options = options || {};
+        
+            // parents
+        let li = $("<li/>"),
+            wrapper = $("<span/>"),
+            switch_el = $("<span/>"),
+            // text next to the checkbox
+            label = $("<label/>"),
+            // checkbox
+            input = $("<input/>"),
+            input_label = $("<label/>");
+        
+        li.addClass("parent");
+        
+        // item that contains the name of the tract as well as the toggle
+        wrapper.addClass("toggle-switch");
+        wrapper.on("mouseenter", e => {
+            label.addClass("active");
+            if (tractName != "All") {
+                config.tracts[tractName]._restore = {
+                    color: config.tracts[tractName].material.color,
+                    visible: config.tracts[tractName].visible
+                };
+                // make the tract white and visible
+                config.tracts[tractName].material.color = new THREE.Color(1, 1, 1);
+                config.tracts[tractName].visible = true;
+            }
+        });
+        wrapper.on("mouseleave", e => {
+            label.removeClass("active");
+            if (tractName != "All") {
+                config.tracts[tractName].material.color = config.tracts[tractName]._restore.color;
+                config.tracts[tractName].visible = config.tracts[tractName]._restore.visible;
+            }
+        });
+        
+        // text that appears beside the toggle switch
+        var switchText = tractName;
+        if (switchText == 'All')
+            switchText += ` (Fibers: ${config.num_fibers})`;
+        label.text(switchText);
+        label.attr({'title': tractName, 'for': tractName});
+        label.addClass("identifier");
+        
+        // the toggle switch itself
+        switch_el.addClass("material-switch");
+        input.attr({'type': 'checkbox','id': tractName, 'checked': true});
+        input.on('change', e => {
+            if (e.target.checked) wrapper.removeClass("disabled");
+            else wrapper.addClass("disabled");
+            
+            if (tractName == "All") Object.keys(LRtractNames).forEach(key =>  {
+                if (key == 'All') return;
+                var subTracts = LRtractNames[key];
+                
+                if (subTracts.checkbox) {
+                    if (subTracts.checkbox.checked != e.target.checked) subTracts.checkbox.click();
+                }
+                else {
+                    var checkboxLeft = LRtractNames[key].left.checkbox,
+                        checkboxRight = LRtractNames[key].right.checkbox;
+                    
+                    if (checkboxLeft.checked != e.target.checked) checkboxLeft.click();
+                    if (checkboxRight.checked != e.target.checked) checkboxRight.click();
+                }
+            } );
+            else {
+                config.tracts[tractName].visible = e.target.checked;
+                config.tracts[tractName]._restore.visible = e.target.checked;
+            }
+        });
+        input_label.addClass("label-default");
+        input_label.attr('for', tractName);
+        
+        switch_el.append([input, input_label]);
+        
+        // wrapper div to avoid word wrap issues
+        wrapper.addClass("wrapper");
+        
+        wrapper.append([label, switch_el]);
+        li.append(wrapper);
+        
+        if (tractName == 'all') li.addClass("all");
+        li.checkbox = input[0];
+        li.wrapper = wrapper;
+        return li;
     }
     
     function load_tract(path, cb) {
@@ -182,7 +377,7 @@ $(document).ready(() => {
             mesh.position.z = -20;
             mesh.position.y = -20;
 
-            cb(null, mesh);
+            cb(null, mesh, res);
         });
     }
     
