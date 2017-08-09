@@ -79,3 +79,18 @@ $(function(){
     ]
 }
 ```
+
+If you are generating an output from AFQ in Matlab, you can use savejson and a script similar to the following in order to create a list of output json files:
+
+```
+[fg_classified,~,classification] = AFQ_SegmentFiberGroups(config.dt6, fg, [], [], false);
+tracts = fg2Array(fg_classified);
+mkdir('tracts');
+cm = parula(length(tracts));
+for it = 1:length(tracts)
+  tract.name   = tracts(it).name;
+  tract.color  = cm(it,:);
+  tract.coords = tracts(it).fibers;
+  savejson('', tract, fullfile('tracts',sprintf('%i.json',it)));
+end
+```
