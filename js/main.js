@@ -10,7 +10,7 @@ $(function() {
         jwt: localStorage.getItem('jwt'),
         num_tracts: 20,
         
-        debug: false,
+        debug: true,
     };
     
     if (!config.jwt)
