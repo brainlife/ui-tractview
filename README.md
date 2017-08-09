@@ -1,7 +1,7 @@
 # ui-tractview
 HTML5 Tract Viewer - Used to visualize output from AFQ
 
-![Preview Image](https://raw.githubusercontent.com/stevengeeky/ui-tractview/modular/images/preview.png)
+![Preview Image](https://raw.githubusercontent.com/stevengeeky/ui-tractview/master/images/preview.png)
 
 ## Install
 
