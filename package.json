@@ -1,6 +1,6 @@
 {
   "name": "ui-tractview",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "tracts viewer",
   "main": "undefined",
   "scripts": {
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
     "three": "^0.86.0"
   }
 }
