@@ -422,161 +422,157 @@ var TractView = {
         }
         
         function populateHtml(element) {
-            element.html(`<div style="display:inline-block;width:100%;height:100%;overflow:hidden;">
-                <div class="container">
-                    <!-- Main Connectome View -->
-                    <div id="conview" class="conview"></div>
-                    
-                    <!-- Tiny Brain to Show Orientation -->
-                    <div id="tinybrain" class="tinybrain"></div>
-                    
-                    <div id="controls" class="controls">
-                        <div style="display:flex;">
-                            <!-- Hide/Show Panel -->
-                            <div id="hide_show" class="hide_show">
-                                <div class="table">
-                                    <div class="cell">
-                                        <div class="rotated" id="hide_show_text"></div>
-                                    </div>
+            element.html(`
+            <div class="container">
+                <!-- Main Connectome View -->
+                <div id="conview" class="conview"></div>
+                
+                <!-- Tiny Brain to Show Orientation -->
+                <div id="tinybrain" class="tinybrain"></div>
+                
+                <div id="controls" class="controls">
+                    <div style="display:flex;">
+                        <!-- Hide/Show Panel -->
+                        <div id="hide_show" class="hide_show">
+                            <div class="table">
+                                <div class="cell">
+                                    <div class="rotated" id="hide_show_text"></div>
                                 </div>
                             </div>
-                            
-                            <!-- Fascicle Toggling -->
-                            <div class="container_toggles" id="container_toggles">
-                                <table class="tract_toggles" id="tract_toggles"></table>
-                            </div>
+                        </div>
+                        
+                        <!-- Fascicle Toggling -->
+                        <div class="container_toggles" id="container_toggles">
+                            <table class="tract_toggles" id="tract_toggles"></table>
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <style scoped>
+                .container {
+                    width: 100%;
+                    height: 100%;
+                    padding: 0px;
+                }
+                .conview {
+                    width:100%;
+                    height: 100%;
+                    background:black;
+                }
+                .tinybrain {
+                    position:absolute;
+                    pointer-events:none;
+                    left:0;
+                    bottom:0;
+                    width:100px;
+                    height:100px;
+                }
                 
-                <style scoped>
-                    .container {
-                        display:inline-block;
-                        position:relative;
-                        width:100%;
-                        height:100%;
-                        overflow:hidden;
-                        background:black;
-                    }
-                    .conview {
-                        display:inline-block;
-                        width:100%;
-                        height:100%;
-                    }
-                    
-                    .tinybrain {
-                        position:absolute;
-                        pointer-events:none;
-                        left:0;
-                        bottom:0;
-                        width:64px;
-                        height:64px;
-                    }
-                    
-                    .controls {
-                        display:inline-block;
-                        position:absolute;
-                        right:0;
-                        top:0;
-                        width:auto;
-                        height:auto;
-                        max-height:100%;
-                        padding-left:1px;
-                        overflow-x:hidden;
-                        overflow-y:auto;
-                        white-space:nowrap;
-                        font-family:Roboto;
-                        font-size:12px;
-                        background:rgba(0, 0, 0, .7);
-                    }
-                    
-                    .hide_show {
-                        display:inline-block;
-                        position:relative;
-                        vertical-align:top;
-                        text-align:left;
-                        width:auto;
-                        flex:1;
-                        color: #777;
-                        overflow:hidden;
-                        cursor:default;
-                        transition:background 1s, color 1s;
-                    }
-                    .hide_show:hover {
-                        background:black;
-                        color:white;
-                    }
-                    
-                    /* Hide/Show Vertical Alignment */
-                    .parent {
-                        padding-right:4px;
-                    }
-                    .list-group-item.table {
-                        height:auto !important;
-                    }
-                    .table {
-                        display:table;
-                        height:100%;
-                        margin-bottom:0 !important;
-                    }
-                    .cell {
-                        display:table-cell;
-                        vertical-align:middle;
-                    }
-                    
-                    .hide_show .rotated {
-                        display:inline-block;
-                        min-width:16px;
-                        max-width:16px;
-                        vertical-align:middle;
-                        transform:rotate(-90deg);
-                    }
-                    
-                    .container_toggles {
-                        display:inline-block;
-                        max-width:500px;
-                        width:auto;
-                        height:auto;
-                        padding-top:2px;
-                        overflow:hidden;
-                        transition:max-width .5s, opacity .5s, padding .5s;
-                    }
-                    
-                    label {
-                        font-weight:100;
-                        font-size:12px;
-                    }
-                    tr.header {
-                        color:white;
-                        text-align:center;
-                        margin:0;
-                    }
-                    tr.header label {
-                        margin-right:4px;
-                        cursor:pointer;
-                    }
-                    
-                    input[type="checkbox"] {
-                        vertical-align:middle;
-                        margin:0;
-                        cursor:pointer;
-                    }
-                    
-                    td.label {
-                        text-overflow:ellipsis;
-                    }
-                    
-                    tr.row.disabled {
-                        opacity:.5;
-                    }
-                    tr.row label {
-                        color:#ccc;
-                    }
-                    tr.row.active label {
-                        color:#fff;
-                    }
-                </style>
-            </div>`);
+                .controls {
+                    display:inline-block;
+                    position:absolute;
+                    right:0;
+                    top:0;
+                    width:auto;
+                    height:auto;
+                    max-height:100%;
+                    padding-left:1px;
+                    overflow-x:hidden;
+                    overflow-y:auto;
+                    white-space:nowrap;
+                    font-family:Roboto;
+                    font-size:12px;
+                    background:rgba(0, 0, 0, .7);
+                }
+                
+                .hide_show {
+                    display:inline-block;
+                    position:relative;
+                    vertical-align:top;
+                    text-align:left;
+                    width:auto;
+                    flex:1;
+                    color: #777;
+                    overflow:hidden;
+                    cursor:default;
+                    transition:background 1s, color 1s;
+                }
+                .hide_show:hover {
+                    background:black;
+                    color:white;
+                }
+                
+                /* Hide/Show Vertical Alignment */
+                .parent {
+                    padding-right:4px;
+                }
+                .list-group-item.table {
+                    height:auto !important;
+                }
+                .table {
+                    display:table;
+                    height:100%;
+                    margin-bottom:0 !important;
+                }
+                .cell {
+                    display:table-cell;
+                    vertical-align:middle;
+                }
+                
+                .hide_show .rotated {
+                    display:inline-block;
+                    min-width:16px;
+                    max-width:16px;
+                    vertical-align:middle;
+                    transform:rotate(-90deg);
+                }
+                
+                .container_toggles {
+                    display:inline-block;
+                    max-width:500px;
+                    width:auto;
+                    height:auto;
+                    padding-top:2px;
+                    overflow:hidden;
+                    transition:max-width .5s, opacity .5s, padding .5s;
+                }
+                
+                label {
+                    font-weight:100;
+                    font-size:12px;
+                }
+                tr.header {
+                    color:white;
+                    text-align:center;
+                    margin:0;
+                }
+                tr.header label {
+                    margin-right:4px;
+                    cursor:pointer;
+                }
+                
+                input[type="checkbox"] {
+                    vertical-align:middle;
+                    margin:0;
+                    cursor:pointer;
+                }
+                
+                td.label {
+                    text-overflow:ellipsis;
+                }
+                
+                tr.row.disabled {
+                    opacity:.5;
+                }
+                tr.row label {
+                    color:#ccc;
+                }
+                tr.row.active label {
+                    color:#fff;
+                }
+            </style>
+            `);
         }
     }
     

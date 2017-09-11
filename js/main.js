@@ -10,7 +10,10 @@ $(function() {
         jwt: localStorage.getItem('jwt'),
         num_tracts: 20,
         
-        debug: true,
+        // to be set later
+        num_fibers: 0,
+        tracts: {},     // toggle on/off fascicles
+        debug: false,
     };
     
     if (!config.jwt)
