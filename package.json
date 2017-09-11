@@ -1,6 +1,6 @@
 {
   "name": "ui-tractview",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "tracts viewer",
   "main": "undefined",
   "scripts": {
@@ -19,7 +19,11 @@
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
     "bootstrap": "^3.3.7",
+<<<<<<< HEAD
     "panning-orbit-controls": "^1.0.0",
+=======
+    "jquery": "^3.2.1",
+>>>>>>> c1084029981eb3da15026a4c46998b69d19d1906
     "three": "^0.86.0"
   }
 }
