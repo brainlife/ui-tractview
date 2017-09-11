@@ -19,6 +19,7 @@
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "panning-orbit-controls": "^1.0.0",
     "three": "^0.86.0"
   }
 }
