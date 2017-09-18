@@ -1,6 +1,3 @@
-/**
- * UI to display output surface from tract classification using THREE.js
- */
 
 var TractView = {
     
@@ -8,26 +5,22 @@ var TractView = {
      * Inits the tractography viewer
      * 
      * @param {String} config.selector -> Query selector for the element that will contain the tractview control
-     * @param {Number} config.num_tracts -> Number of tracts to be loaded
-     * @param {Function} config.get_json_file -> Function that returns the path to the json file containing a tract, given the tract number
+     * @param {Object[]} config.tracts -> Array containing name,color,and url for each tracts to load
      * 
      * (Optional)
      * @param {String} config.preview_scene_path -> Path to the scene to use which portrays the orientation of the brain
      */
     init: function(config) {
-        if (!config)
-            throw "Error: No config provided";
+        if (!config) throw "Error: No config provided";
+        
         // set up for later
-        config.tracts = {};
         config.num_fibers = 0;
         config.LRtractNames = {};
         
         if (typeof config.selector != 'string')
             throw "Error: config.selector not provided or not set to a string";
-        if (typeof config.num_tracts != 'number')
-            throw "Error: config.num_tracts not provided or not set to a number";
-        if (typeof config.get_json_file != 'function')
-            throw "Error: config.get_json_file not provided or not set to a function";
+        if (typeof config.tracts != 'object')
+            throw "Error: config.tracts not provided";
         
         var user_container = $(config.selector);
         if (user_container.length == 0)
@@ -48,12 +41,8 @@ var TractView = {
         function init_conview() {
             var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
             var brainRenderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
-            //renderer.setClearColor(0xffffff, 0);
 
-            //scenes - back scene for brain siluet
             var scene = new THREE.Scene();
-            
-            //scene_back.background = new THREE.Color(0x333333);
             
             //camera
             var camera = new THREE.PerspectiveCamera( 45, view.width() / view.height(), 1, 5000);
@@ -93,21 +82,165 @@ var TractView = {
                     tinyBrainScene.add(brainlight);
                 });
             }
+
+            // sort + make non-LR based tracts appear first
+            config.tracts.sort((_a, _b) => {
+                var a = _a.name;
+                var b = _b.name;
+                var a_has_lr = isLeftTract(a) || isRightTract(a);
+                var b_has_lr = isLeftTract(b) || isRightTract(b);
+                
+                if (a_has_lr && !b_has_lr) return 1;
+                if (!a_has_lr && b_has_lr) return -1;
+                
+                if (a > b) return 1;
+                if (a == b) return 0;
+                return -1;
+            });
+
+            // make 'All' button that toggles everything on/off
+            var checkbox_all = $('<input type="checkbox" id="checkbox_all" checked />');
+            checkbox_all.on('change', e => {
+                for (let tractName in config.LRtractNames) {
+                    let toggle = config.LRtractNames[tractName];
+                    if (toggle.left) {
+                        if (toggle.left.checkbox[0].checked != e.target.checked) toggle.left.checkbox.click();
+                        if (toggle.right.checkbox[0].checked != e.target.checked) toggle.right.checkbox.click();
+                    }
+                    else {
+                        if (toggle.checkbox[0].checked != e.target.checked) toggle.checkbox.click();
+                    }
+                }
+            });
             
-            for(var i = 1;i <= config.num_tracts;++i) {
-                // load the tract
-                load_tract(config.get_json_file(i), function(err, mesh, res) {
-                    scene.add(mesh);
+            // add header toggles to controls
+            tract_toggles_el.append(
+                $('<tr/>').addClass('header').append([
+                    $('<td><label class="all" for="checkbox_all">All</label></td>').append(checkbox_all),
+                    $('<td><label>Left</label></td>'),
+                    $('<td><label>Right</label></td>')
+                ])
+            );
+            
+            // group together tract names in the following way:
+            // tractName -> { left: {tractNameLeft, mesh}, right: {tractNameRight, mesh} }
+            // or tractName -> {mesh} if there are no children
+            config.tracts.forEach(tract=>{
+
+                //convert color array to THREE.Color
+                tract.color = new THREE.Color(tract.color[0], tract.color[1], tract.color[2]);
+
+                var rawName = tract.name.replace(/ [LR]$|^(Left|Right) /g, "");
+                if (rawName != tract.name) {
+                    config.LRtractNames[rawName] = config.LRtractNames[rawName] || {};
+                    if (isLeftTract(tract.name)) config.LRtractNames[rawName].left = tract;
+                    else config.LRtractNames[rawName].right = tract;
+                }
+                else config.LRtractNames[rawName] = tract;   // standalone, not left or right
+            });
+            
+            // add tract toggles to controls
+            for (let tractName in config.LRtractNames) {
+                let subTracts = config.LRtractNames[tractName];
+                
+                // toggles that only have a name and a single checkbox
+                if (!~Object.keys(subTracts).indexOf('left')) {
+                    var row = makeToggle(tractName, {
+                        hideRightToggle: true,
+                        onchange_left: (left_checked) => {
+                            subTracts.mesh.visible = left_checked;
+                            subTracts._restore.visible = left_checked;
+                            
+                            if (!left_checked) row.addClass('disabled');
+                            else row.removeClass('disabled');
+                        },
+                        onmouseenter: e => {
+                            subTracts.mesh.visible = true;
+                            subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
+                        },
+                        onmouseleave: e => {
+                            var restore = config.LRtractNames[tractName]._restore;
+                            subTracts.mesh.visible = restore.visible;
+                            subTracts.mesh.material.color = restore.color;
+                        }
+                    });
                     
-                    config.num_fibers += res.coords.length;
+                    subTracts.checkbox = row.checkbox_left;
+                    subTracts._restore = {
+                        visible: true,
+                        color: subTracts.color,
+                    };
+                } else {
+                    // toggles that have both L + R checkboxes, almost the same as code above, just done twice
+                    let left = subTracts.left;
+                    let right = subTracts.right;
+
+                    var row = makeToggle(tractName, {
+                        onchange_left: (left_checked, none_checked) => {
+                            left.mesh.visible = left_checked;
+                            left._restore.visible = left_checked;
+                            if (none_checked) row.addClass('disabled');
+                            else row.removeClass('disabled');
+                        },
+                        onchange_right: (right_checked, none_checked) => {
+                            right.mesh.visible = right_checked;
+                            right._restore.visible = right_checked;
+                            if (none_checked) row.addClass('disabled');
+                            else row.removeClass('disabled');
+                        },
+                        onmouseenter: e => {
+                            left.mesh.visible = true;
+                            left.mesh.material.color = new THREE.Color(1, 1, 1);
+                            right.mesh.visible = true;
+                            right.mesh.material.color = new THREE.Color(1, 1, 1);
+                        },
+                        onmouseleave: e => {
+                            left.mesh.visible = left._restore.visible;
+                            left.mesh.material.color = left._restore.color;
+                            right.mesh.visible = right._restore.visible;
+                            right.mesh.material.color = right._restore.color;
+                        }
+                    });
                     
-                    config.tracts[res.name] = mesh;
+                    left.checkbox = row.checkbox_left;
+                    left._restore = {
+                        visible: true,
+                        color: subTracts.left.color, 
+                    };
                     
-                    // when all tracts are loaded, add the toggles to the side banner
-                    if (Object.keys(config.tracts).length == config.num_tracts)
-                        makeTractToggles();
-                });
+                    right.checkbox = row.checkbox_right;
+                    right._restore = {
+                        visible: true, 
+                        color: subTracts.right.color,
+                    };
+                }
+                tract_toggles_el.append(row);
             }
+            
+            // configure hiding/showing the panel
+            hide_show_text_el.text('Hide Controls');
+            hide_show_el.on("click", e => {
+                if (container_toggles.css('opacity') == '0') {
+                    container_toggles.css({ 'max-width': '500px', 'opacity': 1 });
+                    controls_el.css({ 'overflow-y': 'auto' });
+                    hide_show_text_el.text('Hide Controls');
+                }
+                else {
+                    hide_show_el.css('min-height', container_toggles.height() + 'px');
+                    container_toggles.css({ 'max-width': '0px', 'opacity': 0 });
+                    controls_el.css({ 'overflow-y': 'hidden' });
+                    hide_show_text_el.text('Show Controls');
+                }
+            });
+            
+            // start loading the tract
+            config.tracts.forEach(tract=>{
+                load_tract(tract, function(err, mesh, res) {
+                    scene.add(mesh);
+                    config.num_fibers += res.coords.length;
+                    tract.mesh = mesh;
+                });
+            });
             
             renderer.autoClear = false;
             renderer.setSize(view.width(), view.height());
@@ -152,159 +285,6 @@ var TractView = {
             }
             
             animate_conview();
-        }
-        
-        // add tract toggles to side panel
-        function makeTractToggles() {
-            // sort + make non-LR based tracts appear first
-            var keys = Object.keys(config.tracts).sort((a, b) => {
-                var a_has_lr = isLeftTract(a) || isRightTract(a);
-                var b_has_lr = isLeftTract(b) || isRightTract(b);
-                
-                if (a_has_lr && !b_has_lr) return 1;
-                if (!a_has_lr && b_has_lr) return -1;
-                
-                if (a > b) return 1;
-                if (a == b) return 0;
-                return -1;
-            });
-            
-            // group together tract names in the following way:
-            // tractName -> { left: {tractNameLeft, mesh}, right: {tractNameRight, mesh} }
-            // or tractName -> {mesh} if there are no children
-            keys.forEach(tractName => {
-                var rawName = tractName.replace(/ [LR]$|^(Left|Right) /g, "");
-                if (rawName != tractName) {
-                    config.LRtractNames[rawName] = config.LRtractNames[rawName] || {};
-                    if (isLeftTract(tractName)) config.LRtractNames[rawName].left = { name: tractName, mesh: config.tracts[tractName] };
-                    else config.LRtractNames[rawName].right = { name: tractName, mesh: config.tracts[tractName] };
-                }
-                else config.LRtractNames[rawName] = { mesh: config.tracts[tractName] };   // standalone, not left or right
-            });
-            
-            // make 'All' button that toggles everything on/off
-            var checkbox_all = $('<input type="checkbox" id="checkbox_all" checked />');
-            checkbox_all.on('change', e => {
-                for (let tractName in config.LRtractNames) {
-                    let toggle = config.LRtractNames[tractName];
-                    if (toggle.left) {
-                        if (toggle.left.checkbox[0].checked != e.target.checked) toggle.left.checkbox.click();
-                        if (toggle.right.checkbox[0].checked != e.target.checked) toggle.right.checkbox.click();
-                    }
-                    else {
-                        if (toggle.checkbox[0].checked != e.target.checked) toggle.checkbox.click();
-                    }
-                }
-            });
-            
-            // add header toggles to controls
-            tract_toggles_el.append(
-                $('<tr/>').addClass('header').append([
-                    $('<td><label class="all" for="checkbox_all">All</label></td>').append(
-                        checkbox_all),
-                    $('<td><label>Left</label></td>'),
-                    $('<td><label>Right</label></td>')
-            ]));
-            
-            // add tract toggles to controls
-            for (let tractName in config.LRtractNames) {
-                let subTracts = config.LRtractNames[tractName], row;
-                
-                // toggles that only have a name and a single checkbox
-                if (!~Object.keys(subTracts).indexOf('left')) {
-                    row = makeToggle(tractName, {
-                        hideRightToggle: true,
-                        onchange_left: (left_checked) => {
-                            // set up restore variables for hiding/showing later
-                            config.LRtractNames[tractName].mesh.visible = left_checked;
-                            config.LRtractNames[tractName]._restore.visible = left_checked;
-                            
-                            if (!left_checked) row.addClass('disabled');
-                            else row.removeClass('disabled');
-                        },
-                        onmouseenter: e => {
-                            config.LRtractNames[tractName].mesh.visible = true;
-                            config.LRtractNames[tractName].mesh.material.color = new THREE.Color(1, 1, 1);
-                        },
-                        onmouseleave: e => {
-                            var restore = config.LRtractNames[tractName]._restore;
-                            config.LRtractNames[tractName].mesh.visible = restore.visible;
-                            config.LRtractNames[tractName].mesh.material.color = restore.color;
-                        }
-                    });
-                    
-                    config.LRtractNames[tractName].checkbox = row.checkbox_left;
-                    config.LRtractNames[tractName]._restore = {
-                        visible: subTracts.mesh.visible,
-                        color: subTracts.mesh.material.color
-                    };
-                }
-                // toggles that have both L + R checkboxes, almost the same as code above, just done twice
-                else {
-                    row = makeToggle(tractName, {
-                        onchange_left: (left_checked, none_checked) => {
-                            config.LRtractNames[tractName].left.mesh.visible = left_checked;
-                            config.LRtractNames[tractName].left._restore.visible = left_checked;
-                            
-                            if (none_checked) row.addClass('disabled');
-                            else row.removeClass('disabled');
-                        },
-                        onchange_right: (right_checked, none_checked) => {
-                            config.LRtractNames[tractName].right.mesh.visible = right_checked;
-                            config.LRtractNames[tractName].right._restore.visible = right_checked;
-                            
-                            if (none_checked) row.addClass('disabled');
-                            else row.removeClass('disabled');
-                        },
-                        onmouseenter: e => {
-                            config.LRtractNames[tractName].left.mesh.visible = true;
-                            config.LRtractNames[tractName].left.mesh.material.color = new THREE.Color(1, 1, 1);
-                            
-                            config.LRtractNames[tractName].right.mesh.visible = true;
-                            config.LRtractNames[tractName].right.mesh.material.color = new THREE.Color(1, 1, 1);
-                        },
-                        onmouseleave: e => {
-                            var restore_left = config.LRtractNames[tractName].left._restore,
-                                restore_right = config.LRtractNames[tractName].right._restore;
-                            
-                            config.LRtractNames[tractName].left.mesh.visible = restore_left.visible;
-                            config.LRtractNames[tractName].left.mesh.material.color = restore_left.color;
-                            
-                            config.LRtractNames[tractName].right.mesh.visible = restore_right.visible;
-                            config.LRtractNames[tractName].right.mesh.material.color = restore_right.color;
-                        }
-                    });
-                    
-                    config.LRtractNames[tractName].left.checkbox = row.checkbox_left;
-                    config.LRtractNames[tractName].left._restore = {
-                        visible: subTracts.left.mesh.visible,
-                        color: subTracts.left.mesh.material.color
-                    };
-                    
-                    config.LRtractNames[tractName].right.checkbox = row.checkbox_right;
-                    config.LRtractNames[tractName].right._restore = {
-                        visible: subTracts.right.mesh.visible,
-                        color: subTracts.right.mesh.material.color
-                    };
-                }
-                tract_toggles_el.append(row);
-            }
-            
-            // configure hiding/showing the panel
-            hide_show_text_el.text('Hide Controls');
-            hide_show_el.on("click", e => {
-                if (container_toggles.css('opacity') == '0') {
-                    container_toggles.css({ 'max-width': '500px', 'opacity': 1 });
-                    controls_el.css({ 'overflow-y': 'auto' });
-                    hide_show_text_el.text('Hide Controls');
-                }
-                else {
-                    hide_show_el.css('min-height', container_toggles.height() + 'px');
-                    container_toggles.css({ 'max-width': '0px', 'opacity': 0 });
-                    controls_el.css({ 'overflow-y': 'hidden' });
-                    hide_show_text_el.text('Show Controls');
-                }
-            });
         }
         
         // helper method for making toggles
@@ -365,16 +345,11 @@ var TractView = {
             return row;
         }
         
-        function load_tract(path, cb) {
-            //console.log("loading tract "+path);
-            //$scope.loading = true;
-            $.get(path, res => {
-                var name = res.name;
-                var color = res.color;
+        function load_tract(tract, cb) {
+            $.get(tract.url, res => {
                 var bundle = res.coords;
 
                 var threads_pos = [];
-                //bundle = [bundle[0]];
                 bundle.forEach(function(fascicle) {
                     
                     if (fascicle[0] instanceof Array)
@@ -398,16 +373,12 @@ var TractView = {
                 var geometry = new THREE.BufferGeometry();
                 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3 ) );
                 var material = new THREE.LineBasicMaterial( {
-                    color: new THREE.Color(color[0], color[1], color[2]),
+                    color: tract.color,
                     transparent: true,
                     opacity: 0.7,
                 } );
                 var mesh = new THREE.LineSegments( geometry, material );
                 mesh.rotation.x = -Math.PI/2;
-                //temporarly hack to fit fascicles inside
-                //mesh.position.z = -20;
-                //mesh.position.y = -20;
-
                 cb(null, mesh, res);
             });
         }
