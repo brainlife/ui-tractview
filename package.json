@@ -21,6 +21,9 @@
     "@types/jquery": "^3.2.12",
     "bootstrap": "^3.3.7",
     "jquery": "^3.2.1",
+    "ndarray": "^1.0.18",
+    "nifti-js": "^1.0.1",
+    "pako": "^1.0.6",
     "panning-orbit-controls": "^1.0.0",
     "three": "^0.86.0"
   }
