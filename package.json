@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
-    "@types/jquery": "^3.2.12",
+    "@types/jquery": "^3.2.16",
     "bootstrap": "^3.3.7",
     "jquery": "^3.2.1",
     "ndarray": "^1.0.18",
@@ -26,6 +26,6 @@
     "pako": "^1.0.6",
     "panning-orbit-controls": "^1.0.0",
     "plotly.js": "^1.31.2",
-    "three": "^0.86.0"
+    "three": "^0.88.0"
   }
 }
