@@ -1,29 +1,29 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var TractView = require('./tractview.js');
+$(function() {
+    var TractView = require('./tractview.js');
+    var jwt = localStorage.getItem('jwt');
+    var config = window.config || window.parent.config;
+    if(localStorage.getItem('debug_config')) {
+        config = JSON.parse(localStorage.getItem("debug_config"));
+       //debug: let datauis/wmc view create a debug config
+    }
 
-var jwt = localStorage.getItem('jwt');
-var config = window.config
-
-if(localStorage.getItem('debug_config')) {
-    config = JSON.parse(localStorage.getItem("debug_config"));
-   //debug: let datauis/wmc view create a debug config
-}
-
-//set token for each tracts/layers
-config.tracts.forEach(tract=>{
-    tract.url += "&at="+jwt;
-});
-config.layers.forEach(layer=>{
-    layer.url += "&at="+jwt;
-});
-console.dir(config);
-TractView.init({
-    selector: '#tractview',
-    preview_scene_path: 'models/brain.json',
-    tracts: config.tracts,
-    niftis: config.layers,
+    //set token for each tracts/layers
+    config.tracts.forEach(tract=>{
+        tract.url += "&at="+jwt;
+    });
+    if(config.layer) config.layers.forEach(layer=>{
+        layer.url += "&at="+jwt;
+    });
+    console.dir(config);
+    TractView.init({
+        selector: '#tractview',
+        preview_scene_path: 'models/brain.json',
+        tracts: config.tracts,
+        niftis: config.layers,
+    });
 });
 
 },{"./tractview.js":2}],2:[function(require,module,exports){
@@ -62,7 +62,7 @@ var TractView = {
         
         var user_container = $(config.selector);
         if (user_container.length == 0)
-            throw `Error: Selector '${selector}' did not match any elements`;
+            throw `Error: Selector '${config.selector}' did not match any elements`;
         
         populateHtml(user_container);
         
