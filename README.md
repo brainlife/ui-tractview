@@ -19,9 +19,9 @@ Include script dependencies in your index.html file:
 <script type="text/javascript" src="node_modules/three/build/three.min.js"></script>
 <script type="text/javascript" src="node_modules/three/examples/js/loaders/VTKLoader.js"></script>
 <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="node_modules/panning-orbit-controls/dist/panning-orbit-controls.js">
 
 <!-- Main Scripts -->
-<script type="text/javascript" src="node_modules/ui-tractview/js/OrbitControls.js"></script>
 <script type="text/javascript" src="node_modules/ui-tractview/js/tractview.js"></script>
 
 <!-- Dep Styles -->

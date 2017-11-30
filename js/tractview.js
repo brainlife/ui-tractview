@@ -1,4 +1,11 @@
 
+var ndarray = require('ndarray');
+var nifti = require('nifti-js');
+var Plotly = require('plotly.js/lib/core');
+Plotly.register([
+    require('plotly.js/lib/histogram')
+]);
+
 var TractView = {
     
     /**
@@ -12,6 +19,8 @@ var TractView = {
      */
     init: function(config) {
         if (!config) throw "Error: No config provided";
+        
+        var color_map, color_map_head, all_geometry = [], all_mesh = [], brainRotationX = -Math.PI/2;
         
         // set up for later
         config.num_fibers = 0;
@@ -28,24 +37,28 @@ var TractView = {
         
         populateHtml(user_container);
         
+        var scene, camera;
+        
         var view = user_container.find("#conview"),
             tinyBrain = user_container.find("#tinybrain"),
             controls_el = user_container.find("#controls"),
             container_toggles = user_container.find("#container_toggles"),
             tract_toggles_el = user_container.find("#tract_toggles"),
             hide_show_el = user_container.find("#hide_show"),
-            hide_show_text_el = user_container.find("#hide_show_text");
+            hide_show_text_el = user_container.find("#hide_show_text"),
+            nifti_select_el = user_container.find("#nifti_select");
         
+        create_nifti_options();
         init_conview();
         
         function init_conview() {
             var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
             var brainRenderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
-
-            var scene = new THREE.Scene();
+            
+            scene = new THREE.Scene();
             
             //camera
-            var camera = new THREE.PerspectiveCamera( 45, view.width() / view.height(), 1, 5000);
+            camera = new THREE.PerspectiveCamera( 45, view.width() / view.height(), 1, 5000);
             var brainCam = new THREE.PerspectiveCamera( 45, tinyBrain.width() / tinyBrain.height(), 1, 5000 );
             camera.position.z = 200;
             
@@ -151,8 +164,8 @@ var TractView = {
                             subTracts.mesh.visible = left_checked;
                             subTracts._restore.visible = left_checked;
                             
-                            if (!left_checked) row.addClass('disabled');
-                            else row.removeClass('disabled');
+                            // if (!left_checked) row.addClass('disabled');
+                            // else row.removeClass('disabled');
                         },
                         onmouseenter: e => {
                             subTracts.mesh.visible = true;
@@ -179,14 +192,14 @@ var TractView = {
                         onchange_left: (left_checked, none_checked) => {
                             left.mesh.visible = left_checked;
                             left._restore.visible = left_checked;
-                            if (none_checked) row.addClass('disabled');
-                            else row.removeClass('disabled');
+                            // if (none_checked) row.addClass('disabled');
+                            // else row.removeClass('disabled');
                         },
                         onchange_right: (right_checked, none_checked) => {
                             right.mesh.visible = right_checked;
                             right._restore.visible = right_checked;
-                            if (none_checked) row.addClass('disabled');
-                            else row.removeClass('disabled');
+                            // if (none_checked) row.addClass('disabled');
+                            // else row.removeClass('disabled');
                         },
                         onmouseenter: e => {
                             left.mesh.visible = true;
@@ -234,9 +247,9 @@ var TractView = {
             });
             
             // start loading the tract
-            config.tracts.forEach(tract=>{
-                load_tract(tract, function(err, mesh, res) {
-                    scene.add(mesh);
+            config.tracts.forEach((tract, i)=>{
+                load_tract(tract, i, function(err, mesh, res) {
+                    add_mesh_to_scene(mesh);
                     config.num_fibers += res.coords.length;
                     tract.mesh = mesh;
                 });
@@ -345,7 +358,7 @@ var TractView = {
             return row;
         }
         
-        function load_tract(tract, cb) {
+        function load_tract(tract, index, cb) {
             $.get(tract.url, res => {
                 var bundle = res.coords;
 
@@ -372,14 +385,13 @@ var TractView = {
                 var vertices = new Float32Array(threads_pos);
                 var geometry = new THREE.BufferGeometry();
                 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3 ) );
-                var material = new THREE.LineBasicMaterial( {
-                    color: tract.color,
-                    transparent: true,
-                    opacity: 0.7,
-                } );
-                var mesh = new THREE.LineSegments( geometry, material );
-                mesh.rotation.x = -Math.PI/2;
-                cb(null, mesh, res);
+                
+                geometry.tract = tract;
+                geometry.vertices = vertices;
+                geometry.tract_index = index;
+                all_geometry.push(geometry);
+                
+                cb(null, calculateMesh(geometry), res);
             });
         }
         
@@ -390,6 +402,173 @@ var TractView = {
         // returns whether or not the tractName is considered to be a right tract
         function isRightTract(tractName) {
             return tractName.startsWith('Right ') || tractName.endsWith(' R');
+        }
+        
+        function add_mesh_to_scene(mesh) {
+            mesh.rotation.x = brainRotationX;
+            all_mesh.push(mesh);
+            scene.add(mesh);
+        }
+        
+        function calculateMesh(geometry) {
+            
+            if (nifti_select_el.val() == 'rainbow') {
+                var vertexShader = `attribute vec3 col;
+                                    varying vec3 vColor;
+                                    
+                                    void main(){
+                                        vColor = col;
+                                        
+                                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                                    }`;
+
+                    var fragmentShader = `varying vec3 vColor;
+                                            
+                                        void main(){
+                                            gl_FragColor = vec4( vColor.rgb, 1.0 );
+                                        }`;
+
+                    var cols = [];
+                    for (var i = 0; i < geometry.vertices.length; i += 3) {
+                        var l = Math.sqrt(geometry.vertices[i] * geometry.vertices[i] + geometry.vertices[i + 1] * geometry.vertices[i + 1] + geometry.vertices[i + 2] * geometry.vertices[i + 2]);
+                        
+                        cols.push(geometry.vertices[i] / l);
+                        cols.push(geometry.vertices[i + 1] / l);
+                        cols.push(geometry.vertices[i + 2] / l);
+                    }
+                    geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 3));
+                    
+                    var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
+                        vertexShader,
+                        fragmentShader
+                    }) );
+                    config.tracts[geometry.tract_index].mesh = m;
+                    
+                    return m;
+            }
+            else if (color_map) {
+                var vertexShader = `attribute vec3 col;
+                                    varying vec3 vColor;
+                                    
+                                    void main(){
+                                        vColor = col;
+                                        
+                                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                                    }`;
+
+                var fragmentShader = `varying vec3 vColor;
+                                      
+                                      void main(){
+                                          gl_FragColor = vec4( vColor.rgb, 1.0 );
+                                      }`;
+                
+                var cols = [];
+                for (var i = 0; i < geometry.vertices.length; i += 3) {
+                    // var l = Math.sqrt(geometry.vertices[i] * geometry.vertices[i] + geometry.vertices[i + 1] * geometry.vertices[i + 1] + geometry.vertices[i + 2] * geometry.vertices[i + 2]);
+                    
+                    // cols.push(geometry.vertices[i] / l);
+                    // cols.push(geometry.vertices[i + 1] / l);
+                    // cols.push(geometry.vertices[i + 2] / l);
+                    
+                    var x__ = geometry.vertices[i],
+                        y__ = geometry.vertices[i + 1],
+                        z__ = geometry.vertices[i + 2];
+                    
+                    var x_ = x__,
+                        y_ = y__ * Math.cos(brainRotationX) - z__ * Math.sin(brainRotationX),
+                        z_ = y__ * Math.sin(brainRotationX) + z__ * Math.cos(brainRotationX);
+                    
+                    x_ = Math.floor((x_ - color_map_head.spaceOrigin[0]) / color_map_head.thicknesses[0]);
+                    y_ = Math.floor((y_ - color_map_head.spaceOrigin[1]) / color_map_head.thicknesses[2]);
+                    z_ = Math.floor((z_ - color_map_head.spaceOrigin[2]) / color_map_head.thicknesses[2]);
+                    
+                    // rotation.x = -Math.PI/2
+                    
+                    if (color_map.shape.length == 3) {
+                        var weight = Math.pow( color_map.get(x_, y_, z_), 1/6);
+                        
+                        cols.push(weight);
+                        cols.push(weight);
+                        cols.push(weight);
+                    }
+                    else if (color_map.shape.length == 4 && color_map.shape[color_map.shape.length - 1] == 3) {
+                        cols.push(color_map.get(x_, y_, z_, 0) / 255);
+                        cols.push(color_map.get(x_, y_, z_, 1) / 255);
+                        cols.push(color_map.get(x_, y_, z_, 2) / 255);
+                    }
+                    else
+                        throw `Unsupported color_map_shape: ${color_map.shape}`;
+                    
+                }
+                geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 3));
+                
+                var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
+                    vertexShader,
+                    fragmentShader
+                }) );
+                config.tracts[geometry.tract_index].mesh = m;
+                
+                return m;
+            }
+            else {
+                var m = new THREE.LineSegments( geometry, new THREE.LineBasicMaterial({
+                    color: geometry.tract.color,
+                    transparent: true,
+                    opacity: 0.7
+                }) );
+                config.tracts[geometry.tract_index].mesh = m;
+                
+                return m;
+            }    
+        }
+        
+        function recalculateMaterials() {
+            while (all_mesh.length)
+                scene.remove(all_mesh.pop());
+            
+            all_geometry.forEach(geometry => {
+                add_mesh_to_scene( calculateMesh(geometry) );
+            });
+        }
+        
+        function create_nifti_options() {
+            nifti_select_el.append($("<option/>").html("None").val('none'));
+            nifti_select_el.append($("<option/>").html("Rainboww!! :D").val('rainbow'));
+            
+            if (config.niftis) {
+                config.niftis.forEach(nifti => {
+                    nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
+                });
+                
+                nifti_select_el.on('change', function() {
+                    if (nifti_select_el.val() == 'none' || nifti_select_el.val() == 'rainbow') {
+                        color_map = undefined;
+                        recalculateMaterials();
+                        return;
+                    }
+                    
+                    fetch(nifti_select_el.val())
+                    .then(res => res.arrayBuffer())
+                    .then(function(buffer) {
+                        // console.log(nifti.parseHeader(pako.inflate(buffer)),
+                        //             nifti.parseNIfTIHeader(pako.inflate(buffer)),
+                        //             nifti.parse(pako.inflate(buffer)));
+                        
+                        var raw = pako.inflate(buffer);
+                        var N = nifti.parse(raw);
+                        
+                        color_map_head = nifti.parseHeader(raw);
+                        color_map = ndarray(N.data, N.sizes);//.slice().reverse());
+                        
+                        console.log(N, color_map_head);
+                        
+                        //color_map = N;
+                        //console.log(color_map);
+                        recalculateMaterials();
+                    })
+                    .catch(err => console.error);
+                });
+            }
         }
         
         function populateHtml(element) {
@@ -415,7 +594,13 @@ var TractView = {
                         <!-- Fascicle Toggling -->
                         <div class="container_toggles" id="container_toggles">
                             <table class="tract_toggles" id="tract_toggles"></table>
+                            
+                            <!-- Nifti Choosing -->
+                            <div class="nifti_chooser">
+                                <select id="nifti_select" class="nifti_select"></select>
+                            </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -548,3 +733,5 @@ var TractView = {
     }
     
 };
+
+module.exports = TractView;
