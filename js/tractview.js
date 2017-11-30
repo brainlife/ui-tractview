@@ -33,7 +33,7 @@ var TractView = {
         
         var user_container = $(config.selector);
         if (user_container.length == 0)
-            throw `Error: Selector '${selector}' did not match any elements`;
+            throw `Error: Selector '${config.selector}' did not match any elements`;
         
         populateHtml(user_container);
         
