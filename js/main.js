@@ -13,9 +13,10 @@ $(function() {
     config.tracts.forEach(tract=>{
         tract.url += "&at="+jwt;
     });
-    if(config.layer) config.layers.forEach(layer=>{
+    if(config.layers) config.layers.forEach(layer=>{
         layer.url += "&at="+jwt;
     });
+    console.log("dump");
     console.dir(config);
     TractView.init({
         selector: '#tractview',
