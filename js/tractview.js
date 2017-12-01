@@ -470,23 +470,30 @@ var TractView = {
                     // cols.push(geometry.vertices[i + 1] / l);
                     // cols.push(geometry.vertices[i + 2] / l);
                     
-                    var x__ = geometry.vertices[i],
-                        y__ = geometry.vertices[i + 1],
-                        z__ = geometry.vertices[i + 2];
+                    var x_ = geometry.vertices[i],
+                        y_ = geometry.vertices[i + 1],
+                        z_ = geometry.vertices[i + 2];
                     
+                        /*
                     var x_ = x__,
                         y_ = y__ * Math.cos(brainRotationX) - z__ * Math.sin(brainRotationX),
                         z_ = y__ * Math.sin(brainRotationX) + z__ * Math.cos(brainRotationX);
+                        */
                     
-                    x_ = Math.floor((x_ - color_map_head.spaceOrigin[0]) / color_map_head.thicknesses[0]);
-                    y_ = Math.floor((y_ - color_map_head.spaceOrigin[1]) / color_map_head.thicknesses[2]);
-                    z_ = Math.floor((z_ - color_map_head.spaceOrigin[2]) / color_map_head.thicknesses[2]);
+                    x_ = Math.round((x_ - color_map_head.spaceOrigin[0]) / color_map_head.thicknesses[0]);
+                    y_ = Math.round((y_ - color_map_head.spaceOrigin[1]) / color_map_head.thicknesses[1]);
+                    z_ = Math.round((z_ - color_map_head.spaceOrigin[2]) / color_map_head.thicknesses[2]);
                     
+                    /*
+                    x_ = Math.round((x_/color_map_head.thicknesses[0]) - color_map_head.spaceOrigin[0]);
+                    y_ = Math.round((y_/color_map_head.thicknesses[1]) - color_map_head.spaceOrigin[1]);
+                    z_ = Math.round((z_/color_map_head.thicknesses[2]) - color_map_head.spaceOrigin[2]);
+                    */
                     // rotation.x = -Math.PI/2
                     
                     if (color_map.shape.length == 3) {
-                        var weight = Math.pow( color_map.get(x_, y_, z_), 1/6);
-                        
+                        //var weight = Math.pow( color_map.get(x_, y_, z_), 1/6);
+                        var weight = color_map.get(z_, y_, x_)*20;
                         cols.push(weight);
                         cols.push(weight);
                         cols.push(weight);
@@ -558,7 +565,8 @@ var TractView = {
                         var N = nifti.parse(raw);
                         
                         color_map_head = nifti.parseHeader(raw);
-                        color_map = ndarray(N.data, N.sizes);//.slice().reverse());
+                        //color_map = ndarray(N.data, N.sizes.slice().reverse());
+                        color_map = ndarray(N.data, N.sizes.slice().reverse());
                         
                         console.log(N, color_map_head);
                         
