@@ -6,6 +6,10 @@ Plotly.register([
     require('plotly.js/lib/histogram')
 ]);
 
+Number.prototype.map = function (in_min, in_max, out_min, out_max) {
+    return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 var TractView = {
     
     /**
@@ -491,12 +495,29 @@ var TractView = {
                     */
                     // rotation.x = -Math.PI/2
                     
+                    var weight = color_map.get(z_, y_, x_);
+                    //weight = (weight - color_map.min) * (1- 0.5) / (color_map.max - color_map.min) + 0.5;
+                    weight = (weight - color_map.min) / (color_map.max - color_map.min);
+                    //weight = Math.exp(weight) / Math.E; 
+                    weight = Math.pow(weight, 1/4);
+                    /*
+                    var weight = color_map.get(z_, y_, x_);
+                    if(i % 10000 == 0) {
+                        console.log(weight, weight.map(color_map.min, color_map.max, 0, 1));
+                    }
+                    weight = weight.map(color_map.min, color_map.max, 0, 0.5);
+                    */
+                    cols.push(weight);
+                    cols.push(weight);
+                    cols.push(weight);
+                    /*
                     if (color_map.shape.length == 3) {
                         //var weight = Math.pow( color_map.get(x_, y_, z_), 1/6);
-                        var weight = color_map.get(z_, y_, x_)*20;
-                        cols.push(weight);
-                        cols.push(weight);
-                        cols.push(weight);
+                        var weight = color_map.get(z_, y_, x_);
+                        if(weight>0 && i % 1000 == 0) console.log(weight);
+                        cols.push(weight*10);
+                        cols.push(weight*10);
+                        cols.push(weight*10);
                     }
                     else if (color_map.shape.length == 4 && color_map.shape[color_map.shape.length - 1] == 3) {
                         cols.push(color_map.get(x_, y_, z_, 0) / 255);
@@ -505,6 +526,7 @@ var TractView = {
                     }
                     else
                         throw `Unsupported color_map_shape: ${color_map.shape}`;
+                        */
                     
                 }
                 geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 3));
@@ -565,13 +587,18 @@ var TractView = {
                         var N = nifti.parse(raw);
                         
                         color_map_head = nifti.parseHeader(raw);
-                        //color_map = ndarray(N.data, N.sizes.slice().reverse());
                         color_map = ndarray(N.data, N.sizes.slice().reverse());
+
+                        //find min/max
+                        color_map.min = N.data[0];
+                        color_map.max = N.data[0];
+                        N.data.forEach(v=>{
+                            if(v > color_map.max) color_map.max = v;
+                            if(v < color_map.min) color_map.min = v;
+                        });
+                        console.log("here");
+                        console.log(color_map);
                         
-                        console.log(N, color_map_head);
-                        
-                        //color_map = N;
-                        //console.log(color_map);
                         recalculateMaterials();
                     })
                     .catch(err => console.error);
