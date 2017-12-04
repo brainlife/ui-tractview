@@ -17,6 +17,7 @@ $(function() {
     if(config.layers) config.layers.forEach(layer=>{
         layer.url += "&at="+jwt;
     });
+    
     console.log("dump");
     console.dir(config);
     TractView.init({
@@ -232,6 +233,7 @@ var TractView = {
                         onchange_right: (right_checked, none_checked) => {
                             right.mesh.visible = right_checked;
                             right._restore.visible = right_checked;
+                            console.log("RIGHT CHANGED", right_checked);
                             // if (none_checked) row.addClass('disabled');
                             // else row.removeClass('disabled');
                         },
@@ -362,15 +364,15 @@ var TractView = {
             });
             
             checkbox_left.on('change', e => {
-                var left_checked = checkbox_left[0].checked,
-                    right_checked = checkbox_right[0].checked || options.hideRightToggle;
+                var left_checked = checkbox_left[0].checked || false,
+                    right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
                 
                 if (options.onchange_left)
                     options.onchange_left(left_checked, !left_checked && !right_checked);
             });
             checkbox_right.on('change', e => {
-                var left_checked = checkbox_left[0].checked,
-                    right_checked = checkbox_right[0].checked || options.hideRightToggle;
+                var left_checked = checkbox_left[0].checked || false,
+                    right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
                 
                 if (options.onchange_right)
                     options.onchange_right(right_checked, !left_checked && !right_checked);
@@ -11653,7 +11655,7 @@ module.exports = true;
 /*!
  * Determine if an object is a Buffer
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @author   Feross Aboukhadijeh <https://feross.org>
  * @license  MIT
  */
 
