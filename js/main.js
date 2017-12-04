@@ -16,6 +16,7 @@ $(function() {
     if(config.layers) config.layers.forEach(layer=>{
         layer.url += "&at="+jwt;
     });
+    
     console.log("dump");
     console.dir(config);
     TractView.init({
