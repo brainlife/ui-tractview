@@ -12,9 +12,13 @@ $(function() {
 
     //set token for each tracts/layers
     config.tracts.forEach(tract=>{
-        tract.url += "&at="+jwt;
+        if(~tract.url.indexOf("?")) tract.url += "&";
+        else tract.url += "?";
+        tract.url += "at="+jwt;
     });
     if(config.layers) config.layers.forEach(layer=>{
+        if(~layer.url.indexOf("?")) layer.url += "&";
+        else layer.url += "?";
         layer.url += "&at="+jwt;
     });
     
@@ -1319,22 +1323,11 @@ var TractView = {
                     //find voxel value
                     var v = color_map.get(z, y, x);
 
-                    /*
-                    if(v === NaN) {
-                        console.log("NaN detected at", i);
-                    }
-                    */
-
-                    //normalize value between 0 to 1
-                    //var normalized_v = v.map(color_map.min, color_map.max, 0.5, 1);
-                    //var normalized_v = v * 100;
                     var normalized_v = (v - color_map.min) / (color_map.max - color_map.min);
                     
-                    /*
                     if(i%5000 == 0) {
                         console.log(v, normalized_v);
                     }
-                    */
                     //clip..
                     if(normalized_v < 0.1) normalized_v = 0.1;
                     if(normalized_v > 1) normalized_v = 1;
@@ -1344,10 +1337,6 @@ var TractView = {
                     if(!hist[hv]) hist[hv] = 1;
                     else hist[hv]++;
 
-                    //TODO - pick a better color?
-                    var r = 1;
-                    var g = 1;
-                    var b = 1;
                     /*
                     if(x > 63 && x < 66) {// & y > 113 && y < 136 && x > 46 && x < 58) {
                         //console.log(normalized_v);
@@ -1355,21 +1344,16 @@ var TractView = {
                         normalized_v = 0.05;
                     }
                     */
-                    cols.push(r);
-                    cols.push(g);
-                    cols.push(b);
-                    cols.push(normalized_v);
-
-                    /* rainbow
-                    var l = Math.sqrt(geometry.vertices[i] * geometry.vertices[i] + geometry.vertices[i + 1] * geometry.vertices[i + 1] + geometry.vertices[i + 2] * geometry.vertices[i + 2]);
-                    cols.push(geometry.vertices[i] / l);
-                    cols.push(geometry.vertices[i + 1] / l);
-                    cols.push(geometry.vertices[i + 2] / l);
-                    */
+                    //TODO - pick a better color?
+                    cols.push(0); //r
+                    cols.push(normalized_v); //g
+                    cols.push(0.5); //b
+                    cols.push(0.75); //a
                 }
                 geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 4));
-                //console.log("displaying histographm");
-                //console.dir(hist);
+                
+                console.log("displaying histographm");
+                console.dir(hist);
 
                 var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
                     vertexShader,
@@ -1418,9 +1402,6 @@ var TractView = {
                     fetch(nifti_select_el.val())
                         .then(res => res.arrayBuffer())
                         .then(function(buffer) {
-                            // console.log(nifti.parseHeader(pako.inflate(buffer)),
-                            //             nifti.parseNIfTIHeader(pako.inflate(buffer)),
-                            //             nifti.parse(pako.inflate(buffer)));
 
                             var raw = pako.inflate(buffer);
                             var N = nifti.parse(raw);
@@ -1429,12 +1410,8 @@ var TractView = {
                             color_map = ndarray(N.data, N.sizes.slice().reverse());
 
                             color_map.sum = 0;
-                            //color_map.min = N.data[0];
-                            //color_map.max = N.data[0];
                             N.data.forEach(v=>{
                                 color_map.sum+=v;
-                                //if(v > color_map.max) color_map.max = v;
-                                //if(v < color_map.min) color_map.min = v;
                             });
                             color_map.mean = color_map.sum / N.data.length;
 
@@ -1447,9 +1424,10 @@ var TractView = {
                             color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
 
                             //set min/max
-                            color_map.min = color_map.mean - color_map.sdev*2;
-                            color_map.max = color_map.mean + color_map.sdev*2;
+                            color_map.min = color_map.mean - color_map.sdev;
+                            color_map.max = color_map.mean + color_map.sdev*5;
 
+                            console.log("color map");
                             console.dir(color_map);
 
                             recalculateMaterials();
@@ -1502,7 +1480,7 @@ var TractView = {
             .conview {
                 width:100%;
                       height: 100%;
-                              background:black;
+                              background:#666;
             }
             .tinybrain {
                 position:absolute;
