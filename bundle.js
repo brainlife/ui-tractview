@@ -1386,19 +1386,10 @@ var TractView = {
             for (let tractName in config.LRtractNames) {
                 let toggle = config.LRtractNames[tractName];
                 if (toggle.left) {
-                    // toggle toggle
-                    toggle.left.checkbox.click();
-                    toggle.left.checkbox.click();
-                    
-                    // toggle toggle
-                    toggle.right.checkbox.click();
-                    toggle.right.checkbox.click();
+                    toggle.left.checkbox.click().click();
+                    toggle.right.checkbox.click().click();
                 }
-                else {
-                    // toggle toggle
-                    toggle.checkbox.click();
-                    toggle.checkbox.click();
-                }
+                else toggle.checkbox.click().click();
             }
         }
         
