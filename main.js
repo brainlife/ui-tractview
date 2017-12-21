@@ -11,9 +11,13 @@ $(function() {
 
     //set token for each tracts/layers
     config.tracts.forEach(tract=>{
-        tract.url += "&at="+jwt;
+        if(~tract.url.indexOf("?")) tract.url += "&";
+        else tract.url += "?";
+        tract.url += "at="+jwt;
     });
     if(config.layers) config.layers.forEach(layer=>{
+        if(~layer.url.indexOf("?")) layer.url += "&";
+        else layer.url += "?";
         layer.url += "&at="+jwt;
     });
     
