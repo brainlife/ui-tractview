@@ -515,7 +515,27 @@ var TractView = {
                 return m;
             }    
         }
-
+        
+        function reselectAll() {
+            for (let tractName in config.LRtractNames) {
+                let toggle = config.LRtractNames[tractName];
+                if (toggle.left) {
+                    // toggle toggle
+                    toggle.left.checkbox.click();
+                    toggle.left.checkbox.click();
+                    
+                    // toggle toggle
+                    toggle.right.checkbox.click();
+                    toggle.right.checkbox.click();
+                }
+                else {
+                    // toggle toggle
+                    toggle.checkbox.click();
+                    toggle.checkbox.click();
+                }
+            }
+        }
+        
         function recalculateMaterials() {
             while (all_mesh.length)
                 scene.remove(all_mesh.pop());
@@ -538,6 +558,7 @@ var TractView = {
                     if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
                         color_map = undefined;
                         recalculateMaterials();
+                        reselectAll();
                         return;
                     }
 
@@ -573,6 +594,7 @@ var TractView = {
                             console.dir(color_map);
 
                             recalculateMaterials();
+                            reselectAll();
                         })
                     .catch(err => console.error);
                 });
