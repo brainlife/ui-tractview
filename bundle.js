@@ -1445,13 +1445,13 @@ var TractView = {
                         color_map = undefined;
                         recalculateMaterials();
                         reselectAll();
-                        return;
                     }
-
-                    fetch(nifti_select_el.val())
-                        .then(res => res.arrayBuffer())
-                        .then(processDeflatedNiftiBuffer)
-                    .catch(err => console.error);
+                    else {
+                        fetch(nifti_select_el.val())
+                            .then(res => res.arrayBuffer())
+                            .then(processDeflatedNiftiBuffer)
+                        .catch(err => console.error);
+                    }
                 });
             }
         }
