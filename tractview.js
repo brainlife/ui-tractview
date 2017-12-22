@@ -1,6 +1,7 @@
 
 var ndarray = require('ndarray');
 var nifti = require('nifti-js');
+
 /*
 var Plotly = require('plotly.js/lib/core');
 Plotly.register([
@@ -41,6 +42,7 @@ var TractView = {
         populateHtml(user_container);
 
         var scene, camera;
+        var user_uploaded_files = {};
 
         var view = user_container.find("#conview"),
         tinyBrain = user_container.find("#tinybrain"),
@@ -50,8 +52,29 @@ var TractView = {
         hide_show_el = user_container.find("#hide_show"),
         hide_show_text_el = user_container.find("#hide_show_text"),
         nifti_select_el = user_container.find("#nifti_select");
-
+        
         create_nifti_options();
+        $("#upload_nifti").on('change', function() {
+            // should we allow multiple uploads at once?
+            // for now just one, easy to expand
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.addEventListener('load', function(buffer) {
+                // if file was already uploaded with same name we could use unique tokens or just override the old one, as is done here (simplicity over extensibility)
+                if (user_uploaded_files[file.name]) console.log(`Warning: file with name ${file.name} was already uploaded; the old one will be overwritten`);
+                else nifti_select_el.append($("<option/>").text(file.name).val(`user_uploaded|${file.name}`));
+                
+                // buffer is reader.result
+                user_uploaded_files[file.name] = reader.result;
+                
+                // to autouse the uploaded nifti, or to not autouse the uploaded nifti, that is the question
+                // for now I think yes...
+                // but if you think no then remove the following line:
+                nifti_select_el.val(`user_uploaded|${file.name}`).trigger('change');
+            });
+            reader.readAsArrayBuffer(this.files[0]);
+        });
+        
         init_conview();
 
         function init_conview() {
@@ -468,7 +491,7 @@ var TractView = {
                     var normalized_v = (v - color_map.min) / (color_map.max - color_map.min);
                     
                     if(i%5000 == 0) {
-                        console.log(v, normalized_v);
+                        //console.log(v, normalized_v);
                     }
                     //clip..
                     if(normalized_v < 0.1) normalized_v = 0.1;
@@ -494,8 +517,8 @@ var TractView = {
                 }
                 geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 4));
                 
-                console.log("displaying histographm");
-                console.dir(hist);
+                //console.log("displaying histographm");
+                //console.dir(hist);
 
                 var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
                     vertexShader,
@@ -515,7 +538,18 @@ var TractView = {
                 return m;
             }    
         }
-
+        
+        function reselectAll() {
+            for (let tractName in config.LRtractNames) {
+                let toggle = config.LRtractNames[tractName];
+                if (toggle.left) {
+                    toggle.left.checkbox.click().click();
+                    toggle.right.checkbox.click().click();
+                }
+                else toggle.checkbox.click().click();
+            }
+        }
+        
         function recalculateMaterials() {
             while (all_mesh.length)
                 scene.remove(all_mesh.pop());
@@ -526,6 +560,7 @@ var TractView = {
         }
 
         function create_nifti_options() {
+            let preloaded = [];
             nifti_select_el.append($("<option/>").html("None").val('none'));
             //nifti_select_el.append($("<option/>").html("Rainboww!! :D").val('rainbow'));
 
@@ -535,136 +570,148 @@ var TractView = {
                 });
 
                 nifti_select_el.on('change', function() {
-                    if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
+                    if (nifti_select_el.val().startsWith("user_uploaded|")) {
+                        var buffer = user_uploaded_files[nifti_select_el.val().substring(("user_uploaded|").length)];
+                        // TODO check if file is already re-inflated (not .nii.gz but instead just .nii)
+                        processDeflatedNiftiBuffer(buffer);
+                    }
+                    else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
                         color_map = undefined;
                         recalculateMaterials();
-                        return;
+                        reselectAll();
                     }
-
-                    fetch(nifti_select_el.val())
-                        .then(res => res.arrayBuffer())
-                        .then(function(buffer) {
-
-                            var raw = pako.inflate(buffer);
-                            var N = nifti.parse(raw);
-
-                            color_map_head = nifti.parseHeader(raw);
-                            color_map = ndarray(N.data, N.sizes.slice().reverse());
-
-                            color_map.sum = 0;
-                            N.data.forEach(v=>{
-                                color_map.sum+=v;
-                            });
-                            color_map.mean = color_map.sum / N.data.length;
-
-                            //compute sdev
-                            color_map.dsum = 0;
-                            N.data.forEach(v=>{
-                                var d = v - color_map.mean;
-                                color_map.dsum += d*d;
-                            });
-                            color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
-
-                            //set min/max
-                            color_map.min = color_map.mean - color_map.sdev;
-                            color_map.max = color_map.mean + color_map.sdev*5;
-
-                            console.log("color map");
-                            console.dir(color_map);
-
-                            recalculateMaterials();
-                        })
-                    .catch(err => console.error);
+                    else {
+                        fetch(nifti_select_el.val())
+                            .then(res => res.arrayBuffer())
+                            .then(processDeflatedNiftiBuffer)
+                        .catch(err => console.error);
+                    }
                 });
             }
         }
+        
+        function processDeflatedNiftiBuffer(buffer) {
+            var raw = pako.inflate(buffer);
+            var N = nifti.parse(raw);
 
+            color_map_head = nifti.parseHeader(raw);
+            color_map = ndarray(N.data, N.sizes.slice().reverse());
+
+            color_map.sum = 0;
+            N.data.forEach(v=>{
+                color_map.sum+=v;
+            });
+            color_map.mean = color_map.sum / N.data.length;
+
+            //compute sdev
+            color_map.dsum = 0;
+            N.data.forEach(v=>{
+                var d = v - color_map.mean;
+                color_map.dsum += d*d;
+            });
+            color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
+
+            //set min/max
+            color_map.min = color_map.mean - color_map.sdev;
+            color_map.max = color_map.mean + color_map.sdev*5;
+
+            console.log("color map");
+            console.dir(color_map);
+
+            recalculateMaterials();
+            reselectAll();
+        }
+        
         function populateHtml(element) {
             element.html(`
-                    <div class="container">
-                    <!-- Main Connectome View -->
-                    <div id="conview" class="conview"></div>
+            <div class="container">
+                <!-- Main Connectome View -->
+                <div id="conview" class="conview"></div>
 
-                    <!-- Tiny Brain to Show Orientation -->
-                    <div id="tinybrain" class="tinybrain"></div>
+                <!-- Tiny Brain to Show Orientation -->
+                <div id="tinybrain" class="tinybrain"></div>
 
-                    <div id="controls" class="controls">
+                <div id="controls" class="controls">
                     <div style="display:flex;">
-                    <!-- Hide/Show Panel -->
-                    <div id="hide_show" class="hide_show">
-                    <div class="table">
-                    <div class="cell">
-                    <div class="rotated" id="hide_show_text"></div>
-                    </div>
-                    </div>
-                    </div>
+                        <!-- Hide/Show Panel -->
+                        <div id="hide_show" class="hide_show">
+                            <div class="table">
+                                <div class="cell">
+                                    <div class="rotated" id="hide_show_text"></div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- Fascicle Toggling -->
-                    <div class="container_toggles" id="container_toggles">
-                    <table class="tract_toggles" id="tract_toggles"></table>
+                        <!-- Fascicle Toggling -->
+                        <div class="container_toggles" id="container_toggles">
+                            <table class="tract_toggles" id="tract_toggles"></table>
 
-                    <!-- Nifti Choosing -->
-                    <div class="nifti_chooser">
-                    <select id="nifti_select" class="nifti_select"></select>
+                            <!-- Nifti Choosing -->
+                            <div class="nifti_chooser">
+                                <select id="nifti_select" class="nifti_select"></select>
+                                <div class="upload_div">
+                                    <label for="upload_nifti">Upload Nifti</label>
+                                    <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    </div>
+                </div>
+            </div>
 
-                    </div>
-                    </div>
-                    </div>
-
-                    <style scoped>
-                    .container {
-                        width: 100%;
-                               height: 100%;
-                                       padding: 0px;
-                    }
+            <style scoped>
+            .container {
+                width: 100%;
+                height: 100%;
+                padding: 0px;
+            }
+            
             .conview {
                 width:100%;
-                      height: 100%;
-                              background:#666;
+                height: 100%;
+                background:#666;
             }
             .tinybrain {
                 position:absolute;
-                         pointer-events:none;
-                         left:0;
-                              bottom:0;
-                                     width:100px;
-                                           height:100px;
+                pointer-events:none;
+                left:0;
+                bottom:0;
+                width:100px;
+                height:100px;
             }
 
             .controls {
                 display:inline-block;
-                        position:absolute;
-                                 right:0;
-                                       top:0;
-                                           width:auto;
-                                                 height:auto;
-                                                        max-height:100%;
-                                                        padding-left:1px;
-                                                        overflow-x:hidden;
-                                                        overflow-y:auto;
-                                                        white-space:nowrap;
-                                                        font-family:Roboto;
-                                                        font-size:12px;
-                                                        background:rgba(0, 0, 0, .7);
+                position:absolute;
+                right:0;
+                top:0;
+                width:auto;
+                height:auto;
+                max-height:100%;
+                padding-left:1px;
+                overflow-x:hidden;
+                overflow-y:auto;
+                white-space:nowrap;
+                font-family:Roboto;
+                font-size:12px;
+                background:rgba(0, 0, 0, .7);
             }
 
             .hide_show {
                 display:inline-block;
-                        position:relative;
-                                 vertical-align:top;
-                                 text-align:left;
-                                 width:auto;
-                                       flex:1;
-                                            color: #777;
-                                                   overflow:hidden;
-                                                            cursor:default;
-                                                                   transition:background 1s, color 1s;
+                position:relative;
+                vertical-align:top;
+                text-align:left;
+                width:auto;
+                flex:1;
+                color: #777;
+                overflow:hidden;
+                cursor:default;
+                transition:background 1s, color 1s;
             }
             .hide_show:hover {
                 background:black;
-                           color:white;
+                color:white;
             }
 
             /* Hide/Show Vertical Alignment */
@@ -676,30 +723,42 @@ var TractView = {
             }
             .table {
                 display:table;
-                        height:100%;
-                               margin-bottom:0 !important;
+                height:100%;
+                margin-bottom:0 !important;
             }
             .cell {
                 display:table-cell;
-                        vertical-align:middle;
+                vertical-align:middle;
             }
 
             .hide_show .rotated {
                 display:inline-block;
-                        min-width:16px;
-                        max-width:16px;
-                        vertical-align:middle;
-                        transform:rotate(-90deg);
+                min-width:16px;
+                max-width:16px;
+                vertical-align:middle;
+                transform:rotate(-90deg);
             }
 
             .container_toggles {
                 display:inline-block;
-                        max-width:500px;
-                        width:auto;
-                              height:auto;
-                                     padding-top:2px;
-                                     overflow:hidden;
-                                              transition:max-width .5s, opacity .5s, padding .5s;
+                max-width:500px;
+                width:auto;
+                height:auto;
+                padding-top:2px;
+                overflow:hidden;
+                transition:max-width .5s, opacity .5s, padding .5s;
+            }
+            
+            .nifti_select {
+                margin-bottom:4px;
+            }
+            
+            .upload_div {
+                color:#9cc;
+            }
+            
+            .upload_div:hover {
+                color:#aff;
             }
 
             label {
@@ -708,8 +767,8 @@ var TractView = {
             }
             tr.header {
                 color:white;
-                      text-align:center;
-                      margin:0;
+                text-align:center;
+                margin:0;
             }
             tr.header label {
                 margin-right:4px;
@@ -719,7 +778,7 @@ var TractView = {
             input[type="checkbox"] {
                 vertical-align:middle;
                 margin:0;
-                       cursor:pointer;
+                cursor:pointer;
             }
 
             td.label {
