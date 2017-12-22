@@ -56,7 +56,7 @@ module.exports = iota
 /*!
  * Determine if an object is a Buffer
  *
- * @author   Feross Aboukhadijeh <https://feross.org>
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
  * @license  MIT
  */
 
@@ -1356,9 +1356,6 @@ var TractView = {
 
                     var normalized_v = (v - color_map.min) / (color_map.max - color_map.min);
                     
-                    if(i%5000 == 0) {
-                        //console.log(v, normalized_v);
-                    }
                     //clip..
                     if(normalized_v < 0.1) normalized_v = 0.1;
                     if(normalized_v > 1) normalized_v = 1;
@@ -1376,11 +1373,22 @@ var TractView = {
                     }
                     */
                     //TODO - pick a better color?
+                    /*
                     cols.push(0); //r
                     cols.push(normalized_v); //g
                     cols.push(0.5); //b
                     cols.push(0.75); //a
+                    */
+                    //cols.push((geometry.tract.color.r*2)*normalized_v/2);
+                    //cols.push((geometry.tract.color.g*2)*normalized_v/2);
+                    //cols.push((geometry.tract.color.b*2)*normalized_v/2);
+                    cols.push(geometry.tract.color.r*normalized_v);
+                    cols.push(geometry.tract.color.g*normalized_v);
+                    cols.push(geometry.tract.color.b*normalized_v);
+                    //cols.push(normalized_v); //g
+                    cols.push(0.8);
                 }
+                //console.dir(geometry.tract.color);
                 geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 4));
                 
                 //console.log("displaying histographm");
@@ -1535,7 +1543,7 @@ var TractView = {
             .conview {
                 width:100%;
                 height: 100%;
-                background:#666;
+                background:#222;
             }
             .tinybrain {
                 position:absolute;
