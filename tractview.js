@@ -572,30 +572,28 @@ var TractView = {
             nifti_select_el.append($("<option/>").html("None").val('none'));
             //nifti_select_el.append($("<option/>").html("Rainboww!! :D").val('rainbow'));
 
-            if (config.niftis) {
-                config.niftis.forEach(nifti => {
-                    nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
-                });
+            if(config.niftis) config.niftis.forEach(nifti => {
+                nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
+            });
 
-                nifti_select_el.on('change', function() {
-                    if (nifti_select_el.val().startsWith("user_uploaded|")) {
-                        var buffer = user_uploaded_files[nifti_select_el.val().substring(("user_uploaded|").length)];
-                        // TODO check if file is already re-inflated (not .nii.gz but instead just .nii)
-                        processDeflatedNiftiBuffer(buffer);
-                    }
-                    else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
-                        color_map = undefined;
-                        recalculateMaterials();
-                        reselectAll();
-                    }
-                    else {
-                        fetch(nifti_select_el.val())
-                            .then(res => res.arrayBuffer())
-                            .then(processDeflatedNiftiBuffer)
-                        .catch(err => console.error);
-                    }
-                });
-            }
+            nifti_select_el.on('change', function() {
+                if (nifti_select_el.val().startsWith("user_uploaded|")) {
+                    var buffer = user_uploaded_files[nifti_select_el.val().substring(("user_uploaded|").length)];
+                    // TODO check if file is already re-inflated (not .nii.gz but instead just .nii)
+                    processDeflatedNiftiBuffer(buffer);
+                }
+                else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
+                    color_map = undefined;
+                    recalculateMaterials();
+                    reselectAll();
+                }
+                else {
+                    fetch(nifti_select_el.val())
+                        .then(res => res.arrayBuffer())
+                        .then(processDeflatedNiftiBuffer)
+                    .catch(err => console.error);
+                }
+            });
         }
         
         function processDeflatedNiftiBuffer(buffer) {
