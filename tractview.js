@@ -41,6 +41,9 @@ var TractView = {
 
         populateHtml(user_container);
 
+        var stats = new Stats();
+        user_container.append(stats.dom);
+
         var scene, camera;
         var user_uploaded_files = {};
 
@@ -78,8 +81,8 @@ var TractView = {
         init_conview();
 
         function init_conview() {
-            var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
-            var brainRenderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+            var renderer = new THREE.WebGLRenderer({alpha: false, antialias: true});
+            var brainRenderer = new THREE.WebGLRenderer({alpha: true});
 
             scene = new THREE.Scene();
 
@@ -178,6 +181,10 @@ var TractView = {
                 else config.LRtractNames[rawName] = tract;   // standalone, not left or right
             });
 
+            var white_material = new THREE.LineBasicMaterial({
+                color: new THREE.Color(1,1,1),
+            });
+
             // add tract toggles to controls
             for (let tractName in config.LRtractNames) {
                 let subTracts = config.LRtractNames[tractName];
@@ -188,27 +195,33 @@ var TractView = {
                         hideRightToggle: true,
                         onchange_left: (left_checked) => {
                             subTracts.mesh.visible = left_checked;
-                            subTracts._restore.visible = left_checked;
-
+                            subTracts.mesh.visible_back = left_checked;
                             // if (!left_checked) row.addClass('disabled');
                             // else row.removeClass('disabled');
                         },
                         onmouseenter: e => {
+                            //subTracts.mesh.visible = true;
+                            //subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
+                            subTracts.mesh.visible_back = subTracts.mesh.visible;
+                            subTracts.mesh.material_back = subTracts.mesh.material;
                             subTracts.mesh.visible = true;
-                            subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
+                            subTracts.mesh.material = white_material;
                         },
                         onmouseleave: e => {
-                            var restore = config.LRtractNames[tractName]._restore;
-                            subTracts.mesh.visible = restore.visible;
-                            subTracts.mesh.material.color = restore.color;
+                            //subTracts.mesh.visible = restore.visible;
+                            subTracts.mesh.visible = subTracts.mesh.visible_back;
+                            subTracts.mesh.material = subTracts.mesh.material_back;
                         }
                     });
 
                     subTracts.checkbox = row.checkbox_left;
+                    /*
                     subTracts._restore = {
                         visible: true,
                         color: subTracts.color,
+                        //material: subTracts.mesh.material,
                     };
+                    */
                 } else {
                     // toggles that have both L + R checkboxes, almost the same as code above, just done twice
                     let left = subTracts.left;
@@ -217,42 +230,34 @@ var TractView = {
                     var row = makeToggle(tractName, {
                         onchange_left: (left_checked, none_checked) => {
                             left.mesh.visible = left_checked;
-                            left._restore.visible = left_checked;
-                            // if (none_checked) row.addClass('disabled');
-                            // else row.removeClass('disabled');
+                            left.mesh.visible_back = left_checked;
+                            //left._restore.visible = left_checked;
                         },
                         onchange_right: (right_checked, none_checked) => {
                             right.mesh.visible = right_checked;
-                            right._restore.visible = right_checked;
-
-                            // if (none_checked) row.addClass('disabled');
-                            // else row.removeClass('disabled');
+                            right.mesh.visible_back = right_checked;
+                            //right._restore.visible = right_checked;
                         },
                         onmouseenter: e => {
+                            left.mesh.visible_back = left.mesh.visible;
+                            right.mesh.visible_back = right.mesh.visible;
+                            left.mesh.material_back = left.mesh.material;
+                            right.mesh.material_back = right.mesh.material;
                             left.mesh.visible = true;
-                            left.mesh.material.color = new THREE.Color(1, 1, 1);
                             right.mesh.visible = true;
-                            right.mesh.material.color = new THREE.Color(1, 1, 1);
+                            left.mesh.material = white_material;
+                            right.mesh.material = white_material;
                         },
                         onmouseleave: e => {
-                            left.mesh.visible = left._restore.visible;
-                            left.mesh.material.color = left._restore.color;
-                            right.mesh.visible = right._restore.visible;
-                            right.mesh.material.color = right._restore.color;
+                            left.mesh.visible = left.mesh.visible_back;
+                            left.mesh.material = left.mesh.material_back;
+                            right.mesh.visible = right.mesh.visible_back;
+                            right.mesh.material = right.mesh.material_back;
                         }
                     });
 
                     left.checkbox = row.checkbox_left;
-                    left._restore = {
-                        visible: true,
-                        color: subTracts.left.color, 
-                    };
-
                     right.checkbox = row.checkbox_right;
-                    right._restore = {
-                        visible: true, 
-                        color: subTracts.right.color,
-                    };
                 }
                 tract_toggles_el.append(row);
             }
@@ -322,6 +327,7 @@ var TractView = {
                 }
 
                 requestAnimationFrame( animate_conview );
+                stats.update();
             }
 
             animate_conview();
@@ -460,11 +466,12 @@ var TractView = {
             else
             */
             if (color_map) {
+                /*
                 var vertexShader = `
-                    attribute vec4 col;
+                    attribute vec4 color;
                     varying vec4 vColor;
                     void main(){
-                        vColor = col;
+                        vColor = color;
                         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                     }
                 `;
@@ -477,6 +484,7 @@ var TractView = {
                         gl_FragColor = vColor;
                     }
                 `;
+                */
                 var cols = [];
                 var hist = [];
                 for (var i = 0; i < geometry.vertices.length; i += 3) {
@@ -520,31 +528,37 @@ var TractView = {
                     cols.push(geometry.tract.color.g*normalized_v);
                     cols.push(geometry.tract.color.b*normalized_v);
                     //cols.push(normalized_v); //g
-                    cols.push(0.8);
+                    //cols.push(1);
                 }
                 //console.dir(geometry.tract.color);
-                geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 4));
+                geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 3));
+                //geometry.addAttribute('color', new THREE.Float32BufferAttribute(cols), 3);
                 
                 //console.log("displaying histographm");
                 //console.dir(hist);
 
+                /*
                 var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
                     vertexShader,
                     fragmentShader,
                     transparent: true,
                 }) );
-                config.tracts[geometry.tract_index].mesh = m;
-
-                return m;
+                */
+                var material = new THREE.LineBasicMaterial({ 
+                    vertexColors: THREE.VertexColors,
+                    transparent: true,
+                    opacity: 0.7,
+                });
             } else {
-                var m = new THREE.LineSegments( geometry, new THREE.LineBasicMaterial({
+                var material = new THREE.LineBasicMaterial({
                     color: geometry.tract.color,
                     transparent: true,
-                    opacity: 0.7
-                }) );
-                config.tracts[geometry.tract_index].mesh = m;
-                return m;
+                    opacity: 0.7,
+                });
             }    
+            var m = new THREE.LineSegments( geometry, material);
+            config.tracts[geometry.tract_index].mesh = m;
+            return m;
         }
         
         function reselectAll() {
@@ -675,7 +689,6 @@ var TractView = {
             .conview {
                 width:100%;
                 height: 100%;
-                background:#222;
             }
             .tinybrain {
                 position:absolute;
