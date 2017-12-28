@@ -563,8 +563,10 @@ var TractView = {
             let preloaded = [];
             nifti_select_el.append($("<option/>").html("None").val('none'));
             //nifti_select_el.append($("<option/>").html("Rainboww!! :D").val('rainbow'));
-
+            
             if (config.niftis) {
+                $(".nifti_chooser")[0].style.display = "";
+                
                 config.niftis.forEach(nifti => {
                     nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
                 });
@@ -647,7 +649,7 @@ var TractView = {
                             <table class="tract_toggles" id="tract_toggles"></table>
 
                             <!-- Nifti Choosing -->
-                            <div class="nifti_chooser">
+                            <div class="nifti_chooser" style="display:none;">
                                 <select id="nifti_select" class="nifti_select"></select>
                                 <div class="upload_div">
                                     <label for="upload_nifti">Upload Nifti</label>
