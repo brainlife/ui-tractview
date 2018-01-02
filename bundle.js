@@ -1572,7 +1572,7 @@ var TractView = {
                             <!-- Nifti Choosing -->
                             <div class="nifti_chooser" style="display:none;">
                                 <select id="nifti_select" class="nifti_select"></select>
-                                <div><label style="color:#ccc;">Gamma:</label> <input type="number" min="1" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
+                                <div><label style="color:#ccc;">Gamma:</label> <input type="number" min=".00001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
                                 <div class="upload_div">
                                     <label for="upload_nifti">Upload Nifti</label>
                                     <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
