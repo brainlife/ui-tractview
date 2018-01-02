@@ -24,8 +24,12 @@ var TractView = {
     init: function(config) {
         if (!config) throw "Error: No config provided";
 
-        var color_map, color_map_head, all_geometry = [], all_mesh = [], brainRotationX = -Math.PI/2;
-
+        var color_map, color_map_head, all_geometry = [], all_mesh = [],
+            brainRotationX = -Math.PI/2;
+        
+        // global uniforms
+        var gamma_value = 1, dataMin_value = 1, dataMax_value = 1;
+        
         // set up for later
         config.num_fibers = 0;
         config.LRtractNames = {};
@@ -51,7 +55,10 @@ var TractView = {
         tract_toggles_el = user_container.find("#tract_toggles"),
         hide_show_el = user_container.find("#hide_show"),
         hide_show_text_el = user_container.find("#hide_show_text"),
-        nifti_select_el = user_container.find("#nifti_select");
+        nifti_select_el = user_container.find("#nifti_select"),
+        gamma_input_el = user_container.find("#gamma_input");
+        
+        let debounce = null;
         
         create_nifti_options();
         $("#upload_nifti").on('change', function() {
@@ -293,14 +300,20 @@ var TractView = {
             //use OrbitControls and make camera light follow camera position
             var controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.autoRotate = true;
-            controls.addEventListener('change', function() {
+            controls.addEventListener('change', function(e) {
                 //rotation changes
             });
             controls.addEventListener('start', function(){
                 //use interacting with control
+                gamma_input_el.trigger({type: "blur"});
                 controls.autoRotate = false;
             });
+            
+            gamma_input_el.on('change', gamma_changed);
+            gamma_input_el.on('keyup', gamma_changed);
+            
             function animate_conview() {
+                controls.enableKeys = !gamma_input_el.is(":focus");
                 controls.update();
 
                 renderer.clear();
@@ -421,6 +434,27 @@ var TractView = {
                 cb(null, calculateMesh(geometry), res);
             });
         }
+        
+        function gamma_changed() {
+            gamma_value = +this.value;
+            let tmp = setTimeout(function() {
+                if (debounce == tmp)
+                    updateAllShaders();
+            }, 500);
+            debounce = tmp;
+        }
+        
+        // update all shaders, namely their uniforms
+        function updateAllShaders() {
+            all_mesh.forEach(mesh => {
+                if (mesh.material.uniforms) {
+                    // console.log(mesh.material.uniforms);
+                    mesh.material.uniforms["gamma"].value = gamma_value;
+                    if (mesh.material.uniforms["dataMin"]) mesh.material.uniforms["dataMin"].value = dataMin_value;
+                    if (mesh.material.uniforms["dataMax"]) mesh.material.uniforms["dataMax"].value = dataMax_value;
+                }
+            });
+        }
 
         // returns whether or not the tractName is considered to be a left tract
         function isLeftTract(tractName) {
@@ -463,6 +497,7 @@ var TractView = {
                 var vertexShader = `
                     attribute vec4 col;
                     varying vec4 vColor;
+                    
                     void main(){
                         vColor = col;
                         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -471,10 +506,19 @@ var TractView = {
 
                 var fragmentShader = `
                     varying vec4 vColor;
+                    uniform float dataMin;
+                    uniform float dataMax;
+                    uniform float gamma;
+                    
+                    float transformify(float value) {
+                        return pow(value / dataMax, 1.0 / gamma) * dataMax;
+                    }
+                    
                     void main(){
                         //gl_FragColor = vec4( vColor.rgb, 1.0 );
-                        //gl_FragColor = vec4( vColor.rgb[0],1,1,vColor.rgb[0]);
-                        gl_FragColor = vColor;
+                        //gl_FragColor = vec4( vColor.r,1,1,vColor.r);
+                        
+                        gl_FragColor = vec4(transformify(vColor.r), transformify(vColor.g), transformify(vColor.b), vColor.a);
                     }
                 `;
                 var cols = [];
@@ -488,7 +532,7 @@ var TractView = {
                     //find voxel value
                     var v = color_map.get(z, y, x);
 
-                    var normalized_v = (v - color_map.min) / (color_map.max - color_map.min);
+                    var normalized_v = (v - dataMin_value) / (dataMax_value - dataMin_value);
                     
                     if(i%5000 == 0) {
                         //console.log(v, normalized_v);
@@ -523,8 +567,14 @@ var TractView = {
                 var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
                     vertexShader,
                     fragmentShader,
+                    uniforms: {
+                        "gamma": { value: gamma_value },
+                        "dataMin": { value: 1 },
+                        "dataMax": { value: 1 },
+                    },
                     transparent: true,
                 }) );
+                
                 config.tracts[geometry.tract_index].mesh = m;
 
                 return m;
@@ -614,11 +664,11 @@ var TractView = {
             color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
 
             //set min/max
-            color_map.min = color_map.mean - color_map.sdev;
-            color_map.max = color_map.mean + color_map.sdev*5;
+            dataMin_value = color_map.mean - color_map.sdev;
+            dataMax_value = color_map.mean + color_map.sdev*5;
 
-            console.log("color map");
-            console.dir(color_map);
+            // console.log("color map");
+            // console.dir(color_map);
 
             recalculateMaterials();
             reselectAll();
@@ -651,6 +701,7 @@ var TractView = {
                             <!-- Nifti Choosing -->
                             <div class="nifti_chooser" style="display:none;">
                                 <select id="nifti_select" class="nifti_select"></select>
+                                <div><label style="color:#ccc;">Gamma:</label> <input type="number" min="1" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
                                 <div class="upload_div">
                                     <label for="upload_nifti">Upload Nifti</label>
                                     <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
@@ -749,6 +800,17 @@ var TractView = {
                 padding-top:2px;
                 overflow:hidden;
                 transition:max-width .5s, opacity .5s, padding .5s;
+            }
+            
+            .nifti_chooser {
+                padding-left:4px;
+            }
+            
+            .gamma_input {
+                border:none;
+                background:none;
+                color:white;
+                max-width:50px;
             }
             
             .nifti_select {
