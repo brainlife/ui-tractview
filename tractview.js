@@ -25,7 +25,7 @@ var TractView = {
         if (!config) throw "Error: No config provided";
 
         var color_map, color_map_head, all_geometry = [], all_mesh = [],
-            brainRotationX = -Math.PI/2;
+            brainRotationX = -Math.PI/2, bgcolor = [96, 96, 96];
         
         // global uniforms
         var gamma_value = 1, dataMin_value = 1, dataMax_value = 1;
@@ -45,7 +45,7 @@ var TractView = {
 
         populateHtml(user_container);
 
-        var scene, camera;
+        var scene, camera, renderer;
         var user_uploaded_files = {};
 
         var view = user_container.find("#conview"),
@@ -85,7 +85,7 @@ var TractView = {
         init_conview();
 
         function init_conview() {
-            var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+            renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
             var brainRenderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
 
             scene = new THREE.Scene();
@@ -311,6 +311,7 @@ var TractView = {
             
             gamma_input_el.on('change', gamma_changed);
             gamma_input_el.on('keyup', gamma_changed);
+            updateAllShaders();
             
             function animate_conview() {
                 controls.enableKeys = !gamma_input_el.is(":focus");
@@ -454,6 +455,10 @@ var TractView = {
                     if (mesh.material.uniforms["dataMax"]) mesh.material.uniforms["dataMax"].value = dataMax_value;
                 }
             });
+            
+            // update background depending on gamma
+            var transform96 = Math.pow(96 / 255, 1 / gamma_value);
+            renderer.setClearColor(new THREE.Color(transform96,transform96,transform96));
         }
 
         // returns whether or not the tractName is considered to be a left tract
@@ -722,7 +727,6 @@ var TractView = {
             .conview {
                 width:100%;
                 height: 100%;
-                background:#666;
             }
             .tinybrain {
                 position:absolute;
