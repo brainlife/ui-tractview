@@ -5,7 +5,7 @@
   "main": "undefined",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "watchify main.js -o bundle.js & lite-server"
+    "dev": "watchify main.js tractview.js -o bundle.js & lite-server"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "@types/jquery": "^3.2.16",
     "bootstrap": "^3.3.7",
     "jquery": "^3.2.1",
+    "jquery-file-upload": "^4.0.5",
     "ndarray": "^1.0.18",
     "nifti-js": "^1.0.1",
     "pako": "^1.0.6",
