@@ -9,7 +9,6 @@ Plotly.register([
 ]);
 */
 
-
 var TractView = {
 
     /**
@@ -222,13 +221,6 @@ var TractView = {
                     });
 
                     subTracts.checkbox = row.checkbox_left;
-                    /*
-                    subTracts._restore = {
-                        visible: true,
-                        color: subTracts.color,
-                        //material: subTracts.mesh.material,
-                    };
-                    */
                 } else {
                     // toggles that have both L + R checkboxes, almost the same as code above, just done twice
                     let left = subTracts.left;
@@ -534,7 +526,7 @@ var TractView = {
                     cols.push(geometry.tract.color.r*normalized_v);
                     cols.push(geometry.tract.color.g*normalized_v);
                     cols.push(geometry.tract.color.b*normalized_v);
-                    cols.push(0.7);
+                    cols.push(1.0);
                 }
                 geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 4));
                 
