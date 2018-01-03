@@ -202,11 +202,13 @@ var TractView = {
                         },
                         onmouseenter: e => {
                             subTracts.mesh.visible = true;
+                            if (subTracts.mesh.material.uniforms) subTracts.mesh.material.uniforms.selected = { value: true };
                             subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
                         },
                         onmouseleave: e => {
                             var restore = config.LRtractNames[tractName]._restore;
                             subTracts.mesh.visible = restore.visible;
+                            if (subTracts.mesh.material.uniforms) subTracts.mesh.material.uniforms.selected = { value: false };
                             subTracts.mesh.material.color = restore.color;
                         }
                     });
@@ -240,12 +242,18 @@ var TractView = {
                             left.mesh.material.color = new THREE.Color(1, 1, 1);
                             right.mesh.visible = true;
                             right.mesh.material.color = new THREE.Color(1, 1, 1);
+                            
+                            if (left.mesh.material.uniforms) left.mesh.material.uniforms.selected = { value: true };
+                            if (right.mesh.material.uniforms) right.mesh.material.uniforms.selected = { value: true };
                         },
                         onmouseleave: e => {
                             left.mesh.visible = left._restore.visible;
                             left.mesh.material.color = left._restore.color;
                             right.mesh.visible = right._restore.visible;
                             right.mesh.material.color = right._restore.color;
+                            
+                            if (left.mesh.material.uniforms) left.mesh.material.uniforms.selected = { value: false };
+                            if (right.mesh.material.uniforms) right.mesh.material.uniforms.selected = { value: false };
                         }
                     });
 
@@ -514,6 +522,7 @@ var TractView = {
                     uniform float dataMin;
                     uniform float dataMax;
                     uniform float gamma;
+                    uniform bool selected;
                     
                     float transformify(float value) {
                         return pow(value / dataMax, 1.0 / gamma) * dataMax;
@@ -523,7 +532,12 @@ var TractView = {
                         //gl_FragColor = vec4( vColor.rgb, 1.0 );
                         //gl_FragColor = vec4( vColor.r,1,1,vColor.r);
                         
-                        gl_FragColor = vec4(transformify(vColor.r), transformify(vColor.g), transformify(vColor.b), vColor.a);
+                        if (selected) {
+                            gl_FragColor = vec4(1.0, 1.0, 1.0, vColor.a);
+                        }
+                        else {
+                            gl_FragColor = vec4(transformify(vColor.r), transformify(vColor.g), transformify(vColor.b), vColor.a);
+                        }
                     }
                 `;
                 var cols = [];
@@ -576,6 +590,7 @@ var TractView = {
                         "gamma": { value: gamma_value },
                         "dataMin": { value: 1 },
                         "dataMax": { value: 1 },
+                        "selected": { value: false },
                     },
                     transparent: true,
                 }) );

@@ -10,25 +10,31 @@ $(function() {
        //debug: let datauis/wmc view create a debug config
     }
 
-    //set token for each tracts/layers
-    config.tracts.forEach(tract=>{
-        if(~tract.url.indexOf("?")) tract.url += "&";
-        else tract.url += "?";
-        tract.url += "at="+jwt;
-    });
-    if(config.layers) config.layers.forEach(layer=>{
-        if(~layer.url.indexOf("?")) layer.url += "&";
-        else layer.url += "?";
-        layer.url += "at="+jwt;
-    });
-    
     // code to get steven's instance to work without remote loading
-    // config.tracts.forEach(tract => {
-    //     tract.url = encodeURI(`http://localhost:8080/temp/wmc_59b2c17a76fddd0027308fb8/1_tracts/${tract.filename}`);
-    // });
-    // if (config.layers) config.layers.forEach(layer => {
-    //     layer.url = encodeURI(`http://localhost:8080/temp/dtiinit_5a26f2c34e57c077cf5e3472/1_./dti/bin/${layer.filename}`);
-    // });
+    if (localStorage.getItem("steven_debug")) {
+        config.tracts.forEach(tract => {
+            tract.url = encodeURI(`http://localhost:8080/temp/wmc_59b2c17a76fddd0027308fb8/1_tracts/${tract.filename}`);
+        });
+        if (config.layers) config.layers.forEach(layer => {
+            layer.url = encodeURI(`http://localhost:8080/temp/dtiinit_5a26f2c34e57c077cf5e3472/1_./dti/bin/${layer.filename}`);
+        });
+        if (config.extend) config.extend.forEach(extension => {
+            extension.url = encodeURI(`http://localhost:8080/temp/life_599ec73d8aca550029071e2f/${extension.filename}`);
+        });
+    }
+    else {
+        //set token for each tracts/layers
+        config.tracts.forEach(tract=>{
+            if(~tract.url.indexOf("?")) tract.url += "&";
+            else tract.url += "?";
+            tract.url += "at="+jwt;
+        });
+        if(config.layers) config.layers.forEach(layer=>{
+            if(~layer.url.indexOf("?")) layer.url += "&";
+            else layer.url += "?";
+            layer.url += "at="+jwt;
+        });
+    }
     
     console.log("dump");
     console.dir(config);
@@ -37,6 +43,7 @@ $(function() {
         preview_scene_path: 'models/brain.json',
         tracts: config.tracts,
         niftis: config.layers,
+        extend: config.extend,
     });
 });
 
@@ -1068,11 +1075,13 @@ var TractView = {
                         },
                         onmouseenter: e => {
                             subTracts.mesh.visible = true;
+                            if (subTracts.mesh.material.uniforms) subTracts.mesh.material.uniforms.selected = { value: true };
                             subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
                         },
                         onmouseleave: e => {
                             var restore = config.LRtractNames[tractName]._restore;
                             subTracts.mesh.visible = restore.visible;
+                            if (subTracts.mesh.material.uniforms) subTracts.mesh.material.uniforms.selected = { value: false };
                             subTracts.mesh.material.color = restore.color;
                         }
                     });
@@ -1106,12 +1115,18 @@ var TractView = {
                             left.mesh.material.color = new THREE.Color(1, 1, 1);
                             right.mesh.visible = true;
                             right.mesh.material.color = new THREE.Color(1, 1, 1);
+                            
+                            if (left.mesh.material.uniforms) left.mesh.material.uniforms.selected = { value: true };
+                            if (right.mesh.material.uniforms) right.mesh.material.uniforms.selected = { value: true };
                         },
                         onmouseleave: e => {
                             left.mesh.visible = left._restore.visible;
                             left.mesh.material.color = left._restore.color;
                             right.mesh.visible = right._restore.visible;
                             right.mesh.material.color = right._restore.color;
+                            
+                            if (left.mesh.material.uniforms) left.mesh.material.uniforms.selected = { value: false };
+                            if (right.mesh.material.uniforms) right.mesh.material.uniforms.selected = { value: false };
                         }
                     });
 
@@ -1380,6 +1395,7 @@ var TractView = {
                     uniform float dataMin;
                     uniform float dataMax;
                     uniform float gamma;
+                    uniform bool selected;
                     
                     float transformify(float value) {
                         return pow(value / dataMax, 1.0 / gamma) * dataMax;
@@ -1389,7 +1405,12 @@ var TractView = {
                         //gl_FragColor = vec4( vColor.rgb, 1.0 );
                         //gl_FragColor = vec4( vColor.r,1,1,vColor.r);
                         
-                        gl_FragColor = vec4(transformify(vColor.r), transformify(vColor.g), transformify(vColor.b), vColor.a);
+                        if (selected) {
+                            gl_FragColor = vec4(1.0, 1.0, 1.0, vColor.a);
+                        }
+                        else {
+                            gl_FragColor = vec4(transformify(vColor.r), transformify(vColor.g), transformify(vColor.b), vColor.a);
+                        }
                     }
                 `;
                 var cols = [];
@@ -1442,6 +1463,7 @@ var TractView = {
                         "gamma": { value: gamma_value },
                         "dataMin": { value: 1 },
                         "dataMax": { value: 1 },
+                        "selected": { value: false },
                     },
                     transparent: true,
                 }) );
