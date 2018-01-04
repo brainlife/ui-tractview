@@ -61311,7 +61311,8 @@ var TractView = {
         }
         
         function destroyPlot() {
-            plots_el.html('');
+            // plots_el.html('');
+            Plotly.purge(plots_el[0]);
             plots_el[0].style.display = "none";
         }
         
@@ -61470,6 +61471,7 @@ var TractView = {
         }
         
         function recalculateMaterials() {
+            global_hist = [];
             while (all_mesh.length)
                 scene.remove(all_mesh.pop());
 
@@ -61498,7 +61500,9 @@ var TractView = {
                 }
                 else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
                     color_map = undefined;
+                    
                     recalculateMaterials();
+                    destroyPlot();
                     reselectAll();
                 }
                 else {
