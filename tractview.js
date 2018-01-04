@@ -2,12 +2,8 @@
 var ndarray = require('ndarray');
 var nifti = require('nifti-js');
 
-/*
 var Plotly = require('plotly.js/lib/core');
-Plotly.register([
-        require('plotly.js/lib/histogram')
-]);
-*/
+Plotly.register([require('plotly.js/lib/histogram')]);
 
 var TractView = {
 
@@ -23,7 +19,7 @@ var TractView = {
     init: function(config) {
         if (!config) throw "Error: No config provided";
 
-        var color_map, color_map_head, all_geometry = [], all_mesh = [],
+        var color_map, color_map_head, all_geometry = [], all_mesh = [], global_hist = [],
             brainRotationX = -Math.PI/2, bgcolor = [96, 96, 96];
         
         // global uniforms
@@ -58,7 +54,8 @@ var TractView = {
         hide_show_el = user_container.find("#hide_show"),
         hide_show_text_el = user_container.find("#hide_show_text"),
         nifti_select_el = user_container.find("#nifti_select"),
-        gamma_input_el = user_container.find("#gamma_input");
+        gamma_input_el = user_container.find("#gamma_input"),
+        plots_el = user_container.find("#plots");
         
         let debounce = null;
         
@@ -434,6 +431,31 @@ var TractView = {
             });
         }
         
+        function destroyPlot() {
+            plots_el.html('');
+            plots_el[0].style.display = "none";
+        }
+        
+        function makePlot() {
+            destroyPlot();
+            
+            var zero_to_100 = [];
+            for (var x = 0; x <= 100; x++) {
+                zero_to_100.push(x);
+                global_hist[x] = global_hist[x] || 0;
+            }
+            
+            plots_el[0].style.display = "inline-block";
+            Plotly.plot(plots_el[0], [{
+                x: zero_to_100,
+                y: global_hist,
+            }], {
+                xaxis: { title: "Image Intensity" },
+                yaxis: { title: "Number of Voxels" },
+                //margin: {t: 0, b: 35, r: 0},
+            });
+        }
+        
         function gamma_changed() {
             gamma_value = +this.value;
             let tmp = setTimeout(function() {
@@ -520,8 +542,9 @@ var TractView = {
 
                     //compute histogram
                     var hv = Math.round(normalized_v*256);
-                    if(!hist[hv]) hist[hv] = 1;
-                    else hist[hv]++;
+                    var glob_hv = Math.round(normalized_v*100);
+                    hist[hv] = (hist[hv] || 0) + 1;
+                    global_hist[glob_hv] = (global_hist[glob_hv] || 0) + 1;
                     
                     cols.push(geometry.tract.color.r*normalized_v);
                     cols.push(geometry.tract.color.g*normalized_v);
@@ -635,8 +658,10 @@ var TractView = {
 
             // console.log("color map");
             // console.dir(color_map);
-
+            
             recalculateMaterials();
+            makePlot();
+            
             reselectAll();
         }
         
@@ -672,6 +697,7 @@ var TractView = {
                                     <label for="upload_nifti">Upload Nifti</label>
                                     <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
                                 </div>
+                                <div class="plots" id="plots"></div>
                             </div>
                         </div>
                     </div>
@@ -762,13 +788,15 @@ var TractView = {
                 max-width:500px;
                 width:auto;
                 height:auto;
+                max-height:100%;
                 padding-top:2px;
-                overflow:hidden;
+                overflow:auto;
                 transition:max-width .5s, opacity .5s, padding .5s;
             }
             
             .nifti_chooser {
                 padding-left:4px;
+                display:inline-block;
             }
             
             .gamma_input {
@@ -776,6 +804,12 @@ var TractView = {
                 background:none;
                 color:white;
                 max-width:50px;
+            }
+            
+            .plots {
+                display:none;
+                width:400px;
+                height:300px;
             }
             
             .nifti_select {
