@@ -184,7 +184,7 @@ var TractView = {
                 else config.LRtractNames[rawName] = tract;   // standalone, not left or right
             });
 
-            var white_material = new THREE.LineBasicMaterial({
+            let white_material = new THREE.LineBasicMaterial({
                 color: new THREE.Color(1,1,1),
             });
 
@@ -197,12 +197,14 @@ var TractView = {
                     var row = makeToggle(tractName, {
                         hideRightToggle: true,
                         onchange_left: (left_checked) => {
+                            if (!subTracts.mesh) return;
                             subTracts.mesh.visible = left_checked;
                             subTracts.mesh.visible_back = left_checked;
                             // if (!left_checked) row.addClass('disabled');
                             // else row.removeClass('disabled');
                         },
                         onmouseenter: e => {
+                            if (!subTracts.mesh) return;
                             //subTracts.mesh.visible = true;
                             //subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
                             subTracts.mesh.visible_back = subTracts.mesh.visible;
@@ -211,6 +213,7 @@ var TractView = {
                             subTracts.mesh.material = white_material;
                         },
                         onmouseleave: e => {
+                            if (!subTracts.mesh || !subTracts.mesh.material_back) return;
                             //subTracts.mesh.visible = restore.visible;
                             subTracts.mesh.visible = subTracts.mesh.visible_back;
                             subTracts.mesh.material = subTracts.mesh.material_back;
@@ -218,23 +221,27 @@ var TractView = {
                     });
 
                     subTracts.checkbox = row.checkbox_left;
-                } else {
+                }
+                else {
                     // toggles that have both L + R checkboxes, almost the same as code above, just done twice
                     let left = subTracts.left;
                     let right = subTracts.right;
 
                     var row = makeToggle(tractName, {
                         onchange_left: (left_checked, none_checked) => {
+                            if (!left.mesh) return;
                             left.mesh.visible = left_checked;
                             left.mesh.visible_back = left_checked;
                             //left._restore.visible = left_checked;
                         },
                         onchange_right: (right_checked, none_checked) => {
+                            if (!right.mesh) return;
                             right.mesh.visible = right_checked;
                             right.mesh.visible_back = right_checked;
                             //right._restore.visible = right_checked;
                         },
                         onmouseenter: e => {
+                            if (!left.mesh || !right.mesh) return;
                             left.mesh.visible_back = left.mesh.visible;
                             right.mesh.visible_back = right.mesh.visible;
                             left.mesh.material_back = left.mesh.material;
@@ -245,6 +252,7 @@ var TractView = {
                             right.mesh.material = white_material;
                         },
                         onmouseleave: e => {
+                            if (!left.mesh || !right.mesh || !left.mesh.material_back || !right.mesh.material_back) return;
                             left.mesh.visible = left.mesh.visible_back;
                             left.mesh.material = left.mesh.material_back;
                             right.mesh.visible = right.mesh.visible_back;
