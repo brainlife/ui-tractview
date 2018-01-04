@@ -61330,10 +61330,24 @@ var TractView = {
                 x: zero_to_one,
                 y: global_hist,
             }], {
-                xaxis: { title: "Image Intensity" },
-                yaxis: { title: "Number of Voxels" },
+                xaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Image Intensity" },
+                yaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Number of Voxels" },
+                
+                margin: {
+                    t: 5,
+                    b: 32,
+                    l: 52,
+                    r: 30
+                },
+                font: { color: '#ccc' },
+                titlefont: { color: '#ccc' },
+                
+                plot_bgcolor: 'transparent',
+                paper_bgcolor: 'transparent',
+                autosize: true,
+                
                 //margin: {t: 0, b: 35, r: 0},
-            });
+            }, { displayModeBar: false });
         }
         
         function gamma_changed() {
@@ -61691,8 +61705,8 @@ var TractView = {
             
             .plots {
                 display:none;
-                width:400px;
-                height:300px;
+                width:300px;
+                height:200px;
             }
             
             .nifti_select {
