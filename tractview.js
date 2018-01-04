@@ -448,15 +448,15 @@ var TractView = {
         function makePlot() {
             destroyPlot();
             
-            var zero_to_100 = [];
+            var zero_to_one = [];
             for (var x = 0; x <= 100; x++) {
-                zero_to_100.push(x);
+                zero_to_one.push(x / 100);
                 global_hist[x] = global_hist[x] || 0;
             }
             
             plots_el[0].style.display = "inline-block";
             Plotly.plot(plots_el[0], [{
-                x: zero_to_100,
+                x: zero_to_one,
                 y: global_hist,
             }], {
                 xaxis: { title: "Image Intensity" },
