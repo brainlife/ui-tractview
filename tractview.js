@@ -151,8 +151,7 @@ var TractView = {
                     if (toggle.left) {
                         if (toggle.left.checkbox[0].checked != e.target.checked) toggle.left.checkbox.click();
                         if (toggle.right.checkbox[0].checked != e.target.checked) toggle.right.checkbox.click();
-                    }
-                    else {
+                    } else {
                         if (toggle.checkbox[0].checked != e.target.checked) toggle.checkbox.click();
                     }
                 }
@@ -221,8 +220,7 @@ var TractView = {
                     });
 
                     subTracts.checkbox = row.checkbox_left;
-                }
-                else {
+                } else {
                     // toggles that have both L + R checkboxes, almost the same as code above, just done twice
                     let left = subTracts.left;
                     let right = subTracts.right;
@@ -273,8 +271,7 @@ var TractView = {
                     container_toggles.css({ 'max-width': '500px', 'opacity': 1 });
                     controls_el.css({ 'overflow-y': 'auto' });
                     hide_show_text_el.text('Hide Controls');
-                }
-                else {
+                } else {
                     hide_show_el.css('min-height', container_toggles.height() + 'px');
                     container_toggles.css({ 'max-width': '0px', 'opacity': 0 });
                     controls_el.css({ 'overflow-y': 'hidden' });
@@ -647,8 +644,7 @@ var TractView = {
                     recalculateMaterials();
                     destroyPlot();
                     reselectAll();
-                }
-                else {
+                } else {
                     fetch(nifti_select_el.val())
                         .then(res => res.arrayBuffer())
                         .then(processDeflatedNiftiBuffer)
