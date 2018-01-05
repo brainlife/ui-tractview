@@ -2,13 +2,8 @@
 var ndarray = require('ndarray');
 var nifti = require('nifti-js');
 
-/*
 var Plotly = require('plotly.js/lib/core');
-Plotly.register([
-        require('plotly.js/lib/histogram')
-]);
-*/
-
+Plotly.register([require('plotly.js/lib/histogram')]);
 
 var TractView = {
 
@@ -24,8 +19,12 @@ var TractView = {
     init: function(config) {
         if (!config) throw "Error: No config provided";
 
-        var color_map, color_map_head, all_geometry = [], all_mesh = [], brainRotationX = -Math.PI/2;
-
+        var color_map, color_map_head, all_geometry = [], all_mesh = [], global_hist = [],
+            brainRotationX = -Math.PI/2, bgcolor = [96, 96, 96];
+        
+        // global uniforms
+        var gamma_value = 1, dataMin_value = 1, dataMax_value = 1;
+        
         // set up for later
         config.num_fibers = 0;
         config.LRtractNames = {};
@@ -41,10 +40,10 @@ var TractView = {
 
         populateHtml(user_container);
 
+        var scene, camera, renderer;
         var stats = new Stats();
         user_container.append(stats.dom);
 
-        var scene, camera;
         var user_uploaded_files = {};
 
         var view = user_container.find("#conview"),
@@ -54,7 +53,11 @@ var TractView = {
         tract_toggles_el = user_container.find("#tract_toggles"),
         hide_show_el = user_container.find("#hide_show"),
         hide_show_text_el = user_container.find("#hide_show_text"),
-        nifti_select_el = user_container.find("#nifti_select");
+        nifti_select_el = user_container.find("#nifti_select"),
+        gamma_input_el = user_container.find("#gamma_input"),
+        plots_el = user_container.find("#plots");
+        
+        let debounce = null;
         
         create_nifti_options();
         $("#upload_nifti").on('change', function() {
@@ -81,8 +84,8 @@ var TractView = {
         init_conview();
 
         function init_conview() {
-            var renderer = new THREE.WebGLRenderer({alpha: false, antialias: true});
-            var brainRenderer = new THREE.WebGLRenderer({alpha: true});
+            renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+            var brainRenderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
 
             scene = new THREE.Scene();
 
@@ -181,7 +184,7 @@ var TractView = {
                 else config.LRtractNames[rawName] = tract;   // standalone, not left or right
             });
 
-            var white_material = new THREE.LineBasicMaterial({
+            let white_material = new THREE.LineBasicMaterial({
                 color: new THREE.Color(1,1,1),
             });
 
@@ -194,12 +197,14 @@ var TractView = {
                     var row = makeToggle(tractName, {
                         hideRightToggle: true,
                         onchange_left: (left_checked) => {
+                            if (!subTracts.mesh) return;
                             subTracts.mesh.visible = left_checked;
                             subTracts.mesh.visible_back = left_checked;
                             // if (!left_checked) row.addClass('disabled');
                             // else row.removeClass('disabled');
                         },
                         onmouseenter: e => {
+                            if (!subTracts.mesh) return;
                             //subTracts.mesh.visible = true;
                             //subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
                             subTracts.mesh.visible_back = subTracts.mesh.visible;
@@ -208,6 +213,7 @@ var TractView = {
                             subTracts.mesh.material = white_material;
                         },
                         onmouseleave: e => {
+                            if (!subTracts.mesh || !subTracts.mesh.material_back) return;
                             //subTracts.mesh.visible = restore.visible;
                             subTracts.mesh.visible = subTracts.mesh.visible_back;
                             subTracts.mesh.material = subTracts.mesh.material_back;
@@ -215,30 +221,27 @@ var TractView = {
                     });
 
                     subTracts.checkbox = row.checkbox_left;
-                    /*
-                    subTracts._restore = {
-                        visible: true,
-                        color: subTracts.color,
-                        //material: subTracts.mesh.material,
-                    };
-                    */
-                } else {
+                }
+                else {
                     // toggles that have both L + R checkboxes, almost the same as code above, just done twice
                     let left = subTracts.left;
                     let right = subTracts.right;
 
                     var row = makeToggle(tractName, {
                         onchange_left: (left_checked, none_checked) => {
+                            if (!left.mesh) return;
                             left.mesh.visible = left_checked;
                             left.mesh.visible_back = left_checked;
                             //left._restore.visible = left_checked;
                         },
                         onchange_right: (right_checked, none_checked) => {
+                            if (!right.mesh) return;
                             right.mesh.visible = right_checked;
                             right.mesh.visible_back = right_checked;
                             //right._restore.visible = right_checked;
                         },
                         onmouseenter: e => {
+                            if (!left.mesh || !right.mesh) return;
                             left.mesh.visible_back = left.mesh.visible;
                             right.mesh.visible_back = right.mesh.visible;
                             left.mesh.material_back = left.mesh.material;
@@ -249,6 +252,7 @@ var TractView = {
                             right.mesh.material = white_material;
                         },
                         onmouseleave: e => {
+                            if (!left.mesh || !right.mesh || !left.mesh.material_back || !right.mesh.material_back) return;
                             left.mesh.visible = left.mesh.visible_back;
                             left.mesh.material = left.mesh.material_back;
                             right.mesh.visible = right.mesh.visible_back;
@@ -298,14 +302,21 @@ var TractView = {
             //use OrbitControls and make camera light follow camera position
             var controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.autoRotate = true;
-            controls.addEventListener('change', function() {
+            controls.addEventListener('change', function(e) {
                 //rotation changes
             });
             controls.addEventListener('start', function(){
                 //use interacting with control
+                gamma_input_el.trigger({type: "blur"});
                 controls.autoRotate = false;
             });
+            
+            gamma_input_el.on('change', gamma_changed);
+            gamma_input_el.on('keyup', gamma_changed);
+            updateAllShaders();
+            
             function animate_conview() {
+                controls.enableKeys = !gamma_input_el.is(":focus");
                 controls.update();
 
                 renderer.clear();
@@ -427,6 +438,71 @@ var TractView = {
                 cb(null, calculateMesh(geometry), res);
             });
         }
+        
+        function destroyPlot() {
+            // plots_el.html('');
+            Plotly.purge(plots_el[0]);
+            plots_el[0].style.display = "none";
+        }
+        
+        function makePlot() {
+            destroyPlot();
+            
+            var zero_to_one = [];
+            for (var x = 0; x <= 100; x++) {
+                zero_to_one.push(x / 100);
+                global_hist[x] = global_hist[x] || 0;
+            }
+            
+            plots_el[0].style.display = "inline-block";
+            Plotly.plot(plots_el[0], [{
+                x: zero_to_one,
+                y: global_hist,
+            }], {
+                xaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Image Intensity" },
+                yaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Number of Voxels" },
+                
+                margin: {
+                    t: 5,
+                    b: 32,
+                    l: 52,
+                    r: 30
+                },
+                font: { color: '#ccc' },
+                titlefont: { color: '#ccc' },
+                
+                plot_bgcolor: 'transparent',
+                paper_bgcolor: 'transparent',
+                autosize: true,
+                
+                //margin: {t: 0, b: 35, r: 0},
+            }, { displayModeBar: false });
+        }
+        
+        function gamma_changed() {
+            gamma_value = +this.value;
+            let tmp = setTimeout(function() {
+                if (debounce == tmp)
+                    updateAllShaders();
+            }, 500);
+            debounce = tmp;
+        }
+        
+        // update all shaders, namely their uniforms
+        function updateAllShaders() {
+            all_mesh.forEach(mesh => {
+                if (mesh.material.uniforms) {
+                    // console.log(mesh.material.uniforms);
+                    mesh.material.uniforms["gamma"].value = gamma_value;
+                    if (mesh.material.uniforms["dataMin"]) mesh.material.uniforms["dataMin"].value = dataMin_value;
+                    if (mesh.material.uniforms["dataMax"]) mesh.material.uniforms["dataMax"].value = dataMax_value;
+                }
+            });
+            
+            // update background depending on gamma
+            var transform96 = Math.pow(96 / 255, 1 / gamma_value);
+            renderer.setClearColor(new THREE.Color(transform96,transform96,transform96));
+        }
 
         // returns whether or not the tractName is considered to be a left tract
         function isLeftTract(tractName) {
@@ -444,32 +520,11 @@ var TractView = {
         }
 
         function calculateMesh(geometry) {
-
-            /*
-            if (nifti_select_el.val() == 'rainbow') {
-                var cols = [];
-                for (var i = 0; i < geometry.vertices.length; i += 3) {
-                    var l = Math.sqrt(geometry.vertices[i] * geometry.vertices[i] + geometry.vertices[i + 1] * geometry.vertices[i + 1] + geometry.vertices[i + 2] * geometry.vertices[i + 2]);
-                    cols.push(geometry.vertices[i] / l);
-                    cols.push(geometry.vertices[i + 1] / l);
-                    cols.push(geometry.vertices[i + 2] / l);
-                }
-                geometry.addAttribute('col', new THREE.BufferAttribute(new Float32Array(cols), 3));
-                var m = new THREE.LineSegments(geometry, new THREE.ShaderMaterial({
-                    vertexShader,
-                    fragmentShader
-                }) );
-                config.tracts[geometry.tract_index].mesh = m;
-
-                return m;
-            }
-            else
-            */
             if (color_map) {
-                /*
                 var vertexShader = `
                     attribute vec4 color;
                     varying vec4 vColor;
+                    
                     void main(){
                         vColor = color;
                         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -478,13 +533,19 @@ var TractView = {
 
                 var fragmentShader = `
                     varying vec4 vColor;
+                    uniform float dataMin;
+                    uniform float dataMax;
+                    uniform float gamma;
+                    
+                    float transformify(float value) {
+                        return pow(value / dataMax, 1.0 / gamma) * dataMax;
+                    }
+                    
                     void main(){
-                        //gl_FragColor = vec4( vColor.rgb, 1.0 );
-                        //gl_FragColor = vec4( vColor.rgb[0],1,1,vColor.rgb[0]);
-                        gl_FragColor = vColor;
+                        gl_FragColor = vec4(transformify(vColor.r), transformify(vColor.g), transformify(vColor.b), vColor.a);
                     }
                 `;
-                */
+                
                 var cols = [];
                 var hist = [];
                 for (var i = 0; i < geometry.vertices.length; i += 3) {
@@ -496,7 +557,7 @@ var TractView = {
                     //find voxel value
                     var v = color_map.get(z, y, x);
 
-                    var normalized_v = (v - color_map.min) / (color_map.max - color_map.min);
+                    var normalized_v = (v - dataMin_value) / (dataMax_value - dataMin_value);
                     
                     //clip..
                     if(normalized_v < 0.1) normalized_v = 0.1;
@@ -504,60 +565,40 @@ var TractView = {
 
                     //compute histogram
                     var hv = Math.round(normalized_v*256);
-                    if(!hist[hv]) hist[hv] = 1;
-                    else hist[hv]++;
-
-                    /*
-                    if(x > 63 && x < 66) {// & y > 113 && y < 136 && x > 46 && x < 58) {
-                        //console.log(normalized_v);
-                    } else {
-                        normalized_v = 0.05;
-                    }
-                    */
-                    //TODO - pick a better color?
-                    /*
-                    cols.push(0); //r
-                    cols.push(normalized_v); //g
-                    cols.push(0.5); //b
-                    cols.push(0.75); //a
-                    */
-                    //cols.push((geometry.tract.color.r*2)*normalized_v/2);
-                    //cols.push((geometry.tract.color.g*2)*normalized_v/2);
-                    //cols.push((geometry.tract.color.b*2)*normalized_v/2);
+                    var glob_hv = Math.round(normalized_v*100);
+                    hist[hv] = (hist[hv] || 0) + 1;
+                    global_hist[glob_hv] = (global_hist[glob_hv] || 0) + 1;
+                    
                     cols.push(geometry.tract.color.r*normalized_v);
                     cols.push(geometry.tract.color.g*normalized_v);
                     cols.push(geometry.tract.color.b*normalized_v);
-                    //cols.push(normalized_v); //g
-                    //cols.push(1);
+                    cols.push(1.0);
                 }
-                //console.dir(geometry.tract.color);
-                geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 3));
-                //geometry.addAttribute('color', new THREE.Float32BufferAttribute(cols), 3);
+                geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 4));
                 
-                //console.log("displaying histographm");
-                //console.dir(hist);
-
-                /*
                 var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
                     vertexShader,
                     fragmentShader,
+                    uniforms: {
+                        "gamma": { value: gamma_value },
+                        "dataMin": { value: 1 },
+                        "dataMax": { value: 1 },
+                    },
                     transparent: true,
                 }) );
-                */
-                var material = new THREE.LineBasicMaterial({ 
-                    vertexColors: THREE.VertexColors,
-                    transparent: true,
-                    opacity: 0.7,
-                });
-            } else {
-                var material = new THREE.LineBasicMaterial({
-                    color: geometry.tract.color,
-                    transparent: true,
-                    opacity: 0.7,
-                });
-            }    
-            var m = new THREE.LineSegments( geometry, material);
+                
+                config.tracts[geometry.tract_index].mesh = m;
+                return m;
+            }
+            
+            var material = new THREE.LineBasicMaterial({
+                color: geometry.tract.color,
+                transparent: true,
+                opacity: 0.7,
+            });
+            var m = new THREE.LineSegments( geometry, material );
             config.tracts[geometry.tract_index].mesh = m;
+            
             return m;
         }
         
@@ -573,6 +614,7 @@ var TractView = {
         }
         
         function recalculateMaterials() {
+            global_hist = [];
             while (all_mesh.length)
                 scene.remove(all_mesh.pop());
 
@@ -585,11 +627,14 @@ var TractView = {
             let preloaded = [];
             nifti_select_el.append($("<option/>").html("None").val('none'));
             //nifti_select_el.append($("<option/>").html("Rainboww!! :D").val('rainbow'));
-
-            if(config.niftis) config.niftis.forEach(nifti => {
-                nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
-            });
-
+            
+            if (config.niftis) {
+                $(".nifti_chooser")[0].style.display = "";
+                config.niftis.forEach(nifti => {
+                    nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
+                });
+            }
+            
             nifti_select_el.on('change', function() {
                 if (nifti_select_el.val().startsWith("user_uploaded|")) {
                     var buffer = user_uploaded_files[nifti_select_el.val().substring(("user_uploaded|").length)];
@@ -598,7 +643,9 @@ var TractView = {
                 }
                 else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
                     color_map = undefined;
+                    
                     recalculateMaterials();
+                    destroyPlot();
                     reselectAll();
                 }
                 else {
@@ -632,13 +679,15 @@ var TractView = {
             color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
 
             //set min/max
-            color_map.min = color_map.mean - color_map.sdev;
-            color_map.max = color_map.mean + color_map.sdev*5;
+            dataMin_value = color_map.mean - color_map.sdev;
+            dataMax_value = color_map.mean + color_map.sdev*5;
 
-            console.log("color map");
-            console.dir(color_map);
-
+            // console.log("color map");
+            // console.dir(color_map);
+            
             recalculateMaterials();
+            makePlot();
+            
             reselectAll();
         }
         
@@ -667,12 +716,14 @@ var TractView = {
                             <table class="tract_toggles" id="tract_toggles"></table>
 
                             <!-- Nifti Choosing -->
-                            <div class="nifti_chooser">
+                            <div class="nifti_chooser" style="display:none;">
                                 <select id="nifti_select" class="nifti_select"></select>
+                                <div><label style="color:#ccc;">Gamma:</label> <input type="number" min=".00001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
                                 <div class="upload_div">
                                     <label for="upload_nifti">Upload Nifti</label>
                                     <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
                                 </div>
+                                <div class="plots" id="plots"></div>
                             </div>
                         </div>
                     </div>
@@ -763,9 +814,28 @@ var TractView = {
                 max-width:500px;
                 width:auto;
                 height:auto;
+                max-height:100%;
                 padding-top:2px;
-                overflow:hidden;
+                overflow:auto;
                 transition:max-width .5s, opacity .5s, padding .5s;
+            }
+            
+            .nifti_chooser {
+                padding-left:4px;
+                display:inline-block;
+            }
+            
+            .gamma_input {
+                border:none;
+                background:none;
+                color:white;
+                max-width:50px;
+            }
+            
+            .plots {
+                display:none;
+                width:300px;
+                height:200px;
             }
             
             .nifti_select {
