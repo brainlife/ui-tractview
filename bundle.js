@@ -61049,8 +61049,7 @@ var TractView = {
                     config.LRtractNames[rawName] = config.LRtractNames[rawName] || {};
                     if (isLeftTract(tract.name)) config.LRtractNames[rawName].left = tract;
                     else config.LRtractNames[rawName].right = tract;
-                }
-                else config.LRtractNames[rawName] = tract;   // standalone, not left or right
+                } else config.LRtractNames[rawName] = tract;   // standalone, not left or right
             });
 
             let white_material = new THREE.LineBasicMaterial({
@@ -61475,8 +61474,7 @@ var TractView = {
                 if (toggle.left) {
                     toggle.left.checkbox.click().click();
                     toggle.right.checkbox.click().click();
-                }
-                else toggle.checkbox.click().click();
+                } else toggle.checkbox.click().click();
             }
         }
         
@@ -61507,8 +61505,7 @@ var TractView = {
                     var buffer = user_uploaded_files[nifti_select_el.val().substring(("user_uploaded|").length)];
                     // TODO check if file is already re-inflated (not .nii.gz but instead just .nii)
                     processDeflatedNiftiBuffer(buffer);
-                }
-                else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
+                } else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
                     color_map = undefined;
                     
                     recalculateMaterials();
