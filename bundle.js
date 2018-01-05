@@ -13,10 +13,10 @@ $(function() {
     // code to get steven's instance to work without remote loading
     if (localStorage.getItem("steven_debug")) {
         config.tracts.forEach(tract => {
-            tract.url = encodeURI(`http://localhost:8080/temp/wmc_59b2c17a76fddd0027308fb8/1_tracts/${tract.filename}`);
+            tract.url = encodeURI(`http://otherhost/temp/wmc_59b2c17a76fddd0027308fb8/1_tracts/${tract.filename}`);
         });
         if (config.layers) config.layers.forEach(layer => {
-            layer.url = encodeURI(`http://localhost:8080/temp/dtiinit_5a26f2c34e57c077cf5e3472/1_./dti/bin/${layer.filename}`);
+            layer.url = encodeURI(`http://otherhost/temp/dtiinit_5a26f2c34e57c077cf5e3472/1_./dti/bin/${layer.filename}`);
         });
         if (config.extend) config.extend.forEach(extension => {
             extension.url = encodeURI(`http://localhost:8080/temp/life_599ec73d8aca550029071e2f/${extension.filename}`);
