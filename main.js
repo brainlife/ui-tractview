@@ -20,8 +20,7 @@ $(function() {
         if (config.extend) config.extend.forEach(extension => {
             extension.url = encodeURI(`http://localhost:8080/temp/life_599ec73d8aca550029071e2f/${extension.filename}`);
         });
-    }
-    else {
+    } else {
         //set token for each tracts/layers
         config.tracts.forEach(tract=>{
             if(~tract.url.indexOf("?")) tract.url += "&";
