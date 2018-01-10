@@ -1,6 +1,7 @@
 
 var ndarray = require('ndarray');
 var nifti = require('nifti-js');
+var async = require('async');
 
 var Plotly = require('plotly.js/lib/core');
 Plotly.register([require('plotly.js/lib/histogram')]);
@@ -282,13 +283,16 @@ var TractView = {
             });
 
             // start loading the tract
-            config.tracts.forEach((tract, i)=>{
-                load_tract(tract, i, function(err, mesh) {
+            var idx = 0;
+            async.eachLimit(config.tracts, 3, (tract, next_tract)=>{
+                load_tract(tract, idx++, (err, mesh)=>{
+                    if(err) return next_tract(err);
                     add_mesh_to_scene(mesh);
                     //config.num_fibers += res.coords.length;
                     tract.mesh = mesh;
+                    next_tract();
                 });
-            });
+            }, err=>console.log);
 
             renderer.autoClear = false;
             renderer.setSize(view.width(), view.height());
@@ -396,15 +400,18 @@ var TractView = {
         }
 
         function load_tract(tract, index, cb) {
+            console.log("loading tract", tract.url);
             fetch(tract.url).then(res=>{
                 return res.json();
             }).then(json=>{
-                console.dir(json);
                 var bundle = json.coords;
+
+                /* this does not prevent chrome from crashing..
                 if(bundle.length > 1000) {
                     console.log(tract, "has too many bundles - trimming at 1000", bundle.length);
                     bundle = bundle.slice(0, 1000);
                 }
+                */
 
                 //convert each bundle to threads_pos array
                 var threads_pos = [];
