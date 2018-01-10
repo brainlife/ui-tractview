@@ -26,7 +26,7 @@ var TractView = {
         var gamma_value = 1, dataMin_value = 1, dataMax_value = 1;
         
         // set up for later
-        config.num_fibers = 0;
+        //config.num_fibers = 0;
         config.LRtractNames = {};
 
         if (typeof config.selector != 'string')
@@ -162,12 +162,12 @@ var TractView = {
 
             // add header toggles to controls
             tract_toggles_el.append(
-                    $('<tr/>').addClass('header').append([
-                        $('<td><label class="all" for="checkbox_all">All</label></td>').append(checkbox_all),
-                        $('<td><label>Left</label></td>'),
-                        $('<td><label>Right</label></td>')
-                    ])
-                    );
+                $('<tr/>').addClass('header').append([
+                    $('<td><label class="all" for="checkbox_all">All</label></td>').append(checkbox_all),
+                    $('<td><label>Left</label></td>'),
+                    $('<td><label>Right</label></td>')
+                ])
+            );
 
             // group together tract names in the following way:
             // tractName -> { left: {tractNameLeft, mesh}, right: {tractNameRight, mesh} }
@@ -283,9 +283,9 @@ var TractView = {
 
             // start loading the tract
             config.tracts.forEach((tract, i)=>{
-                load_tract(tract, i, function(err, mesh, res) {
+                load_tract(tract, i, function(err, mesh) {
                     add_mesh_to_scene(mesh);
-                    config.num_fibers += res.coords.length;
+                    //config.num_fibers += res.coords.length;
                     tract.mesh = mesh;
                 });
             });
@@ -361,38 +361,32 @@ var TractView = {
             // mouse events
             row.on('mouseenter', e => {
                 row.addClass('active');
-                if (options.onmouseenter)
-                    options.onmouseenter(e);
+                if (options.onmouseenter) options.onmouseenter(e);
             });
             row.on('mouseleave', e => {
                 row.removeClass('active');
-                if (options.onmouseleave)
-                    options.onmouseleave(e);
+                if (options.onmouseleave) options.onmouseleave(e);
             });
 
             checkbox_left.on('change', e => {
                 var left_checked = checkbox_left[0].checked || false,
                 right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
 
-                if (options.onchange_left)
-                    options.onchange_left(left_checked, !left_checked && !right_checked);
+                if (options.onchange_left) options.onchange_left(left_checked, !left_checked && !right_checked);
             });
             checkbox_right.on('change', e => {
                 var left_checked = checkbox_left[0].checked || false,
                 right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
 
-                if (options.onchange_right)
-                    options.onchange_right(right_checked, !left_checked && !right_checked);
+                if (options.onchange_right) options.onchange_right(right_checked, !left_checked && !right_checked);
             });
 
             // add everything
             td_label.addClass('label').append(label);
             td_left.addClass('left').append(checkbox_left);
             td_right.addClass('right');
-            if (!options.hideRightToggle)
-                td_right.append(checkbox_right)
-
-                    row.addClass('row');
+            if (!options.hideRightToggle) td_right.append(checkbox_right)
+            row.addClass('row');
             row.append([td_label, td_left, td_right]);
 
             row.checkbox_left = checkbox_left;
@@ -402,21 +396,23 @@ var TractView = {
         }
 
         function load_tract(tract, index, cb) {
-            $.get(tract.url, res => {
-                var bundle = res.coords;
-
-                var threads_pos = [];
+            fetch(tract.url).then(res=>{
+                return res.json();
+            }).then(json=>{
+                console.dir(json);
+                var bundle = json.coords;
                 if(bundle.length > 1000) {
                     console.log(tract, "has too many bundles - trimming at 1000", bundle.length);
                     bundle = bundle.slice(0, 1000);
                 }
+
+                //convert each bundle to threads_pos array
+                var threads_pos = [];
                 bundle.forEach(function(fascicle) {
-                    if (fascicle[0] instanceof Array)
-                        fascicle = fascicle[0];
+                    if (fascicle[0] instanceof Array) fascicle = fascicle[0]; //for backward compatibility
                     var xs = fascicle[0];
                     var ys = fascicle[1];
                     var zs = fascicle[2];
-
                     for(var i = 1;i < xs.length;++i) {
                         threads_pos.push(xs[i-1]);
                         threads_pos.push(ys[i-1]);
@@ -427,17 +423,17 @@ var TractView = {
                     }
                 });
 
-                //now show bundle
+                //then convert that to bufferedgeometry
                 var vertices = new Float32Array(threads_pos);
                 var geometry = new THREE.BufferGeometry();
                 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3 ) );
-
-                geometry.tract = tract;
                 geometry.vertices = vertices;
                 geometry.tract_index = index;
+                geometry.tract = tract; //metadata..
+
                 all_geometry.push(geometry);
 
-                cb(null, calculateMesh(geometry), res);
+                cb(null, calculateMesh(geometry));
             });
         }
         
