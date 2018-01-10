@@ -35,14 +35,15 @@ $(function() {
         });
     }
     
-    console.log("dump");
-    console.dir(config);
+    //console.log("dump");
+    //console.dir(config);
     TractView.init({
         selector: '#tractview',
         preview_scene_path: 'models/brain.json',
         tracts: config.tracts,
         niftis: config.layers,
         extend: config.extend,
+        debug: true,
     });
 });
 
@@ -10898,7 +10899,7 @@ module.exports = true;
 /*!
  * Determine if an object is a Buffer
  *
- * @author   Feross Aboukhadijeh <https://feross.org>
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
  * @license  MIT
  */
 
@@ -60910,9 +60911,12 @@ var TractView = {
 
         populateHtml(user_container);
 
-        var scene, camera, renderer;
-        var stats = new Stats();
-        user_container.append(stats.dom);
+        var scene, camera, renderer, stats;
+        if(config.debug) {
+            console.log("initializing fps stats graph for debug mode");
+            stats = new Stats();
+            user_container.append(stats.dom);
+        }
 
         var user_uploaded_files = {};
 
@@ -61204,7 +61208,7 @@ var TractView = {
                 }
 
                 requestAnimationFrame( animate_conview );
-                stats.update();
+                if(config.debug) stats.update();
             }
 
             animate_conview();
@@ -61273,8 +61277,11 @@ var TractView = {
                 var bundle = res.coords;
 
                 var threads_pos = [];
+                if(bundle.length > 1000) {
+                    console.log(tract, "has too many bundles - trimming at 1000", bundle.length);
+                    bundle = bundle.slice(0, 1000);
+                }
                 bundle.forEach(function(fascicle) {
-
                     if (fascicle[0] instanceof Array)
                         fascicle = fascicle[0];
                     var xs = fascicle[0];
@@ -61556,198 +61563,198 @@ var TractView = {
         
         function populateHtml(element) {
             element.html(`
-            <div class="container">
-                <!-- Main Connectome View -->
-                <div id="conview" class="conview"></div>
+                <div class="container">
+                    <!-- Main Connectome View -->
+                    <div id="conview" class="conview"></div>
 
-                <!-- Tiny Brain to Show Orientation -->
-                <div id="tinybrain" class="tinybrain"></div>
+                    <!-- Tiny Brain to Show Orientation -->
+                    <div id="tinybrain" class="tinybrain"></div>
 
-                <div id="controls" class="controls">
-                    <div style="display:flex;">
-                        <!-- Hide/Show Panel -->
-                        <div id="hide_show" class="hide_show">
-                            <div class="table">
-                                <div class="cell">
-                                    <div class="rotated" id="hide_show_text"></div>
+                    <div id="controls" class="controls">
+                        <div style="display:flex;">
+                            <!-- Hide/Show Panel -->
+                            <div id="hide_show" class="hide_show">
+                                <div class="table">
+                                    <div class="cell">
+                                        <div class="rotated" id="hide_show_text"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Fascicle Toggling -->
-                        <div class="container_toggles" id="container_toggles">
-                            <table class="tract_toggles" id="tract_toggles"></table>
+                            <!-- Fascicle Toggling -->
+                            <div class="container_toggles" id="container_toggles">
+                                <table class="tract_toggles" id="tract_toggles"></table>
 
-                            <!-- Nifti Choosing -->
-                            <div class="nifti_chooser" style="display:none;">
-                                <select id="nifti_select" class="nifti_select"></select>
-                                <div><label style="color:#ccc;">Gamma:</label> <input type="number" min=".00001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
-                                <div class="upload_div">
-                                    <label for="upload_nifti">Upload Nifti</label>
-                                    <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
+                                <!-- Nifti Choosing -->
+                                <div class="nifti_chooser" style="display:none;">
+                                    <select id="nifti_select" class="nifti_select"></select>
+                                    <div><label style="color:#ccc;">Gamma:</label> <input type="number" min=".00001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
+                                    <div class="upload_div">
+                                        <label for="upload_nifti">Upload Nifti</label>
+                                        <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
+                                    </div>
+                                    <div class="plots" id="plots"></div>
                                 </div>
-                                <div class="plots" id="plots"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <style scoped>
-            .container {
-                width: 100%;
-                height: 100%;
-                padding: 0px;
-            }
-            
-            .conview {
-                width:100%;
-                height: 100%;
-            }
-            .tinybrain {
-                position:absolute;
-                pointer-events:none;
-                left:0;
-                bottom:0;
-                width:100px;
-                height:100px;
-            }
+                <style scoped>
+                .container {
+                    width: 100%;
+                    height: 100%;
+                    padding: 0px;
+                }
+                
+                .conview {
+                    width:100%;
+                    height: 100%;
+                }
+                .tinybrain {
+                    position:absolute;
+                    pointer-events:none;
+                    left:0;
+                    bottom:0;
+                    width:100px;
+                    height:100px;
+                }
 
-            .controls {
-                display:inline-block;
-                position:absolute;
-                right:0;
-                top:0;
-                width:auto;
-                height:auto;
-                max-height:100%;
-                padding-left:1px;
-                overflow-x:hidden;
-                overflow-y:auto;
-                white-space:nowrap;
-                font-family:Roboto;
-                font-size:12px;
-                background:rgba(0, 0, 0, .7);
-            }
+                .controls {
+                    display:inline-block;
+                    position:absolute;
+                    right:0;
+                    top:0;
+                    width:auto;
+                    height:auto;
+                    max-height:100%;
+                    padding-left:1px;
+                    overflow-x:hidden;
+                    overflow-y:auto;
+                    white-space:nowrap;
+                    font-family:Roboto;
+                    font-size:12px;
+                    background:rgba(0, 0, 0, .7);
+                }
 
-            .hide_show {
-                display:inline-block;
-                position:relative;
-                vertical-align:top;
-                text-align:left;
-                width:auto;
-                flex:1;
-                color: #777;
-                overflow:hidden;
-                cursor:default;
-                transition:background 1s, color 1s;
-            }
-            .hide_show:hover {
-                background:black;
-                color:white;
-            }
+                .hide_show {
+                    display:inline-block;
+                    position:relative;
+                    vertical-align:top;
+                    text-align:left;
+                    width:auto;
+                    flex:1;
+                    color: #777;
+                    overflow:hidden;
+                    cursor:default;
+                    transition:background 1s, color 1s;
+                }
+                .hide_show:hover {
+                    background:black;
+                    color:white;
+                }
 
-            /* Hide/Show Vertical Alignment */
-            .parent {
-                padding-right:4px;
-            }
-            .list-group-item.table {
-                height:auto !important;
-            }
-            .table {
-                display:table;
-                height:100%;
-                margin-bottom:0 !important;
-            }
-            .cell {
-                display:table-cell;
-                vertical-align:middle;
-            }
+                /* Hide/Show Vertical Alignment */
+                .parent {
+                    padding-right:4px;
+                }
+                .list-group-item.table {
+                    height:auto !important;
+                }
+                .table {
+                    display:table;
+                    height:100%;
+                    margin-bottom:0 !important;
+                }
+                .cell {
+                    display:table-cell;
+                    vertical-align:middle;
+                }
 
-            .hide_show .rotated {
-                display:inline-block;
-                min-width:16px;
-                max-width:16px;
-                vertical-align:middle;
-                transform:rotate(-90deg);
-            }
+                .hide_show .rotated {
+                    display:inline-block;
+                    min-width:16px;
+                    max-width:16px;
+                    vertical-align:middle;
+                    transform:rotate(-90deg);
+                }
 
-            .container_toggles {
-                display:inline-block;
-                max-width:500px;
-                width:auto;
-                height:auto;
-                max-height:100%;
-                padding-top:2px;
-                overflow:auto;
-                transition:max-width .5s, opacity .5s, padding .5s;
-            }
-            
-            .nifti_chooser {
-                padding-left:4px;
-                display:inline-block;
-            }
-            
-            .gamma_input {
-                border:none;
-                background:none;
-                color:white;
-                max-width:50px;
-            }
-            
-            .plots {
-                display:none;
-                width:300px;
-                height:200px;
-            }
-            
-            .nifti_select {
-                margin-bottom:4px;
-            }
-            
-            .upload_div {
-                color:#9cc;
-            }
-            
-            .upload_div:hover {
-                color:#aff;
-            }
+                .container_toggles {
+                    display:inline-block;
+                    max-width:500px;
+                    width:auto;
+                    height:auto;
+                    max-height:100%;
+                    padding-top:2px;
+                    overflow:auto;
+                    transition:max-width .5s, opacity .5s, padding .5s;
+                }
+                
+                .nifti_chooser {
+                    padding-left:4px;
+                    display:inline-block;
+                }
+                
+                .gamma_input {
+                    border:none;
+                    background:none;
+                    color:white;
+                    max-width:50px;
+                }
+                
+                .plots {
+                    display:none;
+                    width:300px;
+                    height:200px;
+                }
+                
+                .nifti_select {
+                    margin-bottom:4px;
+                }
+                
+                .upload_div {
+                    color:#9cc;
+                }
+                
+                .upload_div:hover {
+                    color:#aff;
+                }
 
-            label {
-                font-weight:100;
-                font-size:12px;
-            }
-            tr.header {
-                color:white;
-                text-align:center;
-                margin:0;
-            }
-            tr.header label {
-                margin-right:4px;
-                cursor:pointer;
-            }
+                label {
+                    font-weight:100;
+                    font-size:12px;
+                }
+                tr.header {
+                    color:white;
+                    text-align:center;
+                    margin:0;
+                }
+                tr.header label {
+                    margin-right:4px;
+                    cursor:pointer;
+                }
 
-            input[type="checkbox"] {
-                vertical-align:middle;
-                margin:0;
-                cursor:pointer;
-            }
+                input[type="checkbox"] {
+                    vertical-align:middle;
+                    margin:0;
+                    cursor:pointer;
+                }
 
-            td.label {
-                text-overflow:ellipsis;
-            }
+                td.label {
+                    text-overflow:ellipsis;
+                }
 
-            tr.row.disabled {
-                opacity:.5;
-            }
-            tr.row label {
-                color:#ccc;
-            }
-            tr.row.active label {
-                color:#fff;
-            }
-            </style>
-                `);
+                tr.row.disabled {
+                    opacity:.5;
+                }
+                tr.row label {
+                    color:#ccc;
+                }
+                tr.row.active label {
+                    color:#fff;
+                }
+                </style>
+            `);
         }
     }
 

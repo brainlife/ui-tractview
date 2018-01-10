@@ -34,13 +34,14 @@ $(function() {
         });
     }
     
-    console.log("dump");
-    console.dir(config);
+    //console.log("dump");
+    //console.dir(config);
     TractView.init({
         selector: '#tractview',
         preview_scene_path: 'models/brain.json',
         tracts: config.tracts,
         niftis: config.layers,
         extend: config.extend,
+        debug: true,
     });
 });
