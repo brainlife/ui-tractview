@@ -70,7 +70,7 @@ The `config` value used above has the following layout:
         "filename": "file/path/to/tract1.json" }/*, ...*/],
     "niftis": [{
         "name": "faStd",
-        "filename":"file/path/to/faStd.nii.gz" }/*, ...*/]
+        "filename": "file/path/to/faStd.nii.gz" }/*, ...*/]
 }
 ```
 
