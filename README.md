@@ -62,30 +62,30 @@ $(function() {
 
 The `config` value used above has the following layout:
 
-```json
+```javascript
 {
-    tracts: [{
+    "tracts": [{
         "name": "Left IFOF",
         "color": [0.1465684211,0.7597421053,0.6797052632],
-        "filename": "file/path/to/tract1.json" }, ...],
-    niftis: [{
+        "filename": "file/path/to/tract1.json" }/*, ...*/],
+    "niftis": [{
         "name": "faStd",
-        "filename":"file/path/to/faStd.nii.gz" }, ...]
+        "filename":"file/path/to/faStd.nii.gz" }/*, ...*/]
 }
 ```
 
 The list of tracts contains a set of objects which each specify what the name of a given tract is, what its color should be represented as in tractview ([r, g, b], each ranging from 0 to 1), and what file or url path leads to the tract's json file, which should look like this:
 
-```json
+```javascript
 {
     "coords": [[
             // x coords
-            [-21.69491386, -21.64446831, -21.4675293, ...],
+            [-21.69491386, -21.64446831, -21.4675293/*, ...*/],
             // y coords
-            [43.13895035, 42.14380264, 41.15979385, ...],
+            [43.13895035, 42.14380264, 41.15979385/*, ...*/],
             // z coords
-            [1.224040627, 1.165375113, 1.165637732, ...]
-        ], ...]
+            [1.224040627, 1.165375113, 1.165637732/*, ...*/]
+        ]/*, ...*/]
 }
 ```
 
