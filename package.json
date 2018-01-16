@@ -5,7 +5,7 @@
   "main": "undefined",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "watchify main.js tractview.js -o bundle.js & lite-server"
+    "dev": "lite-server"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
     "@types/jquery": "^3.2.16",
+    "async": "^2.6.0",
     "bootstrap": "^3.3.7",
     "jquery": "^3.2.1",
     "jquery-file-upload": "^4.0.5",

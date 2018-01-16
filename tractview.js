@@ -1,6 +1,7 @@
 
 var ndarray = require('ndarray');
 var nifti = require('nifti-js');
+var async = require('async');
 
 var Plotly = require('plotly.js/lib/core');
 Plotly.register([require('plotly.js/lib/histogram')]);
@@ -26,7 +27,7 @@ var TractView = {
         var gamma_value = 1, dataMin_value = 1, dataMax_value = 1;
         
         // set up for later
-        config.num_fibers = 0;
+        //config.num_fibers = 0;
         config.LRtractNames = {};
 
         if (typeof config.selector != 'string')
@@ -40,9 +41,12 @@ var TractView = {
 
         populateHtml(user_container);
 
-        var scene, camera, renderer;
-        var stats = new Stats();
-        user_container.append(stats.dom);
+        var scene, camera, renderer, stats;
+        if(config.debug) {
+            console.log("initializing fps stats graph for debug mode");
+            stats = new Stats();
+            user_container.append(stats.dom);
+        }
 
         var user_uploaded_files = {};
 
@@ -159,12 +163,12 @@ var TractView = {
 
             // add header toggles to controls
             tract_toggles_el.append(
-                    $('<tr/>').addClass('header').append([
-                        $('<td><label class="all" for="checkbox_all">All</label></td>').append(checkbox_all),
-                        $('<td><label>Left</label></td>'),
-                        $('<td><label>Right</label></td>')
-                    ])
-                    );
+                $('<tr/>').addClass('header').append([
+                    $('<td><label class="all" for="checkbox_all">All</label></td>').append(checkbox_all),
+                    $('<td><label>Left</label></td>'),
+                    $('<td><label>Right</label></td>')
+                ])
+            );
 
             // group together tract names in the following way:
             // tractName -> { left: {tractNameLeft, mesh}, right: {tractNameRight, mesh} }
@@ -279,13 +283,16 @@ var TractView = {
             });
 
             // start loading the tract
-            config.tracts.forEach((tract, i)=>{
-                load_tract(tract, i, function(err, mesh, res) {
+            var idx = 0;
+            async.eachLimit(config.tracts, 3, (tract, next_tract)=>{
+                load_tract(tract, idx++, (err, mesh)=>{
+                    if(err) return next_tract(err);
                     add_mesh_to_scene(mesh);
-                    config.num_fibers += res.coords.length;
+                    //config.num_fibers += res.coords.length;
                     tract.mesh = mesh;
+                    next_tract();
                 });
-            });
+            }, err=>console.log);
 
             renderer.autoClear = false;
             renderer.setSize(view.width(), view.height());
@@ -334,7 +341,7 @@ var TractView = {
                 }
 
                 requestAnimationFrame( animate_conview );
-                stats.update();
+                if(config.debug) stats.update();
             }
 
             animate_conview();
@@ -358,38 +365,32 @@ var TractView = {
             // mouse events
             row.on('mouseenter', e => {
                 row.addClass('active');
-                if (options.onmouseenter)
-                    options.onmouseenter(e);
+                if (options.onmouseenter) options.onmouseenter(e);
             });
             row.on('mouseleave', e => {
                 row.removeClass('active');
-                if (options.onmouseleave)
-                    options.onmouseleave(e);
+                if (options.onmouseleave) options.onmouseleave(e);
             });
 
             checkbox_left.on('change', e => {
                 var left_checked = checkbox_left[0].checked || false,
                 right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
 
-                if (options.onchange_left)
-                    options.onchange_left(left_checked, !left_checked && !right_checked);
+                if (options.onchange_left) options.onchange_left(left_checked, !left_checked && !right_checked);
             });
             checkbox_right.on('change', e => {
                 var left_checked = checkbox_left[0].checked || false,
                 right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
 
-                if (options.onchange_right)
-                    options.onchange_right(right_checked, !left_checked && !right_checked);
+                if (options.onchange_right) options.onchange_right(right_checked, !left_checked && !right_checked);
             });
 
             // add everything
             td_label.addClass('label').append(label);
             td_left.addClass('left').append(checkbox_left);
             td_right.addClass('right');
-            if (!options.hideRightToggle)
-                td_right.append(checkbox_right)
-
-                    row.addClass('row');
+            if (!options.hideRightToggle) td_right.append(checkbox_right)
+            row.addClass('row');
             row.append([td_label, td_left, td_right]);
 
             row.checkbox_left = checkbox_left;
@@ -399,18 +400,26 @@ var TractView = {
         }
 
         function load_tract(tract, index, cb) {
-            $.get(tract.url, res => {
-                var bundle = res.coords;
+            console.log("loading tract", tract.url);
+            fetch(tract.url).then(res=>{
+                return res.json();
+            }).then(json=>{
+                var bundle = json.coords;
 
+                /* this does not prevent chrome from crashing..
+                if(bundle.length > 1000) {
+                    console.log(tract, "has too many bundles - trimming at 1000", bundle.length);
+                    bundle = bundle.slice(0, 1000);
+                }
+                */
+
+                //convert each bundle to threads_pos array
                 var threads_pos = [];
                 bundle.forEach(function(fascicle) {
-
-                    if (fascicle[0] instanceof Array)
-                        fascicle = fascicle[0];
+                    if (fascicle[0] instanceof Array) fascicle = fascicle[0]; //for backward compatibility
                     var xs = fascicle[0];
                     var ys = fascicle[1];
                     var zs = fascicle[2];
-
                     for(var i = 1;i < xs.length;++i) {
                         threads_pos.push(xs[i-1]);
                         threads_pos.push(ys[i-1]);
@@ -421,17 +430,17 @@ var TractView = {
                     }
                 });
 
-                //now show bundle
+                //then convert that to bufferedgeometry
                 var vertices = new Float32Array(threads_pos);
                 var geometry = new THREE.BufferGeometry();
                 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3 ) );
-
-                geometry.tract = tract;
                 geometry.vertices = vertices;
                 geometry.tract_index = index;
+                geometry.tract = tract; //metadata..
+
                 all_geometry.push(geometry);
 
-                cb(null, calculateMesh(geometry), res);
+                cb(null, calculateMesh(geometry));
             });
         }
         
@@ -686,198 +695,198 @@ var TractView = {
         
         function populateHtml(element) {
             element.html(`
-            <div class="container">
-                <!-- Main Connectome View -->
-                <div id="conview" class="conview"></div>
+                <div class="container">
+                    <!-- Main Connectome View -->
+                    <div id="conview" class="conview"></div>
 
-                <!-- Tiny Brain to Show Orientation -->
-                <div id="tinybrain" class="tinybrain"></div>
+                    <!-- Tiny Brain to Show Orientation -->
+                    <div id="tinybrain" class="tinybrain"></div>
 
-                <div id="controls" class="controls">
-                    <div style="display:flex;">
-                        <!-- Hide/Show Panel -->
-                        <div id="hide_show" class="hide_show">
-                            <div class="table">
-                                <div class="cell">
-                                    <div class="rotated" id="hide_show_text"></div>
+                    <div id="controls" class="controls">
+                        <div style="display:flex;">
+                            <!-- Hide/Show Panel -->
+                            <div id="hide_show" class="hide_show">
+                                <div class="table">
+                                    <div class="cell">
+                                        <div class="rotated" id="hide_show_text"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Fascicle Toggling -->
-                        <div class="container_toggles" id="container_toggles">
-                            <table class="tract_toggles" id="tract_toggles"></table>
+                            <!-- Fascicle Toggling -->
+                            <div class="container_toggles" id="container_toggles">
+                                <table class="tract_toggles" id="tract_toggles"></table>
 
-                            <!-- Nifti Choosing -->
-                            <div class="nifti_chooser" style="display:none;">
-                                <select id="nifti_select" class="nifti_select"></select>
-                                <div><label style="color:#ccc;">Gamma:</label> <input type="number" min=".00001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
-                                <div class="upload_div">
-                                    <label for="upload_nifti">Upload Nifti</label>
-                                    <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
+                                <!-- Nifti Choosing -->
+                                <div class="nifti_chooser" style="display:none;">
+                                    <select id="nifti_select" class="nifti_select"></select>
+                                    <div><label style="color:#ccc;">Gamma:</label> <input type="number" min=".00001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
+                                    <div class="upload_div">
+                                        <label for="upload_nifti">Upload Nifti</label>
+                                        <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
+                                    </div>
+                                    <div class="plots" id="plots"></div>
                                 </div>
-                                <div class="plots" id="plots"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <style scoped>
-            .container {
-                width: 100%;
-                height: 100%;
-                padding: 0px;
-            }
-            
-            .conview {
-                width:100%;
-                height: 100%;
-            }
-            .tinybrain {
-                position:absolute;
-                pointer-events:none;
-                left:0;
-                bottom:0;
-                width:100px;
-                height:100px;
-            }
+                <style scoped>
+                .container {
+                    width: 100%;
+                    height: 100%;
+                    padding: 0px;
+                }
+                
+                .conview {
+                    width:100%;
+                    height: 100%;
+                }
+                .tinybrain {
+                    position:absolute;
+                    pointer-events:none;
+                    left:0;
+                    bottom:0;
+                    width:100px;
+                    height:100px;
+                }
 
-            .controls {
-                display:inline-block;
-                position:absolute;
-                right:0;
-                top:0;
-                width:auto;
-                height:auto;
-                max-height:100%;
-                padding-left:1px;
-                overflow-x:hidden;
-                overflow-y:auto;
-                white-space:nowrap;
-                font-family:Roboto;
-                font-size:12px;
-                background:rgba(0, 0, 0, .7);
-            }
+                .controls {
+                    display:inline-block;
+                    position:absolute;
+                    right:0;
+                    top:0;
+                    width:auto;
+                    height:auto;
+                    max-height:100%;
+                    padding-left:1px;
+                    overflow-x:hidden;
+                    overflow-y:auto;
+                    white-space:nowrap;
+                    font-family:Roboto;
+                    font-size:12px;
+                    background:rgba(0, 0, 0, .7);
+                }
 
-            .hide_show {
-                display:inline-block;
-                position:relative;
-                vertical-align:top;
-                text-align:left;
-                width:auto;
-                flex:1;
-                color: #777;
-                overflow:hidden;
-                cursor:default;
-                transition:background 1s, color 1s;
-            }
-            .hide_show:hover {
-                background:black;
-                color:white;
-            }
+                .hide_show {
+                    display:inline-block;
+                    position:relative;
+                    vertical-align:top;
+                    text-align:left;
+                    width:auto;
+                    flex:1;
+                    color: #777;
+                    overflow:hidden;
+                    cursor:default;
+                    transition:background 1s, color 1s;
+                }
+                .hide_show:hover {
+                    background:black;
+                    color:white;
+                }
 
-            /* Hide/Show Vertical Alignment */
-            .parent {
-                padding-right:4px;
-            }
-            .list-group-item.table {
-                height:auto !important;
-            }
-            .table {
-                display:table;
-                height:100%;
-                margin-bottom:0 !important;
-            }
-            .cell {
-                display:table-cell;
-                vertical-align:middle;
-            }
+                /* Hide/Show Vertical Alignment */
+                .parent {
+                    padding-right:4px;
+                }
+                .list-group-item.table {
+                    height:auto !important;
+                }
+                .table {
+                    display:table;
+                    height:100%;
+                    margin-bottom:0 !important;
+                }
+                .cell {
+                    display:table-cell;
+                    vertical-align:middle;
+                }
 
-            .hide_show .rotated {
-                display:inline-block;
-                min-width:16px;
-                max-width:16px;
-                vertical-align:middle;
-                transform:rotate(-90deg);
-            }
+                .hide_show .rotated {
+                    display:inline-block;
+                    min-width:16px;
+                    max-width:16px;
+                    vertical-align:middle;
+                    transform:rotate(-90deg);
+                }
 
-            .container_toggles {
-                display:inline-block;
-                max-width:500px;
-                width:auto;
-                height:auto;
-                max-height:100%;
-                padding-top:2px;
-                overflow:auto;
-                transition:max-width .5s, opacity .5s, padding .5s;
-            }
-            
-            .nifti_chooser {
-                padding-left:4px;
-                display:inline-block;
-            }
-            
-            .gamma_input {
-                border:none;
-                background:none;
-                color:white;
-                max-width:50px;
-            }
-            
-            .plots {
-                display:none;
-                width:300px;
-                height:200px;
-            }
-            
-            .nifti_select {
-                margin-bottom:4px;
-            }
-            
-            .upload_div {
-                color:#9cc;
-            }
-            
-            .upload_div:hover {
-                color:#aff;
-            }
+                .container_toggles {
+                    display:inline-block;
+                    max-width:500px;
+                    width:auto;
+                    height:auto;
+                    max-height:100%;
+                    padding-top:2px;
+                    overflow:auto;
+                    transition:max-width .5s, opacity .5s, padding .5s;
+                }
+                
+                .nifti_chooser {
+                    padding-left:4px;
+                    display:inline-block;
+                }
+                
+                .gamma_input {
+                    border:none;
+                    background:none;
+                    color:white;
+                    max-width:50px;
+                }
+                
+                .plots {
+                    display:none;
+                    width:300px;
+                    height:200px;
+                }
+                
+                .nifti_select {
+                    margin-bottom:4px;
+                }
+                
+                .upload_div {
+                    color:#9cc;
+                }
+                
+                .upload_div:hover {
+                    color:#aff;
+                }
 
-            label {
-                font-weight:100;
-                font-size:12px;
-            }
-            tr.header {
-                color:white;
-                text-align:center;
-                margin:0;
-            }
-            tr.header label {
-                margin-right:4px;
-                cursor:pointer;
-            }
+                label {
+                    font-weight:100;
+                    font-size:12px;
+                }
+                tr.header {
+                    color:white;
+                    text-align:center;
+                    margin:0;
+                }
+                tr.header label {
+                    margin-right:4px;
+                    cursor:pointer;
+                }
 
-            input[type="checkbox"] {
-                vertical-align:middle;
-                margin:0;
-                cursor:pointer;
-            }
+                input[type="checkbox"] {
+                    vertical-align:middle;
+                    margin:0;
+                    cursor:pointer;
+                }
 
-            td.label {
-                text-overflow:ellipsis;
-            }
+                td.label {
+                    text-overflow:ellipsis;
+                }
 
-            tr.row.disabled {
-                opacity:.5;
-            }
-            tr.row label {
-                color:#ccc;
-            }
-            tr.row.active label {
-                color:#fff;
-            }
-            </style>
-                `);
+                tr.row.disabled {
+                    opacity:.5;
+                }
+                tr.row label {
+                    color:#ccc;
+                }
+                tr.row.active label {
+                    color:#fff;
+                }
+                </style>
+            `);
         }
     }
 
