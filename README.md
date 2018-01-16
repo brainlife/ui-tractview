@@ -67,10 +67,10 @@ The `config` value used above has the following layout:
     "tracts": [{
         "name": "Left IFOF",
         "color": [0.1465684211,0.7597421053,0.6797052632],
-        "filename": "file/path/to/tract1.json" }/*, ...*/],
+        "url": "file/path/to/tract1.json" }/*, ...*/],
     "niftis": [{
         "name": "faStd",
-        "filename": "file/path/to/faStd.nii.gz" }/*, ...*/]
+        "url": "file/path/to/faStd.nii.gz" }/*, ...*/]
 }
 ```
 
