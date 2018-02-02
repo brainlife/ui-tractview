@@ -632,8 +632,8 @@ var TractView = {
             nifti_select_el.append($("<option/>").html("None").val('none'));
             //nifti_select_el.append($("<option/>").html("Rainboww!! :D").val('rainbow'));
             
+            $(".nifti_chooser")[0].style.display = "";
             if (config.niftis) {
-                $(".nifti_chooser")[0].style.display = "";
                 config.niftis.forEach(nifti => {
                     nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
                 });
@@ -719,10 +719,10 @@ var TractView = {
 
                                 <!-- Nifti Choosing -->
                                 <div class="nifti_chooser" style="display:none;">
-                                    <select id="nifti_select" class="nifti_select"></select>
-                                    <div><label style="color:#ccc;">Gamma:</label> <input type="number" min=".00001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
+                                    <div><label style="color:#ccc; width: 120px;">Background Gamma</label> <input type="number" min=".0001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
+                                    <div><label style="color:#ccc; width: 120px;">Overlay</label> <select id="nifti_select" class="nifti_select"></select></div>
                                     <div class="upload_div">
-                                        <label for="upload_nifti">Upload Nifti</label>
+                                        <label for="upload_nifti">Upload Overlay Image (.nii.gz)</label>
                                         <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
                                     </div>
                                     <div class="plots" id="plots"></div>
@@ -760,7 +760,7 @@ var TractView = {
                     width:auto;
                     height:auto;
                     max-height:100%;
-                    padding-left:1px;
+                    padding-left: 1px;
                     overflow-x:hidden;
                     overflow-y:auto;
                     white-space:nowrap;
@@ -817,7 +817,7 @@ var TractView = {
                     width:auto;
                     height:auto;
                     max-height:100%;
-                    padding-top:2px;
+                    padding: 4px 0px;
                     overflow:auto;
                     transition:max-width .5s, opacity .5s, padding .5s;
                 }
@@ -828,10 +828,7 @@ var TractView = {
                 }
                 
                 .gamma_input {
-                    border:none;
-                    background:none;
-                    color:white;
-                    max-width:50px;
+                    width: 55px;
                 }
                 
                 .plots {
