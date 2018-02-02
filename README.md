@@ -7,6 +7,13 @@ HTML5 Tract Viewer - Used to visualize output from AFQ
 
 Install for general purpose use (visualize a set of tracts with optional 3-dimensional nifti masks)
 
+```
+git clone https://github.com/brain-life/ui-tractview.git
+cd ui-tractview && npm install
+```
+
+Or via npm (might be old)
+
 ```bash
 npm install ui-tractview
 ```
