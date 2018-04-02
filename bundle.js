@@ -50,7 +50,7 @@ $(function() {
     });
 });
 
-},{"./tractview.js":303}],2:[function(require,module,exports){
+},{"./tractview.js":306}],2:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -5649,7 +5649,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":306}],3:[function(require,module,exports){
+},{"_process":309}],3:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.17"
@@ -16361,7 +16361,7 @@ return Promise;
 })));
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":306}],5:[function(require,module,exports){
+},{"_process":309}],5:[function(require,module,exports){
 /**
  * inspired by is-number <https://github.com/jonschlinkert/is-number>
  * but significantly simplified and sped up by ignoring number and string constructors
@@ -16483,7 +16483,33 @@ else {
 module.exports = hasHover
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"is-browser":9}],8:[function(require,module,exports){
+},{"is-browser":10}],8:[function(require,module,exports){
+'use strict'
+
+var isBrowser = require('is-browser')
+
+function detect() {
+	var supported = false
+
+	try {
+		var opts = Object.defineProperty({}, 'passive', {
+			get: function() {
+				supported = true
+			}
+		})
+
+		window.addEventListener('test', null, opts)
+		window.removeEventListener('test', null, opts)
+	} catch(e) {
+		supported = false
+	}
+
+	return supported
+}
+
+module.exports = isBrowser && detect()
+
+},{"is-browser":10}],9:[function(require,module,exports){
 "use strict"
 
 function iota(n) {
@@ -16495,13 +16521,13 @@ function iota(n) {
 }
 
 module.exports = iota
-},{}],9:[function(require,module,exports){
-module.exports = true;
 },{}],10:[function(require,module,exports){
+module.exports = true;
+},{}],11:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
- * @author   Feross Aboukhadijeh <https://feross.org>
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
  * @license  MIT
  */
 
@@ -16520,7 +16546,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var rootPosition = { left: 0, top: 0 }
 
 module.exports = mouseEventOffset
@@ -16547,7 +16573,7 @@ function getBoundingClientOffset (element) {
   }
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var iota = require("iota-array")
 var isBuffer = require("is-buffer")
 
@@ -16892,7 +16918,7 @@ function wrappedNDArrayCtor(data, shape, stride, offset) {
 
 module.exports = wrappedNDArrayCtor
 
-},{"iota-array":8,"is-buffer":10}],13:[function(require,module,exports){
+},{"iota-array":9,"is-buffer":11}],14:[function(require,module,exports){
 "use strict"
 var assert = require('assert')
 
@@ -17335,7 +17361,7 @@ function decodeNIfTIUnits(units) {
 }
 
 
-},{"assert":304}],14:[function(require,module,exports){
+},{"assert":307}],15:[function(require,module,exports){
 'use strict';
 
 var Lib = require('../src/lib');
@@ -17400,7 +17426,7 @@ for(var selector in rules) {
     Lib.addStyleRule(fullSelector, rules[selector]);
 }
 
-},{"../src/lib":152}],15:[function(require,module,exports){
+},{"../src/lib":155}],16:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -17526,7 +17552,7 @@ module.exports = {
     }
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -17539,7 +17565,7 @@ module.exports = {
 
 module.exports = require('../src/core');
 
-},{"../src/core":138}],17:[function(require,module,exports){
+},{"../src/core":141}],18:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -17552,7 +17578,7 @@ module.exports = require('../src/core');
 
 module.exports = require('../src/traces/histogram');
 
-},{"../src/traces/histogram":264}],18:[function(require,module,exports){
+},{"../src/traces/histogram":267}],19:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -17649,7 +17675,7 @@ module.exports = function handleAnnotationDefaults(annIn, annOut, fullLayout, op
     return annOut;
 };
 
-},{"../../lib":152,"../../plots/cartesian/axes":195,"./attributes":20,"./common_defaults":23}],19:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/axes":197,"./attributes":21,"./common_defaults":24}],20:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -17720,7 +17746,7 @@ module.exports = [
     }
 ];
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -17743,7 +17769,7 @@ module.exports = {
         valType: 'boolean',
         role: 'info',
         dflt: true,
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Determines whether or not this annotation is visible.'
         ].join(' ')
@@ -17752,7 +17778,7 @@ module.exports = {
     text: {
         valType: 'string',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the text associated with this annotation.',
             'Plotly uses a subset of HTML tags to do things like',
@@ -17765,14 +17791,14 @@ module.exports = {
         valType: 'angle',
         dflt: 0,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the angle at which the `text` is drawn',
             'with respect to the horizontal.'
         ].join(' ')
     },
     font: fontAttrs({
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         colorEditType: 'arraydraw',
         description: 'Sets the annotation text font.'
     }),
@@ -17781,7 +17807,7 @@ module.exports = {
         min: 1,
         dflt: null,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets an explicit width for the text box. null (default) lets the',
             'text set the box width. Wider text will be clipped.',
@@ -17793,7 +17819,7 @@ module.exports = {
         min: 1,
         dflt: null,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets an explicit height for the text box. null (default) lets the',
             'text set the box height. Taller text will be clipped.'
@@ -17854,7 +17880,7 @@ module.exports = {
         min: 0,
         dflt: 1,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the padding (in px) between the `text`',
             'and the enclosing border.'
@@ -17865,7 +17891,7 @@ module.exports = {
         min: 0,
         dflt: 1,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the width (in px) of the border enclosing',
             'the annotation `text`.'
@@ -17876,7 +17902,7 @@ module.exports = {
         valType: 'boolean',
         dflt: true,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Determines whether or not the annotation is drawn with an arrow.',
             'If *true*, `text` is placed near the arrow\'s tail.',
@@ -17921,7 +17947,7 @@ module.exports = {
         min: 0.3,
         dflt: 1,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the size of the end annotation arrow head, relative to `arrowwidth`.',
             'A value of 1 (default) gives a head about 3x as wide as the line.'
@@ -17932,7 +17958,7 @@ module.exports = {
         min: 0.3,
         dflt: 1,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the size of the start annotation arrow head, relative to `arrowwidth`.',
             'A value of 1 (default) gives a head about 3x as wide as the line.'
@@ -17942,7 +17968,7 @@ module.exports = {
         valType: 'number',
         min: 0.1,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: 'Sets the width (in px) of annotation arrow line.'
     },
     standoff: {
@@ -17950,7 +17976,7 @@ module.exports = {
         min: 0,
         dflt: 0,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets a distance, in pixels, to move the end arrowhead away from the',
             'position it is pointing at, for example to point at the edge of',
@@ -17964,7 +17990,7 @@ module.exports = {
         min: 0,
         dflt: 0,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets a distance, in pixels, to move the start arrowhead away from the',
             'position it is pointing at, for example to point at the edge of',
@@ -17976,7 +18002,7 @@ module.exports = {
     ax: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the x component of the arrow tail about the arrow head.',
             'If `axref` is `pixel`, a positive (negative) ',
@@ -17989,7 +18015,7 @@ module.exports = {
     ay: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the y component of the arrow tail about the arrow head.',
             'If `ayref` is `pixel`, a positive (negative) ',
@@ -18056,7 +18082,7 @@ module.exports = {
     x: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the annotation\'s x position.',
             'If the axis `type` is *log*, then you must take the',
@@ -18074,7 +18100,7 @@ module.exports = {
         values: ['auto', 'left', 'center', 'right'],
         dflt: 'auto',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the text box\'s horizontal position anchor',
             'This anchor binds the `x` position to the *left*, *center*',
@@ -18093,7 +18119,7 @@ module.exports = {
         valType: 'number',
         dflt: 0,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Shifts the position of the whole annotation and arrow to the',
             'right (positive) or left (negative) by this many pixels.'
@@ -18119,7 +18145,7 @@ module.exports = {
     y: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the annotation\'s y position.',
             'If the axis `type` is *log*, then you must take the',
@@ -18137,7 +18163,7 @@ module.exports = {
         values: ['auto', 'top', 'middle', 'bottom'],
         dflt: 'auto',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the text box\'s vertical position anchor',
             'This anchor binds the `y` position to the *top*, *middle*',
@@ -18156,7 +18182,7 @@ module.exports = {
         valType: 'number',
         dflt: 0,
         role: 'style',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Shifts the position of the whole annotation and arrow up',
             '(positive) or down (negative) by this many pixels.'
@@ -18268,7 +18294,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian/constants":200,"../../plots/font_attributes":221,"./arrow_paths":19}],21:[function(require,module,exports){
+},{"../../plots/cartesian/constants":202,"../../plots/font_attributes":224,"./arrow_paths":20}],22:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -18380,7 +18406,7 @@ function annAutorange(gd) {
     });
 }
 
-},{"../../lib":152,"../../plots/cartesian/axes":195,"./draw":26}],22:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/axes":197,"./draw":27}],23:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -18389,11 +18415,9 @@ function annAutorange(gd) {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
-var Plotly = require('../../plotly');
-
+var Registry = require('../../registry');
 
 module.exports = {
     hasClickToShow: hasClickToShow,
@@ -18442,7 +18466,7 @@ function onClick(gd, hoverData) {
         update['annotations[' + offSet[i] + '].visible'] = false;
     }
 
-    return Plotly.update(gd, {}, update);
+    return Registry.call('update', gd, {}, update);
 }
 
 /*
@@ -18514,7 +18538,7 @@ function clickData2r(d, ax) {
     return ax.type === 'log' ? ax.l2r(d) : ax.d2r(d);
 }
 
-},{"../../plotly":190}],23:[function(require,module,exports){
+},{"../../registry":237}],24:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -18594,7 +18618,7 @@ module.exports = function handleAnnotationCommonDefaults(annIn, annOut, fullLayo
     coerce('captureevents', !!hoverText);
 };
 
-},{"../../lib":152,"../color":35}],24:[function(require,module,exports){
+},{"../../lib":155,"../color":36}],25:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -18657,7 +18681,7 @@ module.exports = function convertCoords(gd, ax, newType, doExtra) {
     }
 };
 
-},{"../../lib/to_log_range":175,"fast-isnumeric":5}],25:[function(require,module,exports){
+},{"../../lib/to_log_range":178,"fast-isnumeric":5}],26:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -18682,7 +18706,7 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut) {
     handleArrayContainerDefaults(layoutIn, layoutOut, opts);
 };
 
-},{"../../plots/array_container_defaults":192,"./annotation_defaults":18}],26:[function(require,module,exports){
+},{"../../plots/array_container_defaults":193,"./annotation_defaults":19}],27:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -18691,12 +18715,11 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut) {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
 var d3 = require('d3');
 
-var Plotly = require('../../plotly');
+var Registry = require('../../registry');
 var Plots = require('../../plots/plots');
 var Lib = require('../../lib');
 var Axes = require('../../plots/cartesian/axes');
@@ -18706,9 +18729,7 @@ var Fx = require('../fx');
 var svgTextUtils = require('../../lib/svg_text_utils');
 var setCursor = require('../../lib/setcursor');
 var dragElement = require('../dragelement');
-
 var drawArrowHead = require('./draw_arrow_head');
-
 
 // Annotations are stored in gd.layout.annotations, an array of objects
 // index can point to one item in this array,
@@ -19279,7 +19300,7 @@ function drawRaw(gd, options, index, subplotId, xa, ya) {
                         });
                     },
                     doneFn: function() {
-                        Plotly.relayout(gd, update);
+                        Registry.call('relayout', gd, update);
                         var notesBox = document.querySelector('.js-notes-box-panel');
                         if(notesBox) notesBox.redraw(notesBox.selectedObj);
                     }
@@ -19321,8 +19342,10 @@ function drawRaw(gd, options, index, subplotId, xa, ya) {
                         drawArrow(dx, dy);
                     }
                     else if(!subplotId) {
-                        if(xa) update[annbase + '.x'] = options.x + dx / xa._m;
-                        else {
+                        if(xa) {
+                            update[annbase + '.x'] = xa.p2r(xa.r2p(options.x) + dx);
+
+                        } else {
                             var widthFraction = options._xsize / gs.w,
                                 xLeft = options.x + (options._xshift - options.xshift) / gs.w -
                                     widthFraction / 2;
@@ -19331,8 +19354,9 @@ function drawRaw(gd, options, index, subplotId, xa, ya) {
                                 widthFraction, 0, 1, options.xanchor);
                         }
 
-                        if(ya) update[annbase + '.y'] = options.y + dy / ya._m;
-                        else {
+                        if(ya) {
+                            update[annbase + '.y'] = ya.p2r(ya.r2p(options.y) + dy);
+                        } else {
                             var heightFraction = options._ysize / gs.h,
                                 yBottom = options.y - (options._yshift + options.yshift) / gs.h -
                                     heightFraction / 2;
@@ -19358,7 +19382,7 @@ function drawRaw(gd, options, index, subplotId, xa, ya) {
                 },
                 doneFn: function() {
                     setCursor(annTextGroupInner);
-                    Plotly.relayout(gd, update);
+                    Registry.call('relayout', gd, update);
                     var notesBox = document.querySelector('.js-notes-box-panel');
                     if(notesBox) notesBox.redraw(notesBox.selectedObj);
                 }
@@ -19383,13 +19407,13 @@ function drawRaw(gd, options, index, subplotId, xa, ya) {
                     update[ya._name + '.autorange'] = true;
                 }
 
-                Plotly.relayout(gd, update);
+                Registry.call('relayout', gd, update);
             });
     }
     else annText.call(textLayout);
 }
 
-},{"../../lib":152,"../../lib/setcursor":171,"../../lib/svg_text_utils":173,"../../plotly":190,"../../plots/cartesian/axes":195,"../../plots/plots":227,"../color":35,"../dragelement":57,"../drawing":60,"../fx":77,"./draw_arrow_head":27,"d3":3}],27:[function(require,module,exports){
+},{"../../lib":155,"../../lib/setcursor":174,"../../lib/svg_text_utils":176,"../../plots/cartesian/axes":197,"../../plots/plots":230,"../../registry":237,"../color":36,"../dragelement":58,"../drawing":61,"../fx":78,"./draw_arrow_head":28,"d3":3}],28:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19543,7 +19567,7 @@ module.exports = function drawArrowHead(el3, ends, options) {
     if(doEnd) drawhead(headStyle, end, endRot, scale);
 };
 
-},{"../color":35,"./arrow_paths":19,"d3":3}],28:[function(require,module,exports){
+},{"../color":36,"./arrow_paths":20,"d3":3}],29:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19577,7 +19601,7 @@ module.exports = {
     convertCoords: require('./convert_coords')
 };
 
-},{"../../plots/cartesian/include_components":205,"./attributes":20,"./calc_autorange":21,"./click":22,"./convert_coords":24,"./defaults":25,"./draw":26}],29:[function(require,module,exports){
+},{"../../plots/cartesian/include_components":207,"./attributes":21,"./calc_autorange":22,"./click":23,"./convert_coords":25,"./defaults":26,"./draw":27}],30:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19676,7 +19700,7 @@ module.exports = overrideAll({
     // zref: 'z'
 }, 'calc', 'from-root');
 
-},{"../../plot_api/edit_types":179,"../annotations/attributes":20}],30:[function(require,module,exports){
+},{"../../plot_api/edit_types":182,"../annotations/attributes":21}],31:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19729,7 +19753,7 @@ function mockAnnAxes(ann, scene) {
     Axes.setConvert(ann._xa);
     ann._xa._offset = size.l + domain.x[0] * size.w;
     ann._xa.l2p = function() {
-        return 0.5 * (1 + ann.pdata[0] / ann.pdata[3]) * size.w * (domain.x[1] - domain.x[0]);
+        return 0.5 * (1 + ann._pdata[0] / ann._pdata[3]) * size.w * (domain.x[1] - domain.x[0]);
     };
 
     ann._ya = {};
@@ -19737,11 +19761,11 @@ function mockAnnAxes(ann, scene) {
     Axes.setConvert(ann._ya);
     ann._ya._offset = size.t + (1 - domain.y[1]) * size.h;
     ann._ya.l2p = function() {
-        return 0.5 * (1 - ann.pdata[1] / ann.pdata[3]) * size.h * (domain.y[1] - domain.y[0]);
+        return 0.5 * (1 - ann._pdata[1] / ann._pdata[3]) * size.h * (domain.y[1] - domain.y[0]);
     };
 }
 
-},{"../../lib":152,"../../plots/cartesian/axes":195}],31:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/axes":197}],32:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19819,7 +19843,7 @@ function handleAnnotationDefaults(annIn, annOut, sceneLayout, opts, itemOpts) {
     return annOut;
 }
 
-},{"../../lib":152,"../../plots/array_container_defaults":192,"../../plots/cartesian/axes":195,"../annotations/common_defaults":23,"./attributes":29}],32:[function(require,module,exports){
+},{"../../lib":155,"../../plots/array_container_defaults":193,"../../plots/cartesian/axes":197,"../annotations/common_defaults":24,"./attributes":30}],33:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19860,7 +19884,7 @@ module.exports = function draw(scene) {
                 .select('.annotation-' + scene.id + '[data-index="' + i + '"]')
                 .remove();
         } else {
-            ann.pdata = project(scene.glplot.cameraParams, [
+            ann._pdata = project(scene.glplot.cameraParams, [
                 fullSceneLayout.xaxis.r2l(ann.x) * dataScale[0],
                 fullSceneLayout.yaxis.r2l(ann.y) * dataScale[1],
                 fullSceneLayout.zaxis.r2l(ann.z) * dataScale[2]
@@ -19871,7 +19895,7 @@ module.exports = function draw(scene) {
     }
 };
 
-},{"../../plots/gl3d/project":224,"../annotations/draw":26}],33:[function(require,module,exports){
+},{"../../plots/gl3d/project":227,"../annotations/draw":27}],34:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19919,7 +19943,7 @@ function includeGL3D(layoutIn, layoutOut) {
     }
 }
 
-},{"../../lib":152,"../../registry":234,"./attributes":29,"./convert":30,"./defaults":31,"./draw":32}],34:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237,"./attributes":30,"./convert":31,"./defaults":32,"./draw":33}],35:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -19959,7 +19983,7 @@ exports.borderLine = '#BEC8D9';
 // gives back exactly lightLine if the other colors are defaults.
 exports.lightFraction = 100 * (0xe - 0x4) / (0xf - 0x4);
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -20130,7 +20154,7 @@ function cleanOne(val) {
     return 'rgb(' + rgbStr + ')';
 }
 
-},{"./attributes":34,"fast-isnumeric":5,"tinycolor2":302}],36:[function(require,module,exports){
+},{"./attributes":35,"fast-isnumeric":5,"tinycolor2":305}],37:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -20327,7 +20351,7 @@ module.exports = overrideAll({
     }
 }, 'colorbars', 'from-root');
 
-},{"../../lib/extend":146,"../../plot_api/edit_types":179,"../../plots/cartesian/layout_attributes":207,"../../plots/font_attributes":221}],37:[function(require,module,exports){
+},{"../../lib/extend":149,"../../plot_api/edit_types":182,"../../plots/cartesian/layout_attributes":209,"../../plots/font_attributes":224}],38:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -20355,7 +20379,7 @@ module.exports = {
     }
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -20411,18 +20435,16 @@ module.exports = function colorbarDefaults(containerIn, containerOut, layout) {
 
     handleTickValueDefaults(colorbarIn, colorbarOut, coerce, 'linear');
 
-    handleTickLabelDefaults(colorbarIn, colorbarOut, coerce, 'linear',
-        {outerTicks: false, font: layout.font, noHover: true});
-
-    handleTickMarkDefaults(colorbarIn, colorbarOut, coerce, 'linear',
-        {outerTicks: false, font: layout.font, noHover: true});
+    var opts = {outerTicks: false, font: layout.font};
+    handleTickLabelDefaults(colorbarIn, colorbarOut, coerce, 'linear', opts);
+    handleTickMarkDefaults(colorbarIn, colorbarOut, coerce, 'linear', opts);
 
     coerce('title', layout._dfltTitle.colorbar);
     Lib.coerceFont(coerce, 'titlefont', layout.font);
     coerce('titleside');
 };
 
-},{"../../lib":152,"../../plots/cartesian/tick_label_defaults":215,"../../plots/cartesian/tick_mark_defaults":216,"../../plots/cartesian/tick_value_defaults":217,"./attributes":36}],39:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/tick_label_defaults":217,"../../plots/cartesian/tick_mark_defaults":218,"../../plots/cartesian/tick_value_defaults":219,"./attributes":37}],40:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -20437,7 +20459,6 @@ module.exports = function colorbarDefaults(containerIn, containerOut, layout) {
 var d3 = require('d3');
 var tinycolor = require('tinycolor2');
 
-var Plotly = require('../../plotly');
 var Plots = require('../../plots/plots');
 var Registry = require('../../registry');
 var Axes = require('../../plots/cartesian/axes');
@@ -21013,9 +21034,11 @@ module.exports = function draw(gd, id) {
                     setCursor(container);
 
                     if(xf !== undefined && yf !== undefined) {
-                        Plotly.restyle(gd,
+                        Registry.call('restyle',
+                            gd,
                             {'colorbar.x': xf, 'colorbar.y': yf},
-                            getTrace().index);
+                            getTrace().index
+                        );
                     }
                 }
             });
@@ -21066,7 +21089,7 @@ module.exports = function draw(gd, id) {
     return component;
 };
 
-},{"../../constants/alignment":133,"../../lib":152,"../../lib/extend":146,"../../lib/setcursor":171,"../../lib/svg_text_utils":173,"../../plotly":190,"../../plots/cartesian/axes":195,"../../plots/cartesian/axis_defaults":197,"../../plots/cartesian/layout_attributes":207,"../../plots/cartesian/position_defaults":211,"../../plots/plots":227,"../../registry":234,"../color":35,"../dragelement":57,"../drawing":60,"../titles":126,"./attributes":36,"./constants":37,"d3":3,"tinycolor2":302}],40:[function(require,module,exports){
+},{"../../constants/alignment":136,"../../lib":155,"../../lib/extend":149,"../../lib/setcursor":174,"../../lib/svg_text_utils":176,"../../plots/cartesian/axes":197,"../../plots/cartesian/axis_defaults":199,"../../plots/cartesian/layout_attributes":209,"../../plots/cartesian/position_defaults":213,"../../plots/plots":230,"../../registry":237,"../color":36,"../dragelement":58,"../drawing":61,"../titles":129,"./attributes":37,"./constants":38,"d3":3,"tinycolor2":305}],41:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21085,7 +21108,7 @@ module.exports = function hasColorbar(container) {
     return Lib.isPlainObject(container.colorbar);
 };
 
-},{"../../lib":152}],41:[function(require,module,exports){
+},{"../../lib":155}],42:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21170,7 +21193,7 @@ module.exports = {
     }
 };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21249,7 +21272,7 @@ module.exports = function calc(trace, vals, containerStr, cLetter) {
     }
 };
 
-},{"../../lib":152,"./flip_scale":47,"./scales":54}],43:[function(require,module,exports){
+},{"../../lib":155,"./flip_scale":48,"./scales":55}],44:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21363,7 +21386,7 @@ module.exports = function makeColorScaleAttributes(context, editTypeOverride, au
     };
 };
 
-},{"../../lib/extend":146,"./attributes":41,"./scales.js":54}],44:[function(require,module,exports){
+},{"../../lib/extend":149,"./attributes":42,"./scales.js":55}],45:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21379,7 +21402,7 @@ var scales = require('./scales');
 
 module.exports = scales.RdBu;
 
-},{"./scales":54}],45:[function(require,module,exports){
+},{"./scales":55}],46:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21443,7 +21466,7 @@ module.exports = function colorScaleDefaults(traceIn, traceOut, layout, coerce, 
     if(showScale) colorbarDefaults(containerIn, containerOut, layout);
 };
 
-},{"../../lib":152,"../colorbar/defaults":38,"../colorbar/has_colorbar":40,"./flip_scale":47,"./is_valid_scale":51,"fast-isnumeric":5}],46:[function(require,module,exports){
+},{"../../lib":155,"../colorbar/defaults":39,"../colorbar/has_colorbar":41,"./flip_scale":48,"./is_valid_scale":52,"fast-isnumeric":5}],47:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21480,7 +21503,7 @@ module.exports = function extractScale(scl, cmin, cmax) {
     };
 };
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21505,7 +21528,7 @@ module.exports = function flipScale(scl) {
     return sclNew;
 };
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21545,7 +21568,7 @@ module.exports = function getScale(scl, dflt) {
     return scl;
 };
 
-},{"./default_scale":44,"./is_valid_scale_array":52,"./scales":54}],49:[function(require,module,exports){
+},{"./default_scale":45,"./is_valid_scale_array":53,"./scales":55}],50:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21554,24 +21577,20 @@ module.exports = function getScale(scl, dflt) {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
 var isNumeric = require('fast-isnumeric');
-
 var Lib = require('../../lib');
-
 var isValidScale = require('./is_valid_scale');
-
 
 module.exports = function hasColorscale(trace, containerStr) {
     var container = containerStr ?
-            Lib.nestedProperty(trace, containerStr).get() || {} :
-            trace,
-        color = container.color,
-        isArrayWithOneNumber = false;
+        Lib.nestedProperty(trace, containerStr).get() || {} :
+        trace;
+    var color = container.color;
 
-    if(Array.isArray(color)) {
+    var isArrayWithOneNumber = false;
+    if(Lib.isArrayOrTypedArray(color)) {
         for(var i = 0; i < color.length; i++) {
             if(isNumeric(color[i])) {
                 isArrayWithOneNumber = true;
@@ -21591,7 +21610,7 @@ module.exports = function hasColorscale(trace, containerStr) {
     );
 };
 
-},{"../../lib":152,"./is_valid_scale":51,"fast-isnumeric":5}],50:[function(require,module,exports){
+},{"../../lib":155,"./is_valid_scale":52,"fast-isnumeric":5}],51:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21625,7 +21644,7 @@ exports.extractScale = require('./extract_scale');
 
 exports.makeColorScaleFunc = require('./make_color_scale_func');
 
-},{"./attributes":41,"./calc":42,"./default_scale":44,"./defaults":45,"./extract_scale":46,"./flip_scale":47,"./get_scale":48,"./has_colorscale":49,"./is_valid_scale":51,"./make_color_scale_func":53,"./scales":54}],51:[function(require,module,exports){
+},{"./attributes":42,"./calc":43,"./default_scale":45,"./defaults":46,"./extract_scale":47,"./flip_scale":48,"./get_scale":49,"./has_colorscale":50,"./is_valid_scale":52,"./make_color_scale_func":54,"./scales":55}],52:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21646,7 +21665,7 @@ module.exports = function isValidScale(scl) {
     else return isValidScaleArray(scl);
 };
 
-},{"./is_valid_scale_array":52,"./scales":54}],52:[function(require,module,exports){
+},{"./is_valid_scale_array":53,"./scales":55}],53:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21683,7 +21702,7 @@ module.exports = function isValidScaleArray(scl) {
     return true;
 };
 
-},{"tinycolor2":302}],53:[function(require,module,exports){
+},{"tinycolor2":305}],54:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21779,7 +21798,7 @@ function colorArray2rbga(colorArray) {
     return tinycolor(colorObj).toRgbString();
 }
 
-},{"../color":35,"d3":3,"fast-isnumeric":5,"tinycolor2":302}],54:[function(require,module,exports){
+},{"../color":36,"d3":3,"fast-isnumeric":5,"tinycolor2":305}],55:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21922,7 +21941,7 @@ module.exports = {
     ]
 };
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21955,7 +21974,7 @@ module.exports = function align(v, dv, v0, v1, anchor) {
     return vc;
 };
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -21993,7 +22012,7 @@ module.exports = function getCursor(x, y, xanchor, yanchor) {
     return cursorset[y][x];
 };
 
-},{"../../lib":152}],57:[function(require,module,exports){
+},{"../../lib":155}],58:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -22007,8 +22026,9 @@ module.exports = function getCursor(x, y, xanchor, yanchor) {
 
 var mouseOffset = require('mouse-event-offset');
 var hasHover = require('has-hover');
+var supportsPassive = require('has-passive-events');
 
-var Plotly = require('../../plotly');
+var Registry = require('../../registry');
 var Lib = require('../../lib');
 
 var constants = require('../../plots/cartesian/constants');
@@ -22023,7 +22043,6 @@ var unhover = require('./unhover');
 dragElement.unhover = unhover.wrapped;
 dragElement.unhoverRaw = unhover.raw;
 
-var supportsPassive = Lib.eventListenerOptionsSupported();
 
 /**
  * Abstracts click & drag interactions
@@ -22120,6 +22139,8 @@ dragElement.init = function init(options) {
     var clampFn = options.clampFn || _clampFn;
 
     function onStart(e) {
+        e.preventDefault();
+
         // make dragging and dragged into properties of gd
         // so that others can look at and modify them
         gd._dragged = false;
@@ -22129,7 +22150,7 @@ dragElement.init = function init(options) {
         startY = offset[1];
         initialTarget = e.target;
         initialEvent = e;
-        rightClick = (e.buttons && e.buttons === 2) || e.ctrlKey;
+        rightClick = e.buttons === 2 || e.ctrlKey;
 
         newMouseDownTime = (new Date()).getTime();
         if(newMouseDownTime - gd._mouseDownTime < DBLCLICKDELAY) {
@@ -22160,10 +22181,12 @@ dragElement.init = function init(options) {
         document.addEventListener('touchmove', onMove);
         document.addEventListener('touchend', onDone);
 
-        return Lib.pauseEvent(e);
+        return;
     }
 
     function onMove(e) {
+        e.preventDefault();
+
         var offset = pointerOffset(e);
         var minDrag = options.minDrag || constants.MINDRAG;
         var dxdy = clampFn(offset[0] - startX, offset[1] - startY, minDrag);
@@ -22177,7 +22200,7 @@ dragElement.init = function init(options) {
 
         if(gd._dragged && options.moveFn && !rightClick) options.moveFn(dx, dy);
 
-        return Lib.pauseEvent(e);
+        return;
     }
 
     function onDone(e) {
@@ -22185,6 +22208,8 @@ dragElement.init = function init(options) {
         document.removeEventListener('mouseup', onDone);
         document.removeEventListener('touchmove', onMove);
         document.removeEventListener('touchend', onDone);
+
+        e.preventDefault();
 
         if(hasHover) {
             Lib.removeElement(dragCover);
@@ -22242,7 +22267,7 @@ dragElement.init = function init(options) {
 
         gd._dragged = false;
 
-        return Lib.pauseEvent(e);
+        return;
     }
 };
 
@@ -22268,7 +22293,7 @@ dragElement.coverSlip = coverSlip;
 
 function finishDrag(gd) {
     gd._dragging = false;
-    if(gd._replotPending) Plotly.plot(gd);
+    if(gd._replotPending) Registry.call('plot', gd);
 }
 
 function pointerOffset(e) {
@@ -22278,7 +22303,7 @@ function pointerOffset(e) {
     );
 }
 
-},{"../../constants/interactions":134,"../../lib":152,"../../plotly":190,"../../plots/cartesian/constants":200,"./align":55,"./cursor":56,"./unhover":58,"has-hover":7,"mouse-event-offset":11}],58:[function(require,module,exports){
+},{"../../constants/interactions":137,"../../lib":155,"../../plots/cartesian/constants":202,"../../registry":237,"./align":56,"./cursor":57,"./unhover":59,"has-hover":7,"has-passive-events":8,"mouse-event-offset":12}],59:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -22336,7 +22361,7 @@ unhover.raw = function unhoverRaw(gd, evt) {
     }
 };
 
-},{"../../lib/events":145,"../../lib/get_graph_div":150,"../../lib/throttle":174,"../fx/constants":72}],59:[function(require,module,exports){
+},{"../../lib/events":148,"../../lib/get_graph_div":153,"../../lib/throttle":177,"../fx/constants":73}],60:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -22365,7 +22390,7 @@ exports.dash = {
     ].join(' ')
 };
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -22468,8 +22493,10 @@ drawing.hideOutsideRangePoint = function(d, sel, xa, ya, xcalendar, ycalendar) {
     );
 };
 
-drawing.hideOutsideRangePoints = function(traceGroups, subplot) {
+drawing.hideOutsideRangePoints = function(traceGroups, subplot, selector) {
     if(!subplot._hasClipOnAxisFalse) return;
+
+    selector = selector || '.point,.textpoint';
 
     var xa = subplot.xaxis;
     var ya = subplot.yaxis;
@@ -22479,7 +22506,7 @@ drawing.hideOutsideRangePoints = function(traceGroups, subplot) {
         var xcalendar = trace.xcalendar;
         var ycalendar = trace.ycalendar;
 
-        traceGroups.selectAll('.point,.textpoint').each(function(d) {
+        traceGroups.selectAll(selector).each(function(d) {
             drawing.hideOutsideRangePoint(d, d3.select(this), xa, ya, xcalendar, ycalendar);
         });
     });
@@ -22682,10 +22709,10 @@ function singlePointStyle(d, sel, trace, markerScale, lineScale, marker, markerL
 
         if('mlc' in d) lineColor = d.mlcc = lineScale(d.mlc);
         // weird case: array wasn't long enough to apply to every point
-        else if(Array.isArray(markerLine.color)) lineColor = Color.defaultLine;
+        else if(Lib.isArrayOrTypedArray(markerLine.color)) lineColor = Color.defaultLine;
         else lineColor = markerLine.color;
 
-        if(Array.isArray(marker.color)) {
+        if(Lib.isArrayOrTypedArray(marker.color)) {
             fillColor = Color.defaultLine;
             perPointGradient = true;
         }
@@ -22807,8 +22834,8 @@ drawing.pointStyle = function(s, trace, gd) {
     });
 };
 
-drawing.selectedPointStyle = function(s, trace) {
-    if(!s.size() || !trace.selectedpoints) return;
+drawing.makeSelectedPointStyleFns = function(trace) {
+    var out = {};
 
     var selectedAttrs = trace.selected || {};
     var unselectedAttrs = trace.unselected || {};
@@ -22823,40 +22850,31 @@ drawing.selectedPointStyle = function(s, trace) {
     var smoIsDefined = smo !== undefined;
     var usmoIsDefined = usmo !== undefined;
 
-    s.each(function(d) {
-        var pt = d3.select(this);
+    out.opacityFn = function(d) {
         var dmo = d.mo;
         var dmoIsDefined = dmo !== undefined;
-        var mo2;
 
         if(dmoIsDefined || smoIsDefined || usmoIsDefined) {
             if(d.selected) {
-                if(smoIsDefined) mo2 = smo;
+                if(smoIsDefined) return smo;
             } else {
-                if(usmoIsDefined) mo2 = usmo;
-                else mo2 = DESELECTDIM * (dmoIsDefined ? dmo : mo);
+                if(usmoIsDefined) return usmo;
+                return DESELECTDIM * (dmoIsDefined ? dmo : mo);
             }
         }
-
-        if(mo2 !== undefined) pt.style('opacity', mo2);
-    });
+    };
 
     var smc = selectedMarker.color;
     var usmc = unselectedMarker.color;
 
     if(smc || usmc) {
-        s.each(function(d) {
-            var pt = d3.select(this);
-            var mc2;
-
+        out.colorFn = function(d) {
             if(d.selected) {
-                if(smc) mc2 = smc;
+                if(smc) return smc;
             } else {
-                if(usmc) mc2 = usmc;
+                if(usmc) return usmc;
             }
-
-            if(mc2) Color.fill(pt, mc2);
-        });
+        };
     }
 
     var sms = selectedMarker.size;
@@ -22864,18 +22882,45 @@ drawing.selectedPointStyle = function(s, trace) {
     var smsIsDefined = sms !== undefined;
     var usmsIsDefined = usms !== undefined;
 
-    if(Registry.traceIs(trace, 'symbols') && (smsIsDefined || usmsIsDefined)) {
+    if(smsIsDefined || usmsIsDefined) {
+        out.sizeFn = function(d) {
+            var mrc = d.mrc;
+            if(d.selected) {
+                return smsIsDefined ? sms / 2 : mrc;
+            } else {
+                return usmsIsDefined ? usms / 2 : mrc;
+            }
+        };
+    }
+
+    return out;
+};
+
+drawing.selectedPointStyle = function(s, trace) {
+    if(!s.size() || !trace.selectedpoints) return;
+
+    var fns = drawing.makeSelectedPointStyleFns(trace);
+    var marker = trace.marker || {};
+
+    s.each(function(d) {
+        var pt = d3.select(this);
+        var mo2 = fns.opacityFn(d);
+        if(mo2 !== undefined) pt.style('opacity', mo2);
+    });
+
+    if(fns.colorFn) {
         s.each(function(d) {
             var pt = d3.select(this);
-            var mrc = d.mrc;
-            var mx = d.mx || marker.symbol || 0;
-            var mrc2;
+            var mc2 = fns.colorFn(d);
+            if(mc2) Color.fill(pt, mc2);
+        });
+    }
 
-            if(d.selected) {
-                mrc2 = (smsIsDefined) ? sms / 2 : mrc;
-            } else {
-                mrc2 = (usmsIsDefined) ? usms / 2 : mrc;
-            }
+    if(Registry.traceIs(trace, 'symbols') && fns.sizeFn) {
+        s.each(function(d) {
+            var pt = d3.select(this);
+            var mx = d.mx || marker.symbol || 0;
+            var mrc2 = fns.sizeFn(d);
 
             pt.attr('d', makePointPath(drawing.symbolNumber(mx), mrc2));
 
@@ -22890,7 +22935,7 @@ drawing.tryColorscale = function(marker, prefix) {
         scl = cont.colorscale,
         colorArray = cont.color;
 
-    if(scl && Array.isArray(colorArray)) {
+    if(scl && Lib.isArrayOrTypedArray(colorArray)) {
         return Colorscale.makeColorScaleFunc(
             Colorscale.extractScale(scl, cont.cmin, cont.cmax)
         );
@@ -23411,7 +23456,7 @@ drawing.setTextPointsScale = function(selection, xScale, yScale) {
     });
 };
 
-},{"../../constants/alignment":133,"../../constants/interactions":134,"../../constants/xmlns_namespaces":137,"../../lib":152,"../../lib/svg_text_utils":173,"../../registry":234,"../../traces/scatter/make_bubble_size_func":286,"../../traces/scatter/subtypes":291,"../color":35,"../colorscale":50,"./symbol_defs":61,"d3":3,"fast-isnumeric":5,"tinycolor2":302}],61:[function(require,module,exports){
+},{"../../constants/alignment":136,"../../constants/interactions":137,"../../constants/xmlns_namespaces":140,"../../lib":155,"../../lib/svg_text_utils":176,"../../registry":237,"../../traces/scatter/make_bubble_size_func":289,"../../traces/scatter/subtypes":294,"../color":36,"../colorscale":51,"./symbol_defs":62,"d3":3,"fast-isnumeric":5,"tinycolor2":305}],62:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -23899,7 +23944,7 @@ module.exports = {
     }
 };
 
-},{"d3":3}],62:[function(require,module,exports){
+},{"d3":3}],63:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24057,7 +24102,7 @@ module.exports = {
     }
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24120,7 +24165,7 @@ function calcOneAxis(calcTrace, trace, axis, coord) {
     Axes.expand(axis, vals, {padded: true});
 }
 
-},{"../../plots/cartesian/axes":195,"../../registry":234,"./compute_error":64,"fast-isnumeric":5}],64:[function(require,module,exports){
+},{"../../plots/cartesian/axes":197,"../../registry":237,"./compute_error":65,"fast-isnumeric":5}],65:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24153,18 +24198,26 @@ module.exports = function makeComputeError(opts) {
         symmetric = opts.symmetric;
 
     if(type === 'data') {
-        var array = opts.array,
-            arrayminus = opts.arrayminus;
+        var array = opts.array || [];
 
-        if(symmetric || arrayminus === undefined) {
+        if(symmetric) {
             return function computeError(dataPt, index) {
                 var val = +(array[index]);
                 return [val, val];
             };
         }
         else {
+            var arrayminus = opts.arrayminus || [];
             return function computeError(dataPt, index) {
-                return [+arrayminus[index], +array[index]];
+                var val = +array[index];
+                var valMinus = +arrayminus[index];
+                // in case one is present and the other is missing, fill in 0
+                // so we still see the present one. Mostly useful during manual
+                // data entry.
+                if(!isNaN(val) || !isNaN(valMinus)) {
+                    return [valMinus || 0, val || 0];
+                }
+                return [NaN, NaN];
             };
         }
     }
@@ -24216,7 +24269,7 @@ function makeComputeErrorValue(type, value) {
     }
 }
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24263,12 +24316,10 @@ module.exports = function(traceIn, traceOut, defaultColor, opts) {
     }
 
     if(type === 'data') {
-        var array = coerce('array');
-        if(!array) containerOut.array = [];
+        coerce('array');
         coerce('traceref');
         if(!symmetric) {
-            var arrayminus = coerce('arrayminus');
-            if(!arrayminus) containerOut.arrayminus = [];
+            coerce('arrayminus');
             coerce('tracerefminus');
         }
     }
@@ -24293,7 +24344,7 @@ module.exports = function(traceIn, traceOut, defaultColor, opts) {
     }
 };
 
-},{"../../lib":152,"../../registry":234,"./attributes":62,"fast-isnumeric":5}],66:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237,"./attributes":63,"fast-isnumeric":5}],67:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24302,18 +24353,57 @@ module.exports = function(traceIn, traceOut, defaultColor, opts) {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
-var errorBars = module.exports = {};
+var Lib = require('../../lib');
+var overrideAll = require('../../plot_api/edit_types').overrideAll;
 
-errorBars.attributes = require('./attributes');
+var attributes = require('./attributes');
+var calc = require('./calc');
 
-errorBars.supplyDefaults = require('./defaults');
+var xyAttrs = {
+    error_x: Lib.extendFlat({}, attributes),
+    error_y: Lib.extendFlat({}, attributes)
+};
+delete xyAttrs.error_x.copy_zstyle;
+delete xyAttrs.error_y.copy_zstyle;
+delete xyAttrs.error_y.copy_ystyle;
 
-errorBars.calc = require('./calc');
+var xyzAttrs = {
+    error_x: Lib.extendFlat({}, attributes),
+    error_y: Lib.extendFlat({}, attributes),
+    error_z: Lib.extendFlat({}, attributes)
+};
+delete xyzAttrs.error_x.copy_ystyle;
+delete xyzAttrs.error_y.copy_ystyle;
+delete xyzAttrs.error_z.copy_ystyle;
+delete xyzAttrs.error_z.copy_zstyle;
 
-errorBars.calcFromTrace = function(trace, layout) {
+module.exports = {
+    moduleType: 'component',
+    name: 'errorbars',
+
+    schema: {
+        traces: {
+            scatter: xyAttrs,
+            bar: xyAttrs,
+            histogram: xyAttrs,
+            scatter3d: overrideAll(xyzAttrs, 'calc', 'nested'),
+            scattergl: overrideAll(xyAttrs, 'calc', 'nested')
+        }
+    },
+
+    supplyDefaults: require('./defaults'),
+
+    calc: calc,
+    calcFromTrace: calcFromTrace,
+
+    plot: require('./plot'),
+    style: require('./style'),
+    hoverInfo: hoverInfo
+};
+
+function calcFromTrace(trace, layout) {
     var x = trace.x || [],
         y = trace.y || [],
         len = x.length || y.length;
@@ -24329,19 +24419,15 @@ errorBars.calcFromTrace = function(trace, layout) {
 
     calcdataMock[0].trace = trace;
 
-    errorBars.calc({
+    calc({
         calcdata: [calcdataMock],
         _fullLayout: layout
     });
 
     return calcdataMock;
-};
+}
 
-errorBars.plot = require('./plot');
-
-errorBars.style = require('./style');
-
-errorBars.hoverInfo = function(calcPoint, trace, hoverPoint) {
+function hoverInfo(calcPoint, trace, hoverPoint) {
     if((trace.error_y || {}).visible) {
         hoverPoint.yerr = calcPoint.yh - calcPoint.y;
         if(!trace.error_y.symmetric) hoverPoint.yerrneg = calcPoint.y - calcPoint.ys;
@@ -24350,9 +24436,9 @@ errorBars.hoverInfo = function(calcPoint, trace, hoverPoint) {
         hoverPoint.xerr = calcPoint.xh - calcPoint.x;
         if(!trace.error_x.symmetric) hoverPoint.xerrneg = calcPoint.x - calcPoint.xs;
     }
-};
+}
 
-},{"./attributes":62,"./calc":63,"./defaults":65,"./plot":67,"./style":68}],67:[function(require,module,exports){
+},{"../../lib":155,"../../plot_api/edit_types":182,"./attributes":63,"./calc":64,"./defaults":66,"./plot":68,"./style":69}],68:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24431,6 +24517,7 @@ module.exports = function plot(traces, plotinfo, transitionOpts) {
 
             var path;
 
+            var yerror = errorbar.select('path.yerror');
             if(yObj.visible && isNumeric(coords.x) &&
                     isNumeric(coords.yh) &&
                     isNumeric(coords.ys)) {
@@ -24442,8 +24529,6 @@ module.exports = function plot(traces, plotinfo, transitionOpts) {
 
 
                 if(!coords.noYS) path += 'm-' + yw + ',0h' + (2 * yw); // shoe
-
-                var yerror = errorbar.select('path.yerror');
 
                 isNew = !yerror.size();
 
@@ -24460,7 +24545,9 @@ module.exports = function plot(traces, plotinfo, transitionOpts) {
 
                 yerror.attr('d', path);
             }
+            else yerror.remove();
 
+            var xerror = errorbar.select('path.xerror');
             if(xObj.visible && isNumeric(coords.y) &&
                     isNumeric(coords.xh) &&
                     isNumeric(coords.xs)) {
@@ -24471,8 +24558,6 @@ module.exports = function plot(traces, plotinfo, transitionOpts) {
                     'm0,-' + xw + 'H' + coords.xs; // bar
 
                 if(!coords.noXS) path += 'm0,-' + xw + 'v' + (2 * xw); // shoe
-
-                var xerror = errorbar.select('path.xerror');
 
                 isNew = !xerror.size();
 
@@ -24489,6 +24574,7 @@ module.exports = function plot(traces, plotinfo, transitionOpts) {
 
                 xerror.attr('d', path);
             }
+            else xerror.remove();
         });
     });
 };
@@ -24526,7 +24612,7 @@ function errorCoords(d, xa, ya) {
     return out;
 }
 
-},{"../../traces/scatter/subtypes":291,"../drawing":60,"d3":3,"fast-isnumeric":5}],68:[function(require,module,exports){
+},{"../../traces/scatter/subtypes":294,"../drawing":61,"d3":3,"fast-isnumeric":5}],69:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24563,7 +24649,7 @@ module.exports = function style(traces) {
     });
 };
 
-},{"../color":35,"d3":3}],69:[function(require,module,exports){
+},{"../color":36,"d3":3}],70:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24620,7 +24706,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/font_attributes":221}],70:[function(require,module,exports){
+},{"../../plots/font_attributes":224}],71:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24676,7 +24762,7 @@ function paste(traceAttr, cd, cdAttr, fn) {
     }
 }
 
-},{"../../lib":152,"../../registry":234}],71:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237}],72:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24714,7 +24800,7 @@ module.exports = function click(gd, evt, subplot) {
     }
 };
 
-},{"../../registry":234,"./hover":75}],72:[function(require,module,exports){
+},{"../../registry":237,"./hover":76}],73:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24726,9 +24812,6 @@ module.exports = function click(gd, evt, subplot) {
 'use strict';
 
 module.exports = {
-    // max pixels away from mouse to allow a point to highlight
-    MAXDIST: 20,
-
     // hover labels for multiple horizontal bars get tilted by this angle
     YANGLE: 60,
 
@@ -24749,7 +24832,7 @@ module.exports = {
     HOVERID: '-hover'
 };
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24772,7 +24855,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     handleHoverLabelDefaults(traceIn, traceOut, coerce, layout.hoverlabel);
 };
 
-},{"../../lib":152,"./attributes":69,"./hoverlabel_defaults":76}],74:[function(require,module,exports){
+},{"../../lib":155,"./attributes":70,"./hoverlabel_defaults":77}],75:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -24784,7 +24867,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 'use strict';
 
 var Lib = require('../../lib');
-var constants = require('./constants');
 
 // look for either subplot or xaxis and yaxis attributes
 exports.getSubplot = function getSubplot(trace) {
@@ -24837,19 +24919,16 @@ exports.getClosest = function getClosest(cd, distfn, pointData) {
     return pointData;
 };
 
-// for bar charts and others with finite-size objects: you must be inside
-// it to see its hover info, so distance is infinite outside.
-// But make distance inside be at least 1/4 MAXDIST, and a little bigger
-// for bigger bars, to prioritize scatter and smaller bars over big bars
-//
-// note that for closest mode, two inbox's will get added in quadrature
-// args are (signed) difference from the two opposite edges
-// count one edge as in, so that over continuous ranges you never get a gap
-exports.inbox = function inbox(v0, v1) {
-    if(v0 * v1 < 0 || v0 === 0) {
-        return constants.MAXDIST * (0.6 - 0.3 / Math.max(3, Math.abs(v0 - v1)));
-    }
-    return Infinity;
+/*
+ * pseudo-distance function for hover effects on areas: inside the region
+ * distance is finite (`passVal`), outside it's Infinity.
+ *
+ * @param {number} v0: signed difference between the current position and the left edge
+ * @param {number} v1: signed difference between the current position and the right edge
+ * @param {number} passVal: the value to return on success
+ */
+exports.inbox = function inbox(v0, v1, passVal) {
+    return (v0 * v1 < 0 || v0 === 0) ? passVal : Infinity;
 };
 
 exports.quadrature = function quadrature(dx, dy) {
@@ -24999,7 +25078,7 @@ function getPointData(val, pointNumber) {
     }
 }
 
-},{"../../lib":152,"./constants":72}],75:[function(require,module,exports){
+},{"../../lib":155}],76:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -25146,8 +25225,7 @@ exports.loneHover = function loneHover(hoverItem, opts) {
         rotateLabels: false,
         bgColor: opts.bgColor || Color.background,
         container: container3,
-        outerContainer: outerContainer3,
-        hoverdistance: constants.MAXDIST
+        outerContainer: outerContainer3
     };
 
     var hoverLabel = createHoverText([pointData], fullOpts, opts.gd);
@@ -25164,9 +25242,10 @@ function _hover(gd, evt, subplot, noHoverEvent) {
     // use those instead of finding overlayed plots
     var subplots = Array.isArray(subplot) ? subplot : [subplot];
 
-    var fullLayout = gd._fullLayout,
-        plots = fullLayout._plots || [],
-        plotinfo = plots[subplot];
+    var fullLayout = gd._fullLayout;
+    var plots = fullLayout._plots || [];
+    var plotinfo = plots[subplot];
+    var hasCartesian = fullLayout._has('cartesian');
 
     // list of all overlaid subplots to look at
     if(plotinfo) {
@@ -25177,9 +25256,10 @@ function _hover(gd, evt, subplot, noHoverEvent) {
         subplots = subplots.concat(overlayedSubplots);
     }
 
-    var len = subplots.length,
-        xaArray = new Array(len),
-        yaArray = new Array(len);
+    var len = subplots.length;
+    var xaArray = new Array(len);
+    var yaArray = new Array(len);
+    var supportsCompare = false;
 
     for(var i = 0; i < len; i++) {
         var spId = subplots[i];
@@ -25187,6 +25267,7 @@ function _hover(gd, evt, subplot, noHoverEvent) {
         // 'cartesian' case
         var plotObj = plots[spId];
         if(plotObj) {
+            supportsCompare = true;
 
             // TODO make sure that fullLayout_plots axis refs
             // get updated properly so that we don't have
@@ -25204,6 +25285,8 @@ function _hover(gd, evt, subplot, noHoverEvent) {
     }
 
     var hovermode = evt.hovermode || fullLayout.hovermode;
+
+    if(hovermode && !supportsCompare) hovermode = 'closest';
 
     if(['x', 'y', 'closest'].indexOf(hovermode) === -1 || !gd.calcdata ||
             gd.querySelector('.zoombox') || gd._dragging) {
@@ -25349,9 +25432,29 @@ function _hover(gd, evt, subplot, noHoverEvent) {
             trace: trace,
             xa: xaArray[subploti],
             ya: yaArray[subploti],
+
+            // max distances for hover and spikes - for points that want to show but do not
+            // want to override other points, set distance/spikeDistance equal to max*Distance
+            // and it will not get filtered out but it will be guaranteed to have a greater
+            // distance than any point that calculated a real distance.
+            maxHoverDistance: hoverdistance,
+            maxSpikeDistance: spikedistance,
+
             // point properties - override all of these
             index: false, // point index in trace - only used by plotly.js hoverdata consumers
             distance: Math.min(distance, hoverdistance), // pixel distance or pseudo-distance
+
+            // distance/pseudo-distance for spikes. This distance should always be calculated
+            // as if in "closest" mode, and should only be set if this point should
+            // generate a spike.
+            spikeDistance: Infinity,
+
+            // in some cases the spikes have different positioning from the hover label
+            // they don't need x0/x1, just one position
+            xSpike: undefined,
+            ySpike: undefined,
+
+            // where and how to display the hover label
             color: Color.defaultLine, // trace color
             name: trace.name,
             x0: undefined,
@@ -25416,7 +25519,8 @@ function _hover(gd, evt, subplot, noHoverEvent) {
         }
 
         // in closest mode, remove any existing (farther) points
-        // and don't look any farther than this latest point (or points, if boxes)
+        // and don't look any farther than this latest point (or points, some
+        // traces like box & violin make multiple hover labels at once)
         if(hovermode === 'closest' && hoverData.length > closedataPreviousLength) {
             hoverData.splice(0, closedataPreviousLength);
             distance = hoverData[0].distance;
@@ -25424,12 +25528,19 @@ function _hover(gd, evt, subplot, noHoverEvent) {
 
         // Now if there is range to look in, find the points to draw the spikelines
         // Do it only if there is no hoverData
-        if(fullLayout._has('cartesian') && (spikedistance !== 0)) {
+        if(hasCartesian && (spikedistance !== 0)) {
             if(hoverData.length === 0) {
                 pointData.distance = spikedistance;
                 pointData.index = false;
                 var closestPoints = trace._module.hoverPoints(pointData, xval, yval, 'closest', fullLayout._hoverlayer);
                 if(closestPoints) {
+                    closestPoints = closestPoints.filter(function(point) {
+                        // some hover points, like scatter fills, do not allow spikes,
+                        // so will generate a hover point but without a valid spikeDistance
+                        return point.spikeDistance <= spikedistance;
+                    });
+                }
+                if(closestPoints && closestPoints.length) {
                     var tmpPoint;
                     var closestVPoints = closestPoints.filter(function(point) {
                         return point.xa.showspikes;
@@ -25437,8 +25548,8 @@ function _hover(gd, evt, subplot, noHoverEvent) {
                     if(closestVPoints.length) {
                         var closestVPt = closestVPoints[0];
                         if(isNumeric(closestVPt.x0) && isNumeric(closestVPt.y0)) {
-                            tmpPoint = fillClosestPoint(closestVPt);
-                            if(!spikePoints.vLinePoint || (spikePoints.vLinePoint.distance > tmpPoint.distance)) {
+                            tmpPoint = fillSpikePoint(closestVPt);
+                            if(!spikePoints.vLinePoint || (spikePoints.vLinePoint.spikeDistance > tmpPoint.spikeDistance)) {
                                 spikePoints.vLinePoint = tmpPoint;
                             }
                         }
@@ -25450,8 +25561,8 @@ function _hover(gd, evt, subplot, noHoverEvent) {
                     if(closestHPoints.length) {
                         var closestHPt = closestHPoints[0];
                         if(isNumeric(closestHPt.x0) && isNumeric(closestHPt.y0)) {
-                            tmpPoint = fillClosestPoint(closestHPt);
-                            if(!spikePoints.hLinePoint || (spikePoints.hLinePoint.distance > tmpPoint.distance)) {
+                            tmpPoint = fillSpikePoint(closestHPt);
+                            if(!spikePoints.hLinePoint || (spikePoints.hLinePoint.spikeDistance > tmpPoint.spikeDistance)) {
                                 spikePoints.hLinePoint = tmpPoint;
                             }
                         }
@@ -25462,47 +25573,28 @@ function _hover(gd, evt, subplot, noHoverEvent) {
     }
 
     function selectClosestPoint(pointsData, spikedistance) {
-        if(!pointsData.length) return null;
-        var resultPoint;
-        var pointsDistances = pointsData.map(function(point, index) {
-            var xa = point.xa,
-                ya = point.ya,
-                xpx = xa.c2p(xval),
-                ypx = ya.c2p(yval),
-                dxy = function(point) {
-                    var rad = point.kink,
-                        dx = (point.x1 + point.x0) / 2 - xpx,
-                        dy = (point.y1 + point.y0) / 2 - ypx;
-                    return Math.max(Math.sqrt(dx * dx + dy * dy) - rad, 1 - 3 / rad);
-                };
-            var distance = dxy(point);
-            return {distance: distance, index: index};
-        });
-        pointsDistances = pointsDistances
-            .filter(function(point) {
-                return point.distance <= spikedistance;
-            })
-            .sort(function(a, b) {
-                return a.distance - b.distance;
-            });
-        if(pointsDistances.length) {
-            resultPoint = pointsData[pointsDistances[0].index];
-        } else {
-            resultPoint = null;
+        var resultPoint = null;
+        var minDistance = Infinity;
+        var thisSpikeDistance;
+        for(var i = 0; i < pointsData.length; i++) {
+            thisSpikeDistance = pointsData[i].spikeDistance;
+            if(thisSpikeDistance < minDistance && thisSpikeDistance <= spikedistance) {
+                resultPoint = pointsData[i];
+                minDistance = thisSpikeDistance;
+            }
         }
         return resultPoint;
     }
 
-    function fillClosestPoint(point) {
+    function fillSpikePoint(point) {
         if(!point) return null;
         return {
             xa: point.xa,
             ya: point.ya,
-            x0: point.x0,
-            x1: point.x1,
-            y0: point.y0,
-            y1: point.y1,
+            x: point.xSpike !== undefined ? point.xSpike : (point.x0 + point.x1) / 2,
+            y: point.ySpike !== undefined ? point.ySpike : (point.y0 + point.y1) / 2,
             distance: point.distance,
+            spikeDistance: point.spikeDistance,
             curveNumber: point.trace.index,
             color: point.color,
             pointNumber: point.index
@@ -25523,26 +25615,26 @@ function _hover(gd, evt, subplot, noHoverEvent) {
     gd._spikepoints = newspikepoints;
 
     // Now if it is not restricted by spikedistance option, set the points to draw the spikelines
-    if(fullLayout._has('cartesian') && (spikedistance !== 0)) {
+    if(hasCartesian && (spikedistance !== 0)) {
         if(hoverData.length !== 0) {
             var tmpHPointData = hoverData.filter(function(point) {
                 return point.ya.showspikes;
             });
             var tmpHPoint = selectClosestPoint(tmpHPointData, spikedistance);
-            spikePoints.hLinePoint = fillClosestPoint(tmpHPoint);
+            spikePoints.hLinePoint = fillSpikePoint(tmpHPoint);
 
             var tmpVPointData = hoverData.filter(function(point) {
                 return point.xa.showspikes;
             });
             var tmpVPoint = selectClosestPoint(tmpVPointData, spikedistance);
-            spikePoints.vLinePoint = fillClosestPoint(tmpVPoint);
+            spikePoints.vLinePoint = fillSpikePoint(tmpVPoint);
         }
     }
 
     // if hoverData is empty check for the spikes to draw and quit if there are none
     if(hoverData.length === 0) {
         var result = dragElement.unhoverRaw(gd, evt);
-        if(fullLayout._has('cartesian') && ((spikePoints.hLinePoint !== null) || (spikePoints.vLinePoint !== null))) {
+        if(hasCartesian && ((spikePoints.hLinePoint !== null) || (spikePoints.vLinePoint !== null))) {
             if(spikesChanged(oldspikepoints)) {
                 createSpikelines(spikePoints, spikelineOpts);
             }
@@ -25550,7 +25642,7 @@ function _hover(gd, evt, subplot, noHoverEvent) {
         return result;
     }
 
-    if(fullLayout._has('cartesian')) {
+    if(hasCartesian) {
         if(spikesChanged(oldspikepoints)) {
             createSpikelines(spikePoints, spikelineOpts);
         }
@@ -25651,20 +25743,31 @@ function createHoverText(hoverData, opts, gd) {
     // show the common label, if any, on the axis
     // never show a common label in array mode,
     // even if sometimes there could be one
-    var showCommonLabel = c0.distance <= opts.hoverdistance &&
-                          (hovermode === 'x' || hovermode === 'y');
+    var showCommonLabel = (
+        (t0 !== undefined) &&
+        (c0.distance <= opts.hoverdistance) &&
+        (hovermode === 'x' || hovermode === 'y')
+    );
 
     // all hover traces hoverinfo must contain the hovermode
     // to have common labels
-    var i, traceHoverinfo;
-    for(i = 0; i < hoverData.length; i++) {
-        traceHoverinfo = hoverData[i].hoverinfo || hoverData[i].trace.hoverinfo;
-        var parts = Array.isArray(traceHoverinfo) ? traceHoverinfo : traceHoverinfo.split('+');
-        if(parts.indexOf('all') === -1 &&
-            parts.indexOf(hovermode) === -1) {
-            showCommonLabel = false;
-            break;
+    if(showCommonLabel) {
+        var i, traceHoverinfo;
+        var allHaveZ = true;
+        for(i = 0; i < hoverData.length; i++) {
+            if(allHaveZ && hoverData[i].zLabel === undefined) allHaveZ = false;
+
+            traceHoverinfo = hoverData[i].hoverinfo || hoverData[i].trace.hoverinfo;
+            var parts = Array.isArray(traceHoverinfo) ? traceHoverinfo : traceHoverinfo.split('+');
+            if(parts.indexOf('all') === -1 &&
+                parts.indexOf(hovermode) === -1) {
+                showCommonLabel = false;
+                break;
+            }
         }
+
+        // xyz labels put all info in their main label, so have no need of a common label
+        if(allHaveZ) showCommonLabel = false;
     }
 
     var commonLabel = container.selectAll('g.axistext')
@@ -26104,7 +26207,7 @@ function alignHoverText(hoverLabels, rotateLabels) {
             offsetY = d.offset;
         if(d.anchor === 'middle') {
             txx -= d.tx2width / 2;
-            tx2x -= d.tx2width / 2;
+            tx2x += d.txwidth / 2 + HOVERTEXTPAD;
         }
         if(rotateLabels) {
             offsetY *= -YSHIFTY;
@@ -26113,7 +26216,8 @@ function alignHoverText(hoverLabels, rotateLabels) {
 
         g.select('path').attr('d', d.anchor === 'middle' ?
             // middle aligned: rect centered on data
-            ('M-' + (d.bx / 2) + ',-' + (d.by / 2) + 'h' + d.bx + 'v' + d.by + 'h-' + d.bx + 'Z') :
+            ('M-' + (d.bx / 2 + d.tx2width / 2) + ',' + (offsetY - d.by / 2) +
+              'h' + d.bx + 'v' + d.by + 'h-' + d.bx + 'Z') :
             // left or right aligned: side rect with arrow to data
             ('M0,0L' + (horzSign * HOVERARROWSIZE + offsetX) + ',' + (HOVERARROWSIZE + offsetY) +
                 'v' + (d.by / 2 - HOVERARROWSIZE) +
@@ -26168,7 +26272,9 @@ function cleanPoint(d, hovermode) {
     fill('fontColor', 'htc', 'hoverlabel.font.color');
     fill('nameLength', 'hnl', 'hoverlabel.namelength');
 
-    d.posref = hovermode === 'y' ? (d.x0 + d.x1) / 2 : (d.y0 + d.y1) / 2;
+    d.posref = hovermode === 'y' ?
+        (d.xa._offset + (d.x0 + d.x1) / 2) :
+        (d.ya._offset + (d.y0 + d.y1) / 2);
 
     // then constrain all the positions to be on the plot
     d.x0 = Lib.constrain(d.x0, 0, d.xa._length);
@@ -26260,8 +26366,8 @@ function createSpikelines(closestPoints, opts) {
             hLinePointX = evt.pointerX;
             hLinePointY = evt.pointerY;
         } else {
-            hLinePointX = xa._offset + (hLinePoint.x0 + hLinePoint.x1) / 2;
-            hLinePointY = ya._offset + (hLinePoint.y0 + hLinePoint.y1) / 2;
+            hLinePointX = xa._offset + hLinePoint.x;
+            hLinePointY = ya._offset + hLinePoint.y;
         }
         var dfltHLineColor = tinycolor.readability(hLinePoint.color, contrastColor) < 1.5 ?
             Color.contrast(contrastColor) : hLinePoint.color;
@@ -26336,8 +26442,8 @@ function createSpikelines(closestPoints, opts) {
             vLinePointX = evt.pointerX;
             vLinePointY = evt.pointerY;
         } else {
-            vLinePointX = xa._offset + (vLinePoint.x0 + vLinePoint.x1) / 2;
-            vLinePointY = ya._offset + (vLinePoint.y0 + vLinePoint.y1) / 2;
+            vLinePointX = xa._offset + vLinePoint.x;
+            vLinePointY = ya._offset + vLinePoint.y;
         }
         var dfltVLineColor = tinycolor.readability(vLinePoint.color, contrastColor) < 1.5 ?
         Color.contrast(contrastColor) : vLinePoint.color;
@@ -26425,7 +26531,7 @@ function spikesChanged(gd, oldspikepoints) {
     return false;
 }
 
-},{"../../lib":152,"../../lib/events":145,"../../lib/override_cursor":163,"../../lib/svg_text_utils":173,"../../plots/cartesian/axes":195,"../../registry":234,"../color":35,"../dragelement":57,"../drawing":60,"./constants":72,"./helpers":74,"d3":3,"fast-isnumeric":5,"tinycolor2":302}],76:[function(require,module,exports){
+},{"../../lib":155,"../../lib/events":148,"../../lib/override_cursor":166,"../../lib/svg_text_utils":176,"../../plots/cartesian/axes":197,"../../registry":237,"../color":36,"../dragelement":58,"../drawing":61,"./constants":73,"./helpers":75,"d3":3,"fast-isnumeric":5,"tinycolor2":305}],77:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -26447,7 +26553,7 @@ module.exports = function handleHoverLabelDefaults(contIn, contOut, coerce, opts
     Lib.coerceFont(coerce, 'hoverlabel.font', opts.font);
 };
 
-},{"../../lib":152}],77:[function(require,module,exports){
+},{"../../lib":155}],78:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -26525,7 +26631,7 @@ function castHoverinfo(trace, fullLayout, ptNumber) {
     return Lib.castOption(trace, ptNumber, 'hoverinfo', _coerce);
 }
 
-},{"../../lib":152,"../dragelement":57,"./attributes":69,"./calc":70,"./click":71,"./constants":72,"./defaults":73,"./helpers":74,"./hover":75,"./layout_attributes":78,"./layout_defaults":79,"./layout_global_defaults":80,"d3":3}],78:[function(require,module,exports){
+},{"../../lib":155,"../dragelement":58,"./attributes":70,"./calc":71,"./click":72,"./constants":73,"./defaults":74,"./helpers":75,"./hover":76,"./layout_attributes":79,"./layout_defaults":80,"./layout_global_defaults":81,"d3":3}],79:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -26574,7 +26680,11 @@ module.exports = {
         editType: 'none',
         description: [
             'Sets the default distance (in pixels) to look for data',
-            'to add hover labels (-1 means no cutoff, 0 means no looking for data)'
+            'to add hover labels (-1 means no cutoff, 0 means no looking for data).',
+            'This is only a real distance for hovering on point-like objects,',
+            'like scatter points. For area-like objects (bars, scatter fills, etc)',
+            'hovering is on inside the area and off outside, but these objects',
+            'will not supersede hover on point-like objects in case of conflict.'
         ].join(' ')
     },
     spikedistance: {
@@ -26585,7 +26695,10 @@ module.exports = {
         editType: 'none',
         description: [
             'Sets the default distance (in pixels) to look for data to draw',
-            'spikelines to (-1 means no cutoff, 0 means no looking for data).'
+            'spikelines to (-1 means no cutoff, 0 means no looking for data).',
+            'As with hoverdistance, distance does not apply to area-like objects.',
+            'In addition, some objects can be hovered on but will not generate',
+            'spikelines, such as scatter fills.'
         ].join(' ')
     },
     hoverlabel: {
@@ -26625,7 +26738,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/font_attributes":221,"./constants":72}],79:[function(require,module,exports){
+},{"../../plots/font_attributes":224,"./constants":73}],80:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -26691,7 +26804,7 @@ function isHoriz(fullData) {
     return out;
 }
 
-},{"../../lib":152,"./layout_attributes":78}],80:[function(require,module,exports){
+},{"../../lib":155,"./layout_attributes":79}],81:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -26714,7 +26827,420 @@ module.exports = function supplyLayoutGlobalDefaults(layoutIn, layoutOut) {
     handleHoverLabelDefaults(layoutIn, layoutOut, coerce);
 };
 
-},{"../../lib":152,"./hoverlabel_defaults":76,"./layout_attributes":78}],81:[function(require,module,exports){
+},{"../../lib":155,"./hoverlabel_defaults":77,"./layout_attributes":79}],82:[function(require,module,exports){
+/**
+* Copyright 2012-2018, Plotly, Inc.
+* All rights reserved.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+
+'use strict';
+
+var Lib = require('../../lib');
+var counterRegex = require('../../lib/regex').counter;
+var domainAttrs = require('../../plots/domain').attributes;
+var cartesianIdRegex = require('../../plots/cartesian/constants').idRegex;
+
+var gridAttrs = {
+    rows: {
+        valType: 'integer',
+        min: 1,
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'The number of rows in the grid. If you provide a 2D `subplots`',
+            'array or a `yaxes` array, its length is used as the default.',
+            'But it\'s also possible to have a different length, if you',
+            'want to leave a row at the end for non-cartesian subplots.'
+        ].join(' ')
+    },
+    roworder: {
+        valType: 'enumerated',
+        values: ['top to bottom', 'bottom to top'],
+        dflt: 'top to bottom',
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'Is the first row the top or the bottom? Note that columns',
+            'are always enumerated from left to right.'
+        ].join(' ')
+    },
+    columns: {
+        valType: 'integer',
+        min: 1,
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'The number of columns in the grid. If you provide a 2D `subplots`',
+            'array, the length of its longest row is used as the default.',
+            'If you give an `xaxes` array, its length is used as the default.',
+            'But it\'s also possible to have a different length, if you',
+            'want to leave a row at the end for non-cartesian subplots.'
+        ].join(' ')
+    },
+    subplots: {
+        valType: 'info_array',
+        freeLength: true,
+        dimensions: 2,
+        items: {valType: 'enumerated', values: [counterRegex('xy').toString(), ''], editType: 'plot'},
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'Used for freeform grids, where some axes may be shared across subplots',
+            'but others are not. Each entry should be a cartesian subplot id, like',
+            '*xy* or *x3y2*, or ** to leave that cell empty. You may reuse x axes',
+            'within the same column, and y axes within the same row.',
+            'Non-cartesian subplots and traces that support `domain` can place themselves',
+            'in this grid separately using the `gridcell` attribute.'
+        ].join(' ')
+    },
+    xaxes: {
+        valType: 'info_array',
+        freeLength: true,
+        items: {valType: 'enumerated', values: [cartesianIdRegex.x.toString(), ''], editType: 'plot'},
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'Used with `yaxes` when the x and y axes are shared across columns and rows.',
+            'Each entry should be an x axis id like *x*, *x2*, etc., or ** to',
+            'not put an x axis in that column. Entries other than ** must be unique.',
+            'Ignored if `subplots` is present. If missing but `yaxes` is present,',
+            'will generate consecutive IDs.'
+        ].join(' ')
+    },
+    yaxes: {
+        valType: 'info_array',
+        freeLength: true,
+        items: {valType: 'enumerated', values: [cartesianIdRegex.y.toString(), ''], editType: 'plot'},
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'Used with `yaxes` when the x and y axes are shared across columns and rows.',
+            'Each entry should be an y axis id like *y*, *y2*, etc., or ** to',
+            'not put a y axis in that row. Entries other than ** must be unique.',
+            'Ignored if `subplots` is present. If missing but `xaxes` is present,',
+            'will generate consecutive IDs.'
+        ].join(' ')
+    },
+    pattern: {
+        valType: 'enumerated',
+        values: ['independent', 'coupled'],
+        dflt: 'coupled',
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'If no `subplots`, `xaxes`, or `yaxes` are given but we do have `rows` and `columns`,',
+            'we can generate defaults using consecutive axis IDs, in two ways:',
+            '*coupled* gives one x axis per column and one y axis per row.',
+            '*independent* uses a new xy pair for each cell, left-to-right across each row',
+            'then iterating rows according to `roworder`.'
+        ].join(' ')
+    },
+    xgap: {
+        valType: 'number',
+        min: 0,
+        max: 1,
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'Horizontal space between grid cells, expressed as a fraction',
+            'of the total width available to one cell. Defaults to 0.1',
+            'for coupled-axes grids and 0.2 for independent grids.'
+        ].join(' ')
+    },
+    ygap: {
+        valType: 'number',
+        min: 0,
+        max: 1,
+        role: 'info',
+        editType: 'plot',
+        description: [
+            'Vertical space between grid cells, expressed as a fraction',
+            'of the total height available to one cell. Defaults to 0.1',
+            'for coupled-axes grids and 0.3 for independent grids.'
+        ].join(' ')
+    },
+    domain: domainAttrs({name: 'grid', editType: 'plot', noGridCell: true}, {
+        description: [
+            'The first and last cells end exactly at the domain',
+            'edges, with no grout around the edges.'
+        ].join(' ')
+    }),
+    xside: {
+        valType: 'enumerated',
+        values: ['bottom', 'bottom plot', 'top plot', 'top'],
+        dflt: 'bottom plot',
+        role: 'info',
+        editType: 'ticks',
+        description: [
+            'Sets where the x axis labels and titles go. *bottom* means',
+            'the very bottom of the grid. *bottom plot* is the lowest plot',
+            'that each x axis is used in. *top* and *top plot* are similar.'
+        ].join(' ')
+    },
+    yside: {
+        valType: 'enumerated',
+        values: ['left', 'left plot', 'right plot', 'right'],
+        dflt: 'left plot',
+        role: 'info',
+        editType: 'ticks',
+        description: [
+            'Sets where the y axis labels and titles go. *left* means',
+            'the very left edge of the grid. *left plot* is the leftmost plot',
+            'that each y axis is used in. *right* and *right plot* are similar.'
+        ].join(' ')
+    },
+    editType: 'plot'
+};
+
+// the shape of the grid - this needs to be done BEFORE supplyDataDefaults
+// so that non-subplot traces can place themselves in the grid
+function sizeDefaults(layoutIn, layoutOut) {
+    var gridIn = layoutIn.grid;
+    if(!gridIn) return;
+
+    var hasSubplotGrid = Array.isArray(gridIn.subplots) && Array.isArray(gridIn.subplots[0]);
+    var hasXaxes = Array.isArray(gridIn.xaxes);
+    var hasYaxes = Array.isArray(gridIn.yaxes);
+
+    var dfltRows, dfltColumns;
+
+    if(hasSubplotGrid) {
+        dfltRows = gridIn.subplots.length;
+        dfltColumns = gridIn.subplots[0].length;
+    }
+    else {
+        if(hasYaxes) dfltRows = gridIn.yaxes.length;
+        if(hasXaxes) dfltColumns = gridIn.xaxes.length;
+    }
+
+    var gridOut = layoutOut.grid = {};
+
+    function coerce(attr, dflt) {
+        return Lib.coerce(gridIn, gridOut, gridAttrs, attr, dflt);
+    }
+
+    var rows = coerce('rows', dfltRows);
+    var columns = coerce('columns', dfltColumns);
+
+    if(!(rows * columns > 1)) return;
+
+    if(!hasSubplotGrid && !hasXaxes && !hasYaxes) {
+        var useDefaultSubplots = coerce('pattern') === 'independent';
+        if(useDefaultSubplots) hasSubplotGrid = true;
+    }
+    gridOut._hasSubplotGrid = hasSubplotGrid;
+
+    var rowOrder = coerce('roworder');
+    var reversed = rowOrder === 'top to bottom';
+
+    gridOut._domains = {
+        x: fillGridPositions('x', coerce, hasSubplotGrid ? 0.2 : 0.1, columns),
+        y: fillGridPositions('y', coerce, hasSubplotGrid ? 0.3 : 0.1, rows, reversed)
+    };
+}
+
+// coerce x or y sizing attributes and return an array of domains for this direction
+function fillGridPositions(axLetter, coerce, dfltGap, len, reversed) {
+    var dirGap = coerce(axLetter + 'gap', dfltGap);
+    var domain = coerce('domain.' + axLetter);
+    coerce(axLetter + 'side');
+
+    var out = new Array(len);
+    var start = domain[0];
+    var step = (domain[1] - start) / (len - dirGap);
+    var cellDomain = step * (1 - dirGap);
+    for(var i = 0; i < len; i++) {
+        var cellStart = start + step * i;
+        out[reversed ? (len - 1 - i) : i] = [cellStart, cellStart + cellDomain];
+    }
+    return out;
+}
+
+// the (cartesian) contents of the grid - this needs to happen AFTER supplyDataDefaults
+// so that we know what cartesian subplots are available
+function contentDefaults(layoutIn, layoutOut) {
+    var gridOut = layoutOut.grid;
+    // make sure we got to the end of handleGridSizing
+    if(!gridOut || !gridOut._domains) return;
+
+    var gridIn = layoutIn.grid;
+    var subplots = layoutOut._subplots;
+    var hasSubplotGrid = gridOut._hasSubplotGrid;
+    var rows = gridOut.rows;
+    var columns = gridOut.columns;
+    var useDefaultSubplots = gridOut.pattern === 'independent';
+
+    var i, j, xId, yId, subplotId, subplotsOut, yPos;
+
+    var axisMap = gridOut._axisMap = {};
+
+    if(hasSubplotGrid) {
+        var subplotsIn = gridIn.subplots || [];
+        subplotsOut = gridOut.subplots = new Array(rows);
+        var index = 1;
+
+        for(i = 0; i < rows; i++) {
+            var rowOut = subplotsOut[i] = new Array(columns);
+            var rowIn = subplotsIn[i] || [];
+            for(j = 0; j < columns; j++) {
+                if(useDefaultSubplots) {
+                    subplotId = (index === 1) ? 'xy' : ('x' + index + 'y' + index);
+                    index++;
+                }
+                else subplotId = rowIn[j];
+
+                rowOut[j] = '';
+
+                if(subplots.cartesian.indexOf(subplotId) !== -1) {
+                    yPos = subplotId.indexOf('y');
+                    xId = subplotId.slice(0, yPos);
+                    yId = subplotId.slice(yPos);
+                    if((axisMap[xId] !== undefined && axisMap[xId] !== j) ||
+                        (axisMap[yId] !== undefined && axisMap[yId] !== i)
+                    ) {
+                        continue;
+                    }
+
+                    rowOut[j] = subplotId;
+                    axisMap[xId] = j;
+                    axisMap[yId] = i;
+                }
+            }
+        }
+    }
+    else {
+        gridOut.xaxes = fillGridAxes(gridIn.xaxes, subplots.xaxis, columns, axisMap, 'x');
+        gridOut.yaxes = fillGridAxes(gridIn.yaxes, subplots.yaxis, rows, axisMap, 'y');
+    }
+
+    var anchors = gridOut._anchors = {};
+    var reversed = gridOut.roworder === 'top to bottom';
+
+    for(var axisId in axisMap) {
+        var axLetter = axisId.charAt(0);
+        var side = gridOut[axLetter + 'side'];
+
+        var i0, inc, iFinal;
+
+        if(side.length < 8) {
+            // grid edge -  ie not "* plot" - make these as free axes
+            // since we're not guaranteed to have a subplot there at all
+            anchors[axisId] = 'free';
+        }
+        else if(axLetter === 'x') {
+            if((side.charAt(0) === 't') === reversed) {
+                i0 = 0;
+                inc = 1;
+                iFinal = rows;
+            }
+            else {
+                i0 = rows - 1;
+                inc = -1;
+                iFinal = -1;
+            }
+            if(hasSubplotGrid) {
+                var column = axisMap[axisId];
+                for(i = i0; i !== iFinal; i += inc) {
+                    subplotId = subplotsOut[i][column];
+                    if(!subplotId) continue;
+                    yPos = subplotId.indexOf('y');
+                    if(subplotId.slice(0, yPos) === axisId) {
+                        anchors[axisId] = subplotId.slice(yPos);
+                        break;
+                    }
+                }
+            }
+            else {
+                for(i = i0; i !== iFinal; i += inc) {
+                    yId = gridOut.yaxes[i];
+                    if(subplots.cartesian.indexOf(axisId + yId) !== -1) {
+                        anchors[axisId] = yId;
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            if((side.charAt(0) === 'l')) {
+                i0 = 0;
+                inc = 1;
+                iFinal = columns;
+            }
+            else {
+                i0 = columns - 1;
+                inc = -1;
+                iFinal = -1;
+            }
+            if(hasSubplotGrid) {
+                var row = axisMap[axisId];
+                for(i = i0; i !== iFinal; i += inc) {
+                    subplotId = subplotsOut[row][i];
+                    if(!subplotId) continue;
+                    yPos = subplotId.indexOf('y');
+                    if(subplotId.slice(yPos) === axisId) {
+                        anchors[axisId] = subplotId.slice(0, yPos);
+                        break;
+                    }
+                }
+            }
+            else {
+                for(i = i0; i !== iFinal; i += inc) {
+                    xId = gridOut.xaxes[i];
+                    if(subplots.cartesian.indexOf(xId + axisId) !== -1) {
+                        anchors[axisId] = xId;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function fillGridAxes(axesIn, axesAllowed, len, axisMap, axLetter) {
+    var out = new Array(len);
+    var i;
+
+    function fillOneAxis(i, axisId) {
+        if(axesAllowed.indexOf(axisId) !== -1 && axisMap[axisId] === undefined) {
+            out[i] = axisId;
+            axisMap[axisId] = i;
+        }
+        else out[i] = '';
+    }
+
+    if(Array.isArray(axesIn)) {
+        for(i = 0; i < len; i++) {
+            fillOneAxis(i, axesIn[i]);
+        }
+    }
+    else {
+        // default axis list is the first `len` axis ids
+        fillOneAxis(0, axLetter);
+        for(i = 1; i < len; i++) {
+            fillOneAxis(i, axLetter + (i + 1));
+        }
+    }
+
+    return out;
+}
+
+module.exports = {
+    moduleType: 'component',
+    name: 'grid',
+
+    schema: {
+        layout: {grid: gridAttrs}
+    },
+
+    layoutAttributes: gridAttrs,
+    sizeDefaults: sizeDefaults,
+    contentDefaults: contentDefaults
+};
+
+},{"../../lib":155,"../../lib/regex":170,"../../plots/cartesian/constants":202,"../../plots/domain":223}],83:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -26897,7 +27423,7 @@ module.exports = {
     editType: 'arraydraw'
 };
 
-},{"../../plots/cartesian/constants":200}],82:[function(require,module,exports){
+},{"../../plots/cartesian/constants":202}],84:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -26980,7 +27506,7 @@ module.exports = function convertCoords(gd, ax, newType, doExtra) {
     }
 };
 
-},{"../../lib/to_log_range":175,"fast-isnumeric":5}],83:[function(require,module,exports){
+},{"../../lib/to_log_range":178,"fast-isnumeric":5}],85:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27041,7 +27567,7 @@ function imageDefaults(imageIn, imageOut, fullLayout) {
     return imageOut;
 }
 
-},{"../../lib":152,"../../plots/array_container_defaults":192,"../../plots/cartesian/axes":195,"./attributes":81}],84:[function(require,module,exports){
+},{"../../lib":155,"../../plots/array_container_defaults":193,"../../plots/cartesian/axes":197,"./attributes":83}],86:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27262,7 +27788,7 @@ module.exports = function draw(gd) {
     }
 };
 
-},{"../../constants/xmlns_namespaces":137,"../../plots/cartesian/axes":195,"../drawing":60,"d3":3}],85:[function(require,module,exports){
+},{"../../constants/xmlns_namespaces":140,"../../plots/cartesian/axes":197,"../drawing":61,"d3":3}],87:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27286,7 +27812,7 @@ module.exports = {
     convertCoords: require('./convert_coords')
 };
 
-},{"../../plots/cartesian/include_components":205,"./attributes":81,"./convert_coords":82,"./defaults":83,"./draw":84}],86:[function(require,module,exports){
+},{"../../plots/cartesian/include_components":207,"./attributes":83,"./convert_coords":84,"./defaults":85,"./draw":86}],88:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27335,7 +27861,7 @@ exports.isMiddleAnchor = function isMiddleAnchor(opts) {
     );
 };
 
-},{}],87:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27461,7 +27987,7 @@ module.exports = {
     editType: 'legend'
 };
 
-},{"../../plots/font_attributes":221,"../color/attributes":34}],88:[function(require,module,exports){
+},{"../../plots/font_attributes":224,"../color/attributes":35}],90:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27473,13 +27999,13 @@ module.exports = {
 'use strict';
 
 module.exports = {
-    scrollBarWidth: 4,
-    scrollBarHeight: 20,
+    scrollBarWidth: 6,
+    scrollBarMinHeight: 20,
     scrollBarColor: '#808BA4',
     scrollBarMargin: 4
 };
 
-},{}],89:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27500,15 +28026,13 @@ var helpers = require('./helpers');
 
 
 module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
-    var containerIn = layoutIn.legend || {},
-        containerOut = layoutOut.legend = {};
+    var containerIn = layoutIn.legend || {};
+    var containerOut = {};
 
-    var visibleTraces = 0,
-        defaultOrder = 'normal',
-        defaultX,
-        defaultY,
-        defaultXAnchor,
-        defaultYAnchor;
+    var visibleTraces = 0;
+    var defaultOrder = 'normal';
+
+    var defaultX, defaultY, defaultXAnchor, defaultYAnchor;
 
     for(var i = 0; i < fullData.length; i++) {
         var trace = fullData[i];
@@ -27539,6 +28063,8 @@ module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
         basePlotLayoutAttributes, 'showlegend', visibleTraces > 1);
 
     if(showLegend === false) return;
+
+    layoutOut.legend = containerOut;
 
     coerce('bgcolor', layoutOut.paper_bgcolor);
     coerce('bordercolor');
@@ -27572,7 +28098,7 @@ module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
     Lib.noneOrAll(containerIn, containerOut, ['x', 'y']);
 };
 
-},{"../../lib":152,"../../plots/layout_attributes":225,"../../registry":234,"./attributes":87,"./helpers":93}],90:[function(require,module,exports){
+},{"../../lib":155,"../../plots/layout_attributes":228,"../../registry":237,"./attributes":89,"./helpers":95}],92:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -27585,7 +28111,6 @@ module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
 
 var d3 = require('d3');
 
-var Plotly = require('../../plotly');
 var Lib = require('../../lib');
 var Plots = require('../../plots/plots');
 var Registry = require('../../registry');
@@ -27597,7 +28122,10 @@ var handleClick = require('./handle_click');
 
 var constants = require('./constants');
 var interactConstants = require('../../constants/interactions');
-var LINE_SPACING = require('../../constants/alignment').LINE_SPACING;
+var alignmentConstants = require('../../constants/alignment');
+var LINE_SPACING = alignmentConstants.LINE_SPACING;
+var FROM_TL = alignmentConstants.FROM_TL;
+var FROM_BR = alignmentConstants.FROM_BR;
 
 var getLegendData = require('./get_legend_data');
 var style = require('./style');
@@ -27650,9 +28178,9 @@ module.exports = function draw(gd) {
         'shape-rendering': 'crispEdges'
     });
 
-    bg.call(Color.stroke, opts.bordercolor);
-    bg.call(Color.fill, opts.bgcolor);
-    bg.style('stroke-width', opts.borderwidth + 'px');
+    bg.call(Color.stroke, opts.bordercolor)
+        .call(Color.fill, opts.bgcolor)
+        .style('stroke-width', opts.borderwidth + 'px');
 
     var scrollBox = legend.selectAll('g.scrollbox')
         .data([0]);
@@ -27666,10 +28194,10 @@ module.exports = function draw(gd) {
     scrollBar.enter().append('rect')
         .attr({
             'class': 'scrollbar',
-            'rx': 20,
-            'ry': 2,
-            'width': 0,
-            'height': 0
+            rx: 20,
+            ry: 3,
+            width: 0,
+            height: 0
         })
         .call(Color.fill, '#808BA4');
 
@@ -27716,7 +28244,7 @@ module.exports = function draw(gd) {
 
     computeLegendDimensions(gd, groups, traces);
 
-    if(opts.height > lyMax) {
+    if(opts._height > lyMax) {
         // If the legend doesn't fit in the plot area,
         // do not expand the vertical margins.
         expandHorizontalMargin(gd);
@@ -27732,21 +28260,21 @@ module.exports = function draw(gd) {
         ly = gs.t + gs.h * (1 - opts.y);
 
     if(anchorUtils.isRightAnchor(opts)) {
-        lx -= opts.width;
+        lx -= opts._width;
     }
     else if(anchorUtils.isCenterAnchor(opts)) {
-        lx -= opts.width / 2;
+        lx -= opts._width / 2;
     }
 
     if(anchorUtils.isBottomAnchor(opts)) {
-        ly -= opts.height;
+        ly -= opts._height;
     }
     else if(anchorUtils.isMiddleAnchor(opts)) {
-        ly -= opts.height / 2;
+        ly -= opts._height / 2;
     }
 
     // Make sure the legend left and right sides are visible
-    var legendWidth = opts.width,
+    var legendWidth = opts._width,
         legendWidthMax = gs.w;
 
     if(legendWidth > legendWidthMax) {
@@ -27756,13 +28284,13 @@ module.exports = function draw(gd) {
     else {
         if(lx + legendWidth > lxMax) lx = lxMax - legendWidth;
         if(lx < lxMin) lx = lxMin;
-        legendWidth = Math.min(lxMax - lx, opts.width);
+        legendWidth = Math.min(lxMax - lx, opts._width);
     }
 
     // Make sure the legend top and bottom are visible
     // (legends with a scroll bar are not allowed to stretch beyond the extended
     // margins)
-    var legendHeight = opts.height,
+    var legendHeight = opts._height,
         legendHeightMax = gs.h;
 
     if(legendHeight > legendHeightMax) {
@@ -27772,21 +28300,18 @@ module.exports = function draw(gd) {
     else {
         if(ly + legendHeight > lyMax) ly = lyMax - legendHeight;
         if(ly < lyMin) ly = lyMin;
-        legendHeight = Math.min(lyMax - ly, opts.height);
+        legendHeight = Math.min(lyMax - ly, opts._height);
     }
 
     // Set size and position of all the elements that make up a legend:
     // legend, background and border, scroll box and scroll bar
     Drawing.setTranslate(legend, lx, ly);
 
-    var scrollBarYMax = legendHeight -
-            constants.scrollBarHeight -
-            2 * constants.scrollBarMargin,
-        scrollBoxYMax = opts.height - legendHeight,
-        scrollBarY,
-        scrollBoxY;
+    // to be safe, remove previous listeners
+    scrollBar.on('.drag', null);
+    legend.on('wheel', null);
 
-    if(opts.height <= legendHeight || gd._context.staticPlot) {
+    if(opts._height <= legendHeight || gd._context.staticPlot) {
         // if scrollbar should not be shown.
         bg.attr({
             width: legendWidth - opts.borderwidth,
@@ -27804,11 +28329,21 @@ module.exports = function draw(gd) {
             y: opts.borderwidth
         });
 
-        scrollBox.call(Drawing.setClipUrl, clipId);
+        Drawing.setClipUrl(scrollBox, clipId);
+
+        Drawing.setRect(scrollBar, 0, 0, 0, 0);
+        delete opts._scrollY;
     }
     else {
-        scrollBarY = constants.scrollBarMargin,
-        scrollBoxY = scrollBox.attr('data-scroll') || 0;
+        var scrollBarHeight = Math.max(constants.scrollBarMinHeight,
+            legendHeight * legendHeight / opts._height);
+        var scrollBarYMax = legendHeight -
+            scrollBarHeight -
+            2 * constants.scrollBarMargin;
+        var scrollBoxYMax = opts._height - legendHeight;
+        var scrollRatio = scrollBarYMax / scrollBoxYMax;
+
+        var scrollBoxY = Math.min(opts._scrollY || 0, scrollBoxYMax);
 
         // increase the background and clip-path width
         // by the scrollbar width and margin
@@ -27829,60 +28364,58 @@ module.exports = function draw(gd) {
                 constants.scrollBarMargin,
             height: legendHeight - 2 * opts.borderwidth,
             x: opts.borderwidth,
-            y: opts.borderwidth - scrollBoxY
+            y: opts.borderwidth + scrollBoxY
         });
 
-        scrollBox.call(Drawing.setClipUrl, clipId);
+        Drawing.setClipUrl(scrollBox, clipId);
 
-        if(firstRender) scrollHandler(scrollBarY, scrollBoxY);
+        scrollHandler(scrollBoxY, scrollBarHeight, scrollRatio);
 
-        legend.on('wheel', null);  // to be safe, remove previous listeners
         legend.on('wheel', function() {
             scrollBoxY = Lib.constrain(
-                scrollBox.attr('data-scroll') -
+                opts._scrollY +
                     d3.event.deltaY / scrollBarYMax * scrollBoxYMax,
-                -scrollBoxYMax, 0);
-            scrollBarY = constants.scrollBarMargin -
-                scrollBoxY / scrollBoxYMax * scrollBarYMax;
-            scrollHandler(scrollBarY, scrollBoxY);
-            if(scrollBoxY !== 0 && scrollBoxY !== -scrollBoxYMax) {
+                0, scrollBoxYMax);
+            scrollHandler(scrollBoxY, scrollBarHeight, scrollRatio);
+            if(scrollBoxY !== 0 && scrollBoxY !== scrollBoxYMax) {
                 d3.event.preventDefault();
             }
         });
 
-        // to be safe, remove previous listeners
-        scrollBar.on('.drag', null);
-        scrollBox.on('.drag', null);
+        var eventY0, scrollBoxY0;
 
-        var drag = d3.behavior.drag().on('drag', function() {
-            scrollBarY = Lib.constrain(
-                d3.event.y - constants.scrollBarHeight / 2,
-                constants.scrollBarMargin,
-                constants.scrollBarMargin + scrollBarYMax);
-            scrollBoxY = - (scrollBarY - constants.scrollBarMargin) /
-                scrollBarYMax * scrollBoxYMax;
-            scrollHandler(scrollBarY, scrollBoxY);
+        var drag = d3.behavior.drag()
+        .on('dragstart', function() {
+            eventY0 = d3.event.sourceEvent.clientY;
+            scrollBoxY0 = scrollBoxY;
+        })
+        .on('drag', function() {
+            var e = d3.event.sourceEvent;
+            if(e.buttons === 2 || e.ctrlKey) return;
+
+            scrollBoxY = Lib.constrain(
+                (e.clientY - eventY0) / scrollRatio + scrollBoxY0,
+                0, scrollBoxYMax);
+            scrollHandler(scrollBoxY, scrollBarHeight, scrollRatio);
         });
 
         scrollBar.call(drag);
-        scrollBox.call(drag);
     }
 
 
-    function scrollHandler(scrollBarY, scrollBoxY) {
-        scrollBox
-            .attr('data-scroll', scrollBoxY)
-            .call(Drawing.setTranslate, 0, scrollBoxY);
+    function scrollHandler(scrollBoxY, scrollBarHeight, scrollRatio) {
+        opts._scrollY = gd._fullLayout.legend._scrollY = scrollBoxY;
+        Drawing.setTranslate(scrollBox, 0, -scrollBoxY);
 
-        scrollBar.call(
-            Drawing.setRect,
+        Drawing.setRect(
+            scrollBar,
             legendWidth,
-            scrollBarY,
+            constants.scrollBarMargin + scrollBoxY * scrollRatio,
             constants.scrollBarWidth,
-            constants.scrollBarHeight
+            scrollBarHeight
         );
         clipPath.select('rect').attr({
-            y: opts.borderwidth - scrollBoxY
+            y: opts.borderwidth + scrollBoxY
         });
     }
 
@@ -27911,7 +28444,7 @@ module.exports = function draw(gd) {
             },
             doneFn: function() {
                 if(xf !== undefined && yf !== undefined) {
-                    Plotly.relayout(gd, {'legend.x': xf, 'legend.y': yf});
+                    Registry.call('relayout', gd, {'legend.x': xf, 'legend.y': yf});
                 }
             },
             clickFn: function(numClicks, e) {
@@ -28003,10 +28536,10 @@ function drawTexts(g, gd) {
                     update.name = text;
                 }
 
-                return Plotly.restyle(gd, update, traceIndex);
+                return Registry.call('restyle', gd, update, traceIndex);
             });
     } else {
-        text.call(textLayout);
+        textLayout(text);
     }
 }
 
@@ -28108,8 +28641,8 @@ function computeLegendDimensions(gd, groups, traces) {
 
     var extraWidth = 0;
 
-    opts.width = 0;
-    opts.height = 0;
+    opts._width = 0;
+    opts._height = 0;
 
     if(helpers.isVertical(opts)) {
         if(isGrouped) {
@@ -28125,23 +28658,23 @@ function computeLegendDimensions(gd, groups, traces) {
 
             Drawing.setTranslate(this,
                 borderwidth,
-                (5 + borderwidth + opts.height + textHeight / 2));
+                (5 + borderwidth + opts._height + textHeight / 2));
 
-            opts.height += textHeight;
-            opts.width = Math.max(opts.width, textWidth);
+            opts._height += textHeight;
+            opts._width = Math.max(opts._width, textWidth);
         });
 
-        opts.width += 45 + borderwidth * 2;
-        opts.height += 10 + borderwidth * 2;
+        opts._width += 45 + borderwidth * 2;
+        opts._height += 10 + borderwidth * 2;
 
         if(isGrouped) {
-            opts.height += (opts._lgroupsLength - 1) * opts.tracegroupgap;
+            opts._height += (opts._lgroupsLength - 1) * opts.tracegroupgap;
         }
 
         extraWidth = 40;
     }
     else if(isGrouped) {
-        var groupXOffsets = [opts.width],
+        var groupXOffsets = [opts._width],
             groupData = groups.data();
 
         for(var i = 0, n = groupData.length; i < n; i++) {
@@ -28151,9 +28684,9 @@ function computeLegendDimensions(gd, groups, traces) {
 
             var groupWidth = 40 + Math.max.apply(null, textWidths);
 
-            opts.width += opts.tracegroupgap + groupWidth;
+            opts._width += opts.tracegroupgap + groupWidth;
 
-            groupXOffsets.push(opts.width);
+            groupXOffsets.push(opts._width);
         }
 
         groups.each(function(d, i) {
@@ -28176,11 +28709,11 @@ function computeLegendDimensions(gd, groups, traces) {
                 groupHeight += textHeight;
             });
 
-            opts.height = Math.max(opts.height, groupHeight);
+            opts._height = Math.max(opts._height, groupHeight);
         });
 
-        opts.height += 10 + borderwidth * 2;
-        opts.width += borderwidth * 2;
+        opts._height += 10 + borderwidth * 2;
+        opts._width += borderwidth * 2;
     }
     else {
         var rowHeight = 0,
@@ -28206,7 +28739,7 @@ function computeLegendDimensions(gd, groups, traces) {
             if((borderwidth + offsetX + traceGap + traceWidth) > (fullLayout.width - (fullLayout.margin.r + fullLayout.margin.l))) {
                 offsetX = 0;
                 rowHeight = rowHeight + maxTraceHeight;
-                opts.height = opts.height + maxTraceHeight;
+                opts._height = opts._height + maxTraceHeight;
                 // reset for next row
                 maxTraceHeight = 0;
             }
@@ -28215,31 +28748,31 @@ function computeLegendDimensions(gd, groups, traces) {
                 (borderwidth + offsetX),
                 (5 + borderwidth + legendItem.height / 2) + rowHeight);
 
-            opts.width += traceGap + traceWidth;
-            opts.height = Math.max(opts.height, legendItem.height);
+            opts._width += traceGap + traceWidth;
+            opts._height = Math.max(opts._height, legendItem.height);
 
             // keep track of tallest trace in group
             offsetX += traceGap + traceWidth;
             maxTraceHeight = Math.max(legendItem.height, maxTraceHeight);
         });
 
-        opts.width += borderwidth * 2;
-        opts.height += 10 + borderwidth * 2;
+        opts._width += borderwidth * 2;
+        opts._height += 10 + borderwidth * 2;
 
     }
 
     // make sure we're only getting full pixels
-    opts.width = Math.ceil(opts.width);
-    opts.height = Math.ceil(opts.height);
+    opts._width = Math.ceil(opts._width);
+    opts._height = Math.ceil(opts._height);
 
     traces.each(function(d) {
         var legendItem = d[0],
             bg = d3.select(this).select('.legendtoggle');
 
-        bg.call(Drawing.setRect,
+        Drawing.setRect(bg,
             0,
             -legendItem.height / 2,
-            (gd._context.edits.legendText ? 0 : opts.width) + extraWidth,
+            (gd._context.edits.legendText ? 0 : opts._width) + extraWidth,
             legendItem.height
         );
     });
@@ -28269,10 +28802,10 @@ function expandMargin(gd) {
     Plots.autoMargin(gd, 'legend', {
         x: opts.x,
         y: opts.y,
-        l: opts.width * ({right: 1, center: 0.5}[xanchor] || 0),
-        r: opts.width * ({left: 1, center: 0.5}[xanchor] || 0),
-        b: opts.height * ({top: 1, middle: 0.5}[yanchor] || 0),
-        t: opts.height * ({bottom: 1, middle: 0.5}[yanchor] || 0)
+        l: opts._width * (FROM_TL[xanchor]),
+        r: opts._width * (FROM_BR[xanchor]),
+        b: opts._height * (FROM_BR[yanchor]),
+        t: opts._height * (FROM_TL[yanchor])
     });
 }
 
@@ -28292,14 +28825,14 @@ function expandHorizontalMargin(gd) {
     Plots.autoMargin(gd, 'legend', {
         x: opts.x,
         y: 0.5,
-        l: opts.width * ({right: 1, center: 0.5}[xanchor] || 0),
-        r: opts.width * ({left: 1, center: 0.5}[xanchor] || 0),
+        l: opts._width * (FROM_TL[xanchor]),
+        r: opts._width * (FROM_BR[xanchor]),
         b: 0,
         t: 0
     });
 }
 
-},{"../../constants/alignment":133,"../../constants/interactions":134,"../../lib":152,"../../lib/svg_text_utils":173,"../../plotly":190,"../../plots/plots":227,"../../registry":234,"../color":35,"../dragelement":57,"../drawing":60,"./anchor_utils":86,"./constants":88,"./get_legend_data":91,"./handle_click":92,"./helpers":93,"./style":95,"d3":3}],91:[function(require,module,exports){
+},{"../../constants/alignment":136,"../../constants/interactions":137,"../../lib":155,"../../lib/svg_text_utils":176,"../../plots/plots":230,"../../registry":237,"../color":36,"../dragelement":58,"../drawing":61,"./anchor_utils":88,"./constants":90,"./get_legend_data":93,"./handle_click":94,"./helpers":95,"./style":97,"d3":3}],93:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -28404,7 +28937,7 @@ module.exports = function getLegendData(calcdata, opts) {
     return legendData;
 };
 
-},{"../../registry":234,"./helpers":93}],92:[function(require,module,exports){
+},{"../../registry":237,"./helpers":95}],94:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -28415,7 +28948,6 @@ module.exports = function getLegendData(calcdata, opts) {
 
 'use strict';
 
-var Plotly = require('../../plotly');
 var Lib = require('../../lib');
 var Registry = require('../../registry');
 
@@ -28519,7 +29051,7 @@ module.exports = function handleClick(g, gd, numClicks) {
             }
         }
 
-        Plotly.relayout(gd, 'hiddenlabels', hiddenSlices);
+        Registry.call('relayout', gd, 'hiddenlabels', hiddenSlices);
     } else {
         var hasLegendgroup = legendgroup && legendgroup.length;
         var traceIndicesInGroup = [];
@@ -28625,11 +29157,11 @@ module.exports = function handleClick(g, gd, numClicks) {
             }
         }
 
-        Plotly.restyle(gd, attrUpdate, attrIndices);
+        Registry.call('restyle', gd, attrUpdate, attrIndices);
     }
 };
 
-},{"../../lib":152,"../../plotly":190,"../../registry":234}],93:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237}],95:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -28641,11 +29173,14 @@ module.exports = function handleClick(g, gd, numClicks) {
 
 'use strict';
 
-var Registry = require('../../registry');
-
-
 exports.legendGetsTrace = function legendGetsTrace(trace) {
-    return trace.visible && Registry.traceIs(trace, 'showLegend');
+    // traceIs(trace, 'showLegend') is not sufficient anymore, due to contour(carpet)?
+    // which are legend-eligible only if type: constraint. Otherwise, showlegend gets deleted.
+
+    // Note that we explicitly include showlegend: false, so a trace that *could* be
+    // in the legend but is not shown still counts toward the two traces you need to
+    // ensure the legend is shown by default, because this can still help disambiguate.
+    return trace.visible && (trace.showlegend !== undefined);
 };
 
 exports.isGrouped = function isGrouped(legendLayout) {
@@ -28660,7 +29195,7 @@ exports.isReversed = function isReversed(legendLayout) {
     return (legendLayout.traceorder || '').indexOf('reversed') !== -1;
 };
 
-},{"../../registry":234}],94:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -28684,7 +29219,7 @@ module.exports = {
     style: require('./style')
 };
 
-},{"./attributes":87,"./defaults":89,"./draw":90,"./style":95}],95:[function(require,module,exports){
+},{"./attributes":89,"./defaults":91,"./draw":92,"./style":97}],97:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -28747,13 +29282,14 @@ module.exports = function style(s, gd) {
     .each(stylePoints);
 
     function styleLines(d) {
-        var trace = d[0].trace,
-            showFill = trace.visible && trace.fill && trace.fill !== 'none',
-            showLine = subTypes.hasLines(trace);
+        var trace = d[0].trace;
+        var showFill = trace.visible && trace.fill && trace.fill !== 'none';
+        var showLine = subTypes.hasLines(trace);
+        var contours = trace.contours;
 
-        if(trace && trace._module && trace._module.name === 'contourcarpet') {
-            showLine = trace.contours.showlines;
-            showFill = trace.contours.coloring === 'fill';
+        if(contours && contours.type === 'constraint') {
+            showLine = contours.showlines;
+            showFill = contours._operation !== '=';
         }
 
         var fill = d3.select(this).select('.legendfill').selectAll('path')
@@ -28917,7 +29453,7 @@ module.exports = function style(s, gd) {
     }
 };
 
-},{"../../lib":152,"../../registry":234,"../../traces/pie/style_one":267,"../../traces/scatter/subtypes":291,"../color":35,"../drawing":60,"d3":3}],96:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237,"../../traces/pie/style_one":270,"../../traces/scatter/subtypes":294,"../color":36,"../drawing":61,"d3":3}],98:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -28929,13 +29465,11 @@ module.exports = function style(s, gd) {
 
 'use strict';
 
-var Plotly = require('../../plotly');
+var Registry = require('../../registry');
 var Plots = require('../../plots/plots');
 var axisIds = require('../../plots/cartesian/axis_ids');
 var Lib = require('../../lib');
-var downloadImage = require('../../snapshot/download');
 var Icons = require('../../../build/ploticon');
-
 
 var _ = Lib._;
 
@@ -28981,7 +29515,7 @@ modeBarButtons.toImage = {
             format = 'svg';
         }
 
-        downloadImage(gd, {'format': format})
+        Registry.call('downloadImage', gd, {'format': format})
           .then(function(filename) {
               Lib.notifier(_(gd, 'Snapshot succeeded') + ' - ' + filename, 'long');
           })
@@ -29170,7 +29704,7 @@ function handleCartesian(gd, ev) {
         aobj[astr] = val;
     }
 
-    Plotly.relayout(gd, aobj);
+    Registry.call('relayout', gd, aobj);
 }
 
 modeBarButtons.zoom3d = {
@@ -29222,7 +29756,11 @@ function handleDrag3d(gd, ev) {
         layoutUpdate[sceneIds[i] + '.' + parts[1]] = val;
     }
 
-    Plotly.relayout(gd, layoutUpdate);
+    // for multi-type subplots
+    var val2d = (val === 'pan') ? val : 'zoom';
+    layoutUpdate.dragmode = val2d;
+
+    Registry.call('relayout', gd, layoutUpdate);
 }
 
 modeBarButtons.resetCameraDefault3d = {
@@ -29261,7 +29799,7 @@ function handleCamera3d(gd, ev) {
         }
     }
 
-    Plotly.relayout(gd, aobj);
+    Registry.call('relayout', gd, aobj);
 }
 
 modeBarButtons.hoverClosest3d = {
@@ -29322,7 +29860,7 @@ function handleHover3d(gd, ev) {
         button._previousVal = Lib.extendDeep({}, currentSpikes);
     }
 
-    Plotly.relayout(gd, layoutUpdate);
+    Registry.call('relayout', gd, layoutUpdate);
 }
 
 modeBarButtons.zoomInGeo = {
@@ -29378,7 +29916,7 @@ function handleGeo(gd, ev) {
             var scale = geoLayout.projection.scale;
             var newScale = (val === 'in') ? 2 * scale : 0.5 * scale;
 
-            Plotly.relayout(gd, id + '.projection.scale', newScale);
+            Registry.call('relayout', gd, id + '.projection.scale', newScale);
         } else if(attr === 'reset') {
             resetView(gd, 'geo');
         }
@@ -29417,7 +29955,7 @@ function toggleHover(gd) {
 
     var newHover = gd._fullLayout.hovermode ? false : onHoverVal;
 
-    Plotly.relayout(gd, 'hovermode', newHover);
+    Registry.call('relayout', gd, 'hovermode', newHover);
 }
 
 // buttons when more then one plot types are present
@@ -29472,7 +30010,7 @@ modeBarButtons.toggleSpikelines = {
 
         var aobj = setSpikelineVisibility(gd);
 
-        Plotly.relayout(gd, aobj);
+        Registry.call('relayout', gd, aobj);
     }
 };
 
@@ -29519,10 +30057,10 @@ function resetView(gd, subplotType) {
         }
     }
 
-    Plotly.relayout(gd, aObj);
+    Registry.call('relayout', gd, aObj);
 }
 
-},{"../../../build/ploticon":15,"../../lib":152,"../../plotly":190,"../../plots/cartesian/axis_ids":198,"../../plots/plots":227,"../../snapshot/download":236}],97:[function(require,module,exports){
+},{"../../../build/ploticon":16,"../../lib":155,"../../plots/cartesian/axis_ids":200,"../../plots/plots":230,"../../registry":237}],99:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -29536,7 +30074,7 @@ function resetView(gd, subplotType) {
 
 exports.manage = require('./manage');
 
-},{"./manage":98}],98:[function(require,module,exports){
+},{"./manage":100}],100:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -29621,10 +30159,13 @@ function getButtonGroups(gd, buttonsToRemove, buttonsToAdd) {
     var hasTernary = fullLayout._has('ternary');
     var hasMapbox = fullLayout._has('mapbox');
     var hasPolar = fullLayout._has('polar');
+    var allAxesFixed = areAllAxesFixed(fullLayout);
 
     var groups = [];
 
     function addGroup(newGroup) {
+        if(!newGroup.length) return;
+
         var out = [];
 
         for(var i = 0; i < newGroup.length; i++) {
@@ -29639,55 +30180,71 @@ function getButtonGroups(gd, buttonsToRemove, buttonsToAdd) {
     // buttons common to all plot types
     addGroup(['toImage', 'sendDataToCloud']);
 
-    // graphs with more than one plot types get 'union buttons'
-    // which reset the view or toggle hover labels across all subplots.
-    if((hasCartesian || hasGL2D || hasPie || hasTernary) + hasGeo + hasGL3D > 1) {
-        addGroup(['resetViews', 'toggleHover']);
-        return appendButtonsToGroups(groups, buttonsToAdd);
+    var zoomGroup = [];
+    var hoverGroup = [];
+    var resetGroup = [];
+    var dragModeGroup = [];
+
+    if((hasCartesian || hasGL2D || hasPie || hasTernary) + hasGeo + hasGL3D + hasMapbox + hasPolar > 1) {
+        // graphs with more than one plot types get 'union buttons'
+        // which reset the view or toggle hover labels across all subplots.
+        hoverGroup = ['toggleHover'];
+        resetGroup = ['resetViews'];
+    }
+    else if(hasGeo) {
+        zoomGroup = ['zoomInGeo', 'zoomOutGeo'];
+        hoverGroup = ['hoverClosestGeo'];
+        resetGroup = ['resetGeo'];
+    }
+    else if(hasGL3D) {
+        hoverGroup = ['hoverClosest3d'];
+        resetGroup = ['resetCameraDefault3d', 'resetCameraLastSave3d'];
+    }
+    else if(hasMapbox) {
+        hoverGroup = ['toggleHover'];
+        resetGroup = ['resetViewMapbox'];
+    }
+    else if(hasGL2D) {
+        hoverGroup = ['hoverClosestGl2d'];
+    }
+    else if(hasPie) {
+        hoverGroup = ['hoverClosestPie'];
+    }
+    else { // hasPolar, hasTernary
+        // always show at least one hover icon.
+        hoverGroup = ['toggleHover'];
+    }
+    // if we have cartesian, allow switching between closest and compare
+    // regardless of what other types are on the plot, since they'll all
+    // just treat any truthy hovermode as 'closest'
+    if(hasCartesian) {
+        hoverGroup = ['toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian'];
+    }
+
+    if((hasCartesian || hasGL2D) && !allAxesFixed) {
+        zoomGroup = ['zoomIn2d', 'zoomOut2d', 'autoScale2d'];
+        if(resetGroup[0] !== 'resetViews') resetGroup = ['resetScale2d'];
     }
 
     if(hasGL3D) {
-        addGroup(['zoom3d', 'pan3d', 'orbitRotation', 'tableRotation']);
-        addGroup(['resetCameraDefault3d', 'resetCameraLastSave3d']);
-        addGroup(['hoverClosest3d']);
+        dragModeGroup = ['zoom3d', 'pan3d', 'orbitRotation', 'tableRotation'];
     }
-
-    var allAxesFixed = areAllAxesFixed(fullLayout),
-        dragModeGroup = [];
-
-    if(((hasCartesian || hasGL2D) && !allAxesFixed) || hasTernary) {
+    else if(((hasCartesian || hasGL2D) && !allAxesFixed) || hasTernary) {
         dragModeGroup = ['zoom2d', 'pan2d'];
     }
-    if(hasMapbox || hasGeo) {
+    else if(hasMapbox || hasGeo) {
         dragModeGroup = ['pan2d'];
     }
-    if(hasPolar) {
+    else if(hasPolar) {
         dragModeGroup = ['zoom2d'];
     }
     if(isSelectable(fullData)) {
-        dragModeGroup.push('select2d');
-        dragModeGroup.push('lasso2d');
-    }
-    if(dragModeGroup.length) addGroup(dragModeGroup);
-
-    if((hasCartesian || hasGL2D) && !allAxesFixed && !hasTernary) {
-        addGroup(['zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']);
+        dragModeGroup.push('select2d', 'lasso2d');
     }
 
-    if(hasCartesian && hasPie) {
-        addGroup(['toggleHover']);
-    } else if(hasGL2D) {
-        addGroup(['hoverClosestGl2d']);
-    } else if(hasCartesian) {
-        addGroup(['toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian']);
-    } else if(hasPie) {
-        addGroup(['hoverClosestPie']);
-    } else if(hasMapbox) {
-        addGroup(['resetViewMapbox', 'toggleHover']);
-    } else if(hasGeo) {
-        addGroup(['zoomInGeo', 'zoomOutGeo', 'resetGeo']);
-        addGroup(['hoverClosestGeo']);
-    }
+    addGroup(dragModeGroup);
+    addGroup(zoomGroup.concat(resetGroup));
+    addGroup(hoverGroup);
 
     return appendButtonsToGroups(groups, buttonsToAdd);
 }
@@ -29772,7 +30329,7 @@ function fillCustomButton(customButtons) {
     return customButtons;
 }
 
-},{"../../plots/cartesian/axis_ids":198,"../../registry":234,"../../traces/scatter/subtypes":291,"./buttons":96,"./modebar":99}],99:[function(require,module,exports){
+},{"../../plots/cartesian/axis_ids":200,"../../registry":237,"../../traces/scatter/subtypes":294,"./buttons":98,"./modebar":101}],101:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30069,7 +30626,7 @@ function createModeBar(gd, buttons) {
 
 module.exports = createModeBar;
 
-},{"../../../build/ploticon":15,"../../lib":152,"d3":3}],100:[function(require,module,exports){
+},{"../../../build/ploticon":16,"../../lib":155,"d3":3}],102:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30185,7 +30742,7 @@ module.exports = {
     editType: 'plot'
 };
 
-},{"../../lib/extend":146,"../../plots/font_attributes":221,"../color/attributes":34,"./button_attributes":101}],101:[function(require,module,exports){
+},{"../../lib/extend":149,"../../plots/font_attributes":224,"../color/attributes":35,"./button_attributes":103}],103:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30248,7 +30805,7 @@ module.exports = {
     editType: 'plot'
 };
 
-},{}],102:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30277,7 +30834,7 @@ module.exports = {
     darkAmount: 10
 };
 
-},{}],103:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30376,7 +30933,7 @@ function getPosDflt(containerOut, layout, counterAxes) {
     return [containerOut.domain[0], posY + constants.yPad];
 }
 
-},{"../../lib":152,"../color":35,"./attributes":100,"./button_attributes":101,"./constants":102}],104:[function(require,module,exports){
+},{"../../lib":155,"../color":36,"./attributes":102,"./button_attributes":103,"./constants":104}],106:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30385,12 +30942,11 @@ function getPosDflt(containerOut, layout, counterAxes) {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
 var d3 = require('d3');
 
-var Plotly = require('../../plotly');
+var Registry = require('../../registry');
 var Plots = require('../../plots/plots');
 var Color = require('../color');
 var Drawing = require('../drawing');
@@ -30398,7 +30954,10 @@ var svgTextUtils = require('../../lib/svg_text_utils');
 var axisIds = require('../../plots/cartesian/axis_ids');
 var anchorUtils = require('../legend/anchor_utils');
 
-var LINE_SPACING = require('../../constants/alignment').LINE_SPACING;
+var alignmentConstants = require('../../constants/alignment');
+var LINE_SPACING = alignmentConstants.LINE_SPACING;
+var FROM_TL = alignmentConstants.FROM_TL;
+var FROM_BR = alignmentConstants.FROM_BR;
 
 var constants = require('./constants');
 var getUpdateObject = require('./get_update_object');
@@ -30437,7 +30996,7 @@ module.exports = function draw(gd) {
             var button = d3.select(this);
             var update = getUpdateObject(axisLayout, d);
 
-            d.isActive = isActive(axisLayout, d, update);
+            d._isActive = isActive(axisLayout, d, update);
 
             button.call(drawButtonRect, selectorLayout, d);
             button.call(drawButtonText, selectorLayout, d, gd);
@@ -30445,26 +31004,21 @@ module.exports = function draw(gd) {
             button.on('click', function() {
                 if(gd._dragged) return;
 
-                Plotly.relayout(gd, update);
+                Registry.call('relayout', gd, update);
             });
 
             button.on('mouseover', function() {
-                d.isHovered = true;
+                d._isHovered = true;
                 button.call(drawButtonRect, selectorLayout, d);
             });
 
             button.on('mouseout', function() {
-                d.isHovered = false;
+                d._isHovered = false;
                 button.call(drawButtonRect, selectorLayout, d);
             });
         });
 
-        // N.B. this mutates selectorLayout
-        reposition(gd, buttons, selectorLayout, axisLayout._name);
-
-        selector.attr('transform', 'translate(' +
-            selectorLayout.lx + ',' + selectorLayout.ly +
-        ')');
+        reposition(gd, buttons, selectorLayout, axisLayout._name, selector);
     });
 
 };
@@ -30522,7 +31076,7 @@ function drawButtonRect(button, selectorLayout, d) {
 }
 
 function getFillColor(selectorLayout, d) {
-    return (d.isActive || d.isHovered) ?
+    return (d._isActive || d._isHovered) ?
         selectorLayout.activecolor :
         selectorLayout.bgcolor;
 }
@@ -30554,9 +31108,9 @@ function getLabel(opts) {
     return opts.count + opts.step.charAt(0);
 }
 
-function reposition(gd, buttons, opts, axName) {
-    opts.width = 0;
-    opts.height = 0;
+function reposition(gd, buttons, opts, axName, selector) {
+    var width = 0;
+    var height = 0;
 
     var borderWidth = opts.borderwidth;
 
@@ -30567,7 +31121,7 @@ function reposition(gd, buttons, opts, axName) {
         var tHeight = opts.font.size * LINE_SPACING;
         var hEff = Math.max(tHeight * svgTextUtils.lineCount(text), 16) + 3;
 
-        opts.height = Math.max(opts.height, hEff);
+        height = Math.max(height, hEff);
     });
 
     buttons.each(function() {
@@ -30586,64 +31140,64 @@ function reposition(gd, buttons, opts, axName) {
         // TODO add buttongap attribute
 
         button.attr('transform', 'translate(' +
-            (borderWidth + opts.width) + ',' + borderWidth +
+            (borderWidth + width) + ',' + borderWidth +
         ')');
 
         rect.attr({
             x: 0,
             y: 0,
             width: wEff,
-            height: opts.height
+            height: height
         });
 
         svgTextUtils.positionText(text, wEff / 2,
-            opts.height / 2 - ((tLines - 1) * tHeight / 2) + 3);
+            height / 2 - ((tLines - 1) * tHeight / 2) + 3);
 
-        opts.width += wEff + 5;
+        width += wEff + 5;
     });
 
-    buttons.selectAll('rect').attr('height', opts.height);
-
     var graphSize = gd._fullLayout._size;
-    opts.lx = graphSize.l + graphSize.w * opts.x;
-    opts.ly = graphSize.t + graphSize.h * (1 - opts.y);
+    var lx = graphSize.l + graphSize.w * opts.x;
+    var ly = graphSize.t + graphSize.h * (1 - opts.y);
 
     var xanchor = 'left';
     if(anchorUtils.isRightAnchor(opts)) {
-        opts.lx -= opts.width;
+        lx -= width;
         xanchor = 'right';
     }
     if(anchorUtils.isCenterAnchor(opts)) {
-        opts.lx -= opts.width / 2;
+        lx -= width / 2;
         xanchor = 'center';
     }
 
     var yanchor = 'top';
     if(anchorUtils.isBottomAnchor(opts)) {
-        opts.ly -= opts.height;
+        ly -= height;
         yanchor = 'bottom';
     }
     if(anchorUtils.isMiddleAnchor(opts)) {
-        opts.ly -= opts.height / 2;
+        ly -= height / 2;
         yanchor = 'middle';
     }
 
-    opts.width = Math.ceil(opts.width);
-    opts.height = Math.ceil(opts.height);
-    opts.lx = Math.round(opts.lx);
-    opts.ly = Math.round(opts.ly);
+    width = Math.ceil(width);
+    height = Math.ceil(height);
+    lx = Math.round(lx);
+    ly = Math.round(ly);
 
     Plots.autoMargin(gd, axName + '-range-selector', {
         x: opts.x,
         y: opts.y,
-        l: opts.width * ({right: 1, center: 0.5}[xanchor] || 0),
-        r: opts.width * ({left: 1, center: 0.5}[xanchor] || 0),
-        b: opts.height * ({top: 1, middle: 0.5}[yanchor] || 0),
-        t: opts.height * ({bottom: 1, middle: 0.5}[yanchor] || 0)
+        l: width * FROM_TL[xanchor],
+        r: width * FROM_BR[xanchor],
+        b: height * FROM_BR[yanchor],
+        t: height * FROM_TL[yanchor]
     });
+
+    selector.attr('transform', 'translate(' + lx + ',' + ly + ')');
 }
 
-},{"../../constants/alignment":133,"../../lib/svg_text_utils":173,"../../plotly":190,"../../plots/cartesian/axis_ids":198,"../../plots/plots":227,"../color":35,"../drawing":60,"../legend/anchor_utils":86,"./constants":102,"./get_update_object":105,"d3":3}],105:[function(require,module,exports){
+},{"../../constants/alignment":136,"../../lib/svg_text_utils":176,"../../plots/cartesian/axis_ids":200,"../../plots/plots":230,"../../registry":237,"../color":36,"../drawing":61,"../legend/anchor_utils":88,"./constants":104,"./get_update_object":107,"d3":3}],107:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30700,7 +31254,7 @@ function getXRange(axisLayout, buttonLayout) {
     return [range0, range1];
 }
 
-},{"d3":3}],106:[function(require,module,exports){
+},{"d3":3}],108:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30727,7 +31281,7 @@ module.exports = {
     draw: require('./draw')
 };
 
-},{"./attributes":100,"./defaults":103,"./draw":104}],107:[function(require,module,exports){
+},{"./attributes":102,"./defaults":105,"./draw":106}],109:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30745,14 +31299,14 @@ module.exports = {
         valType: 'color',
         dflt: colorAttributes.background,
         role: 'style',
-        editType: 'calc',
+        editType: 'plot',
         description: 'Sets the background color of the range slider.'
     },
     bordercolor: {
         valType: 'color',
         dflt: colorAttributes.defaultLine,
         role: 'style',
-        editType: 'calc',
+        editType: 'plot',
         description: 'Sets the border color of the range slider.'
     },
     borderwidth: {
@@ -30760,7 +31314,7 @@ module.exports = {
         dflt: 0,
         min: 0,
         role: 'style',
-        editType: 'calc',
+        editType: 'plot',
         description: 'Sets the border color of the range slider.'
     },
     autorange: {
@@ -30768,6 +31322,7 @@ module.exports = {
         dflt: true,
         role: 'style',
         editType: 'calc',
+        impliedEdits: {'range[0]': undefined, 'range[1]': undefined},
         description: [
             'Determines whether or not the range slider range is',
             'computed in relation to the input data.',
@@ -30778,10 +31333,11 @@ module.exports = {
         valType: 'info_array',
         role: 'info',
         items: [
-            {valType: 'any', editType: 'calc'},
-            {valType: 'any', editType: 'calc'}
+            {valType: 'any', editType: 'calc', impliedEdits: {'^autorange': false}},
+            {valType: 'any', editType: 'calc', impliedEdits: {'^autorange': false}}
         ],
         editType: 'calc',
+        impliedEdits: {'autorange': false},
         description: [
             'Sets the range of the range slider.',
             'If not set, defaults to the full xaxis range.',
@@ -30801,7 +31357,7 @@ module.exports = {
         min: 0,
         max: 1,
         role: 'style',
-        editType: 'calc',
+        editType: 'plot',
         description: [
             'The height of the range slider as a fraction of the',
             'total plot area height.'
@@ -30820,7 +31376,7 @@ module.exports = {
     editType: 'calc'
 };
 
-},{"../color/attributes":34}],108:[function(require,module,exports){
+},{"../color/attributes":35}],110:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30831,11 +31387,12 @@ module.exports = {
 
 'use strict';
 
-var Axes = require('../../plots/cartesian/axes');
+var listAxes = require('../../plots/cartesian/axis_ids').list;
+var getAutoRange = require('../../plots/cartesian/autorange').getAutoRange;
 var constants = require('./constants');
 
 module.exports = function calcAutorange(gd) {
-    var axes = Axes.list(gd, 'x', true);
+    var axes = listAxes(gd, 'x', true);
 
     // Compute new slider range using axis autorange if necessary.
     //
@@ -30851,12 +31408,12 @@ module.exports = function calcAutorange(gd) {
 
         if(opts && opts.visible && opts.autorange && ax._min.length && ax._max.length) {
             opts._input.autorange = true;
-            opts._input.range = opts.range = Axes.getAutoRange(ax);
+            opts._input.range = opts.range = getAutoRange(ax);
         }
     }
 };
 
-},{"../../plots/cartesian/axes":195,"./constants":109}],109:[function(require,module,exports){
+},{"../../plots/cartesian/autorange":196,"../../plots/cartesian/axis_ids":200,"./constants":111}],111:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30890,9 +31447,13 @@ module.exports = {
     grabAreaMaxClassName: 'rangeslider-grabarea-max',
     handleMaxClassName: 'rangeslider-handle-max',
 
+    maskMinOppAxisClassName: 'rangeslider-mask-min-opp-axis',
+    maskMaxOppAxisClassName: 'rangeslider-mask-max-opp-axis',
+
     // style constants
 
     maskColor: 'rgba(0,0,0,0.4)',
+    maskOppAxisColor: 'rgba(0,0,0,0.2)',
 
     slideBoxFill: 'transparent',
     slideBoxCursor: 'ew-resize',
@@ -30908,7 +31469,7 @@ module.exports = {
     extraPad: 15
 };
 
-},{}],110:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30921,6 +31482,8 @@ module.exports = {
 
 var Lib = require('../../lib');
 var attributes = require('./attributes');
+var oppAxisAttrs = require('./oppaxis_attributes');
+var axisIds = require('../../plots/cartesian/axis_ids');
 
 module.exports = function handleDefaults(layoutIn, layoutOut, axName) {
     if(!layoutIn[axName].rangeslider) return;
@@ -30938,6 +31501,10 @@ module.exports = function handleDefaults(layoutIn, layoutOut, axName) {
         return Lib.coerce(containerIn, containerOut, attributes, attr, dflt);
     }
 
+    function coerceRange(rangeContainerIn, rangeContainerOut, attr, dflt) {
+        return Lib.coerce(rangeContainerIn, rangeContainerOut, oppAxisAttrs, attr, dflt);
+    }
+
     var visible = coerce('visible');
     if(!visible) return;
 
@@ -30946,26 +31513,45 @@ module.exports = function handleDefaults(layoutIn, layoutOut, axName) {
     coerce('borderwidth');
     coerce('thickness');
 
-    coerce('autorange', !axOut.isValidRange(containerIn.range));
+    axOut._rangesliderAutorange = coerce('autorange', !axOut.isValidRange(containerIn.range));
     coerce('range');
 
-    // Expand slider range to the axis range
-    // TODO: what if the ranges are reversed?
-    if(containerOut.range) {
-        var outRange = containerOut.range,
-            axRange = axOut.range;
+    var subplots = layoutOut._subplots;
+    if(subplots) {
+        var yIds = subplots.cartesian
+            .filter(function(subplotId) {
+                return subplotId.substr(0, subplotId.indexOf('y')) === axisIds.name2id(axName);
+            })
+            .map(function(subplotId) {
+                return subplotId.substr(subplotId.indexOf('y'), subplotId.length);
+            });
+        var yNames = Lib.simpleMap(yIds, axisIds.id2name);
+        for(var i = 0; i < yNames.length; i++) {
+            var yName = yNames[i];
 
-        outRange[0] = axOut.l2r(Math.min(axOut.r2l(outRange[0]), axOut.r2l(axRange[0])));
-        outRange[1] = axOut.l2r(Math.max(axOut.r2l(outRange[1]), axOut.r2l(axRange[1])));
+            var rangeContainerIn = containerIn[yName] || {};
+            var rangeContainerOut = containerOut[yName] = {};
+
+            var yAxOut = layoutOut[yName];
+
+            var rangemodeDflt;
+            if(rangeContainerIn.range && yAxOut.isValidRange(rangeContainerIn.range)) {
+                rangemodeDflt = 'fixed';
+            }
+
+            var rangeMode = coerceRange(rangeContainerIn, rangeContainerOut, 'rangemode', rangemodeDflt);
+            if(rangeMode !== 'match') {
+                coerceRange(rangeContainerIn, rangeContainerOut, 'range', yAxOut.range.slice());
+            }
+            yAxOut._rangesliderAutorange = (rangeMode === 'auto');
+        }
     }
-
-    axOut.cleanRange('rangeslider.range');
 
     // to map back range slider (auto) range
     containerOut._input = containerIn;
 };
 
-},{"../../lib":152,"./attributes":107}],111:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/axis_ids":200,"./attributes":109,"./oppaxis_attributes":115}],113:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -30978,12 +31564,13 @@ module.exports = function handleDefaults(layoutIn, layoutOut, axName) {
 
 var d3 = require('d3');
 
-var Plotly = require('../../plotly');
+var Registry = require('../../registry');
 var Plots = require('../../plots/plots');
 
 var Lib = require('../../lib');
 var Drawing = require('../drawing');
 var Color = require('../color');
+var Titles = require('../titles');
 
 var Cartesian = require('../../plots/cartesian');
 var Axes = require('../../plots/cartesian/axes');
@@ -30992,7 +31579,6 @@ var dragElement = require('../dragelement');
 var setCursor = require('../../lib/setcursor');
 
 var constants = require('./constants');
-
 
 module.exports = function(gd) {
     var fullLayout = gd._fullLayout,
@@ -31046,15 +31632,37 @@ module.exports = function(gd) {
     rangeSliders.each(function(axisOpts) {
         var rangeSlider = d3.select(this),
             opts = axisOpts[constants.name],
-            oppAxisOpts = fullLayout[Axes.id2name(axisOpts.anchor)];
+            oppAxisOpts = fullLayout[Axes.id2name(axisOpts.anchor)],
+            oppAxisRangeOpts = opts[Axes.id2name(axisOpts.anchor)];
+
+        // update range
+        // Expand slider range to the axis range
+        // TODO: what if the ranges are reversed?
+        if(opts.range) {
+            var outRange = opts.range;
+            var axRange = axisOpts.range;
+
+            outRange[0] = axisOpts.l2r(Math.min(axisOpts.r2l(outRange[0]), axisOpts.r2l(axRange[0])));
+            outRange[1] = axisOpts.l2r(Math.max(axisOpts.r2l(outRange[1]), axisOpts.r2l(axRange[1])));
+            opts._input.range = outRange.slice();
+        }
+
+        axisOpts.cleanRange('rangeslider.range');
+
 
         // update range slider dimensions
 
-        var margin = fullLayout.margin,
-            graphSize = fullLayout._size,
-            domain = axisOpts.domain,
-            oppDomain = oppAxisOpts.domain,
-            tickHeight = (axisOpts._boundingBox || {}).height || 0;
+        var margin = fullLayout.margin;
+        var graphSize = fullLayout._size;
+        var domain = axisOpts.domain;
+        var tickHeight = (axisOpts._boundingBox || {}).height || 0;
+
+        var oppBottom = Infinity;
+        var subplotData = Axes.getSubplots(gd, axisOpts);
+        for(var i = 0; i < subplotData.length; i++) {
+            var oppAxis = Axes.getFromId(gd, subplotData[i].substr(subplotData[i].indexOf('y')));
+            oppBottom = Math.min(oppBottom, oppAxis.domain[0]);
+        }
 
         opts._id = constants.name + axisOpts._id;
         opts._clipId = opts._id + '-' + fullLayout._uid;
@@ -31066,7 +31674,7 @@ module.exports = function(gd) {
         var x = Math.round(margin.l + (graphSize.w * domain[0]));
 
         var y = Math.round(
-            margin.t + graphSize.h * (1 - oppDomain[0]) +
+            graphSize.t + graphSize.h * (1 - oppBottom) +
             tickHeight +
             opts._offsetShift + constants.extraPad
         );
@@ -31089,13 +31697,23 @@ module.exports = function(gd) {
 
         opts._rl = [range0, range1];
 
+        if(oppAxisRangeOpts.rangemode !== 'match') {
+            var range0OppAxis = oppAxisOpts.r2l(oppAxisRangeOpts.range[0]),
+                range1OppAxis = oppAxisOpts.r2l(oppAxisRangeOpts.range[1]),
+                distOppAxis = range1OppAxis - range0OppAxis;
+
+            opts.d2pOppAxis = function(v) {
+                return (v - range0OppAxis) / distOppAxis * opts._height;
+            };
+        }
+
         // update inner nodes
 
         rangeSlider
             .call(drawBg, gd, axisOpts, opts)
             .call(addClipPath, gd, axisOpts, opts)
             .call(drawRangePlot, gd, axisOpts, opts)
-            .call(drawMasks, gd, axisOpts, opts)
+            .call(drawMasks, gd, axisOpts, opts, oppAxisRangeOpts)
             .call(drawSlideBox, gd, axisOpts, opts)
             .call(drawGrabbers, gd, axisOpts, opts);
 
@@ -31103,20 +31721,33 @@ module.exports = function(gd) {
         setupDragElement(rangeSlider, gd, axisOpts, opts);
 
         // update current range
-        setPixelRange(rangeSlider, gd, axisOpts, opts);
+        setPixelRange(rangeSlider, gd, axisOpts, opts, oppAxisOpts, oppAxisRangeOpts);
+
+        // title goes next to range slider instead of tick labels, so
+        // just take it over and draw it from here
+        if(axisOpts.side === 'bottom') {
+            Titles.draw(gd, axisOpts._id + 'title', {
+                propContainer: axisOpts,
+                propName: axisOpts._name + '.title',
+                placeholder: fullLayout._dfltTitle.x,
+                attributes: {
+                    x: axisOpts._offset + axisOpts._length / 2,
+                    y: y + opts._height + opts._offsetShift + 10 + 1.5 * axisOpts.titlefont.size,
+                    'text-anchor': 'middle'
+                }
+            });
+        }
 
         // update margins
-
         Plots.autoMargin(gd, opts._id, {
             x: domain[0],
-            y: oppDomain[0],
+            y: oppBottom,
             l: 0,
             r: 0,
             t: 0,
             b: opts._height + margin.b + tickHeight,
             pad: constants.extraPad + opts._offsetShift * 2
         });
-
     });
 };
 
@@ -31215,15 +31846,19 @@ function setDataRange(rangeSlider, gd, axisOpts, opts) {
         dataMax = clamp(opts.p2d(opts._pixelMax));
 
     window.requestAnimationFrame(function() {
-        Plotly.relayout(gd, axisOpts._name + '.range', [dataMin, dataMax]);
+        Registry.call('relayout', gd, axisOpts._name + '.range', [dataMin, dataMax]);
     });
 }
 
-function setPixelRange(rangeSlider, gd, axisOpts, opts) {
+function setPixelRange(rangeSlider, gd, axisOpts, opts, oppAxisOpts, oppAxisRangeOpts) {
     var hw2 = constants.handleWidth / 2;
 
     function clamp(v) {
         return Lib.constrain(v, 0, opts._width);
+    }
+
+    function clampOppAxis(v) {
+        return Lib.constrain(v, 0, opts._height);
     }
 
     function clampHandle(v) {
@@ -31243,6 +31878,26 @@ function setPixelRange(rangeSlider, gd, axisOpts, opts) {
     rangeSlider.select('rect.' + constants.maskMaxClassName)
         .attr('x', pixelMax)
         .attr('width', opts._width - pixelMax);
+
+    if(oppAxisRangeOpts.rangemode !== 'match') {
+        var pixelMinOppAxis = opts._height - clampOppAxis(opts.d2pOppAxis(oppAxisOpts._rl[1])),
+            pixelMaxOppAxis = opts._height - clampOppAxis(opts.d2pOppAxis(oppAxisOpts._rl[0]));
+
+        rangeSlider.select('rect.' + constants.maskMinOppAxisClassName)
+            .attr('x', pixelMin)
+            .attr('height', pixelMinOppAxis)
+            .attr('width', pixelMax - pixelMin);
+
+        rangeSlider.select('rect.' + constants.maskMaxOppAxisClassName)
+            .attr('x', pixelMin)
+            .attr('y', pixelMaxOppAxis)
+            .attr('height', opts._height - pixelMaxOppAxis)
+            .attr('width', pixelMax - pixelMin);
+
+        rangeSlider.select('rect.' + constants.slideBoxClassName)
+            .attr('y', pixelMinOppAxis)
+            .attr('height', pixelMaxOppAxis - pixelMinOppAxis);
+    }
 
     // add offset for crispier corners
     // https://github.com/plotly/plotly.js/pull/1409
@@ -31326,7 +31981,8 @@ function drawRangePlot(rangeSlider, gd, axisOpts, opts) {
             isMainPlot = (i === 0);
 
         var oppAxisOpts = Axes.getFromId(gd, id, 'y'),
-            oppAxisName = oppAxisOpts._name;
+            oppAxisName = oppAxisOpts._name,
+            oppAxisRangeOpts = opts[oppAxisName];
 
         var mockFigure = {
             data: [],
@@ -31347,7 +32003,7 @@ function drawRangePlot(rangeSlider, gd, axisOpts, opts) {
         mockFigure.layout[oppAxisName] = {
             type: oppAxisOpts.type,
             domain: [0, 1],
-            range: oppAxisOpts.range.slice(),
+            range: oppAxisRangeOpts.rangemode !== 'match' ? oppAxisRangeOpts.range.slice() : oppAxisOpts.range.slice(),
             calendar: oppAxisOpts.calendar
         };
 
@@ -31388,7 +32044,7 @@ function filterRangePlotCalcData(calcData, subplotId) {
     return out;
 }
 
-function drawMasks(rangeSlider, gd, axisOpts, opts) {
+function drawMasks(rangeSlider, gd, axisOpts, opts, oppAxisRangeOpts) {
     var maskMin = rangeSlider.selectAll('rect.' + constants.maskMinClassName)
         .data([0]);
 
@@ -31412,6 +32068,34 @@ function drawMasks(rangeSlider, gd, axisOpts, opts) {
     maskMax
         .attr('height', opts._height)
         .call(Color.fill, constants.maskColor);
+
+    // masks used for oppAxis zoom
+    if(oppAxisRangeOpts.rangemode !== 'match') {
+        var maskMinOppAxis = rangeSlider.selectAll('rect.' + constants.maskMinOppAxisClassName)
+            .data([0]);
+
+        maskMinOppAxis.enter().append('rect')
+            .classed(constants.maskMinOppAxisClassName, true)
+            .attr('y', 0)
+            .attr('shape-rendering', 'crispEdges');
+
+        maskMinOppAxis
+            .attr('width', opts._width)
+            .call(Color.fill, constants.maskOppAxisColor);
+
+        var maskMaxOppAxis = rangeSlider.selectAll('rect.' + constants.maskMaxOppAxisClassName)
+            .data([0]);
+
+        maskMaxOppAxis.enter().append('rect')
+            .classed(constants.maskMaxOppAxisClassName, true)
+            .attr('y', 0)
+            .attr('shape-rendering', 'crispEdges');
+
+        maskMaxOppAxis
+            .attr('width', opts._width)
+            .style('border-top', constants.maskOppBorder)
+            .call(Color.fill, constants.maskOppAxisColor);
+    }
 }
 
 function drawSlideBox(rangeSlider, gd, axisOpts, opts) {
@@ -31517,7 +32201,42 @@ function clearPushMargins(gd) {
     }
 }
 
-},{"../../lib":152,"../../lib/setcursor":171,"../../plotly":190,"../../plots/cartesian":206,"../../plots/cartesian/axes":195,"../../plots/plots":227,"../color":35,"../dragelement":57,"../drawing":60,"./constants":109,"d3":3}],112:[function(require,module,exports){
+},{"../../lib":155,"../../lib/setcursor":174,"../../plots/cartesian":208,"../../plots/cartesian/axes":197,"../../plots/plots":230,"../../registry":237,"../color":36,"../dragelement":58,"../drawing":61,"../titles":129,"./constants":111,"d3":3}],114:[function(require,module,exports){
+/**
+* Copyright 2012-2018, Plotly, Inc.
+* All rights reserved.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+
+'use strict';
+
+var Lib = require('../../lib');
+var attrs = require('./attributes');
+var oppAxisAttrs = require('./oppaxis_attributes');
+
+module.exports = {
+    moduleType: 'component',
+    name: 'rangeslider',
+
+    schema: {
+        subplots: {
+            xaxis: {
+                rangeslider: Lib.extendFlat({}, attrs, {
+                    yaxis: oppAxisAttrs
+                })
+            }
+        }
+    },
+
+    layoutAttributes: require('./attributes'),
+    handleDefaults: require('./defaults'),
+    calcAutorange: require('./calc_autorange'),
+    draw: require('./draw')
+};
+
+},{"../../lib":155,"./attributes":109,"./calc_autorange":110,"./defaults":112,"./draw":113,"./oppaxis_attributes":115}],115:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -31529,22 +32248,42 @@ function clearPushMargins(gd) {
 'use strict';
 
 module.exports = {
-    moduleType: 'component',
-    name: 'rangeslider',
+    // not really a 'subplot' attribute container,
+    // but this is the flag we use to denote attributes that
+    // support yaxis, yaxis2, yaxis3, ... counters
+    _isSubplotObj: true,
 
-    schema: {
-        subplots: {
-            xaxis: {rangeslider: require('./attributes')}
-        }
+    rangemode: {
+        valType: 'enumerated',
+        values: ['auto', 'fixed', 'match'],
+        dflt: 'match',
+        role: 'style',
+        editType: 'calc',
+        description: [
+            'Determines whether or not the range of this axis in',
+            'the rangeslider use the same value than in the main plot',
+            'when zooming in/out.',
+            'If *auto*, the autorange will be used.',
+            'If *fixed*, the `range` is used.',
+            'If *match*, the current range of the corresponding y-axis on the main subplot is used.'
+        ].join(' ')
     },
-
-    layoutAttributes: require('./attributes'),
-    handleDefaults: require('./defaults'),
-    calcAutorange: require('./calc_autorange'),
-    draw: require('./draw')
+    range: {
+        valType: 'info_array',
+        role: 'style',
+        items: [
+            {valType: 'any', editType: 'plot'},
+            {valType: 'any', editType: 'plot'}
+        ],
+        editType: 'plot',
+        description: [
+            'Sets the range of this axis for the rangeslider.'
+        ].join(' ')
+    },
+    editType: 'calc'
 };
 
-},{"./attributes":107,"./calc_autorange":108,"./defaults":110,"./draw":111}],113:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -31567,7 +32306,7 @@ module.exports = {
         valType: 'boolean',
         role: 'info',
         dflt: true,
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Determines whether or not this shape is visible.'
         ].join(' ')
@@ -31577,7 +32316,7 @@ module.exports = {
         valType: 'enumerated',
         values: ['circle', 'rect', 'path', 'line'],
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Specifies the shape type to be drawn.',
 
@@ -31621,7 +32360,7 @@ module.exports = {
     x0: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the shape\'s starting x position.',
             'See `type` for more info.'
@@ -31630,7 +32369,7 @@ module.exports = {
     x1: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the shape\'s end x position.',
             'See `type` for more info.'
@@ -31650,7 +32389,7 @@ module.exports = {
     y0: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the shape\'s starting y position.',
             'See `type` for more info.'
@@ -31659,7 +32398,7 @@ module.exports = {
     y1: {
         valType: 'any',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'Sets the shape\'s end y position.',
             'See `type` for more info.'
@@ -31669,7 +32408,7 @@ module.exports = {
     path: {
         valType: 'string',
         role: 'info',
-        editType: 'calcIfAutorange',
+        editType: 'calcIfAutorange+arraydraw',
         description: [
             'For `type` *path* - a valid SVG path but with the pixel values',
             'replaced by data values. There are a few restrictions / quirks',
@@ -31705,10 +32444,10 @@ module.exports = {
     },
     line: {
         color: extendFlat({}, scatterLineAttrs.color, {editType: 'arraydraw'}),
-        width: extendFlat({}, scatterLineAttrs.width, {editType: 'calcIfAutorange'}),
+        width: extendFlat({}, scatterLineAttrs.width, {editType: 'calcIfAutorange+arraydraw'}),
         dash: extendFlat({}, dash, {editType: 'arraydraw'}),
         role: 'info',
-        editType: 'calcIfAutorange'
+        editType: 'calcIfAutorange+arraydraw'
     },
     fillcolor: {
         valType: 'color',
@@ -31722,7 +32461,7 @@ module.exports = {
     editType: 'arraydraw'
 };
 
-},{"../../lib/extend":146,"../../traces/scatter/attributes":269,"../annotations/attributes":20,"../drawing/attributes":59}],114:[function(require,module,exports){
+},{"../../lib/extend":149,"../../traces/scatter/attributes":272,"../annotations/attributes":21,"../drawing/attributes":60}],117:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -31799,7 +32538,7 @@ function shapeBounds(ax, v0, v1, path, paramsToUse) {
     if(max >= min) return [min, max];
 }
 
-},{"../../lib":152,"../../plots/cartesian/axes":195,"./constants":115,"./helpers":118}],115:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/axes":197,"./constants":118,"./helpers":121}],118:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -31863,7 +32602,7 @@ module.exports = {
     }
 };
 
-},{}],116:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -31888,7 +32627,7 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut) {
     handleArrayContainerDefaults(layoutIn, layoutOut, opts);
 };
 
-},{"../../plots/array_container_defaults":192,"./shape_defaults":120}],117:[function(require,module,exports){
+},{"../../plots/array_container_defaults":193,"./shape_defaults":123}],120:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -31900,7 +32639,7 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut) {
 
 'use strict';
 
-var Plotly = require('../../plotly');
+var Registry = require('../../registry');
 var Lib = require('../../lib');
 var Axes = require('../../plots/cartesian/axes');
 var Color = require('../color');
@@ -32104,7 +32843,7 @@ function setupDragElement(gd, shapePath, shapeOptions, index) {
 
     function endDrag() {
         setCursor(shapePath);
-        Plotly.relayout(gd, update);
+        Registry.call('relayout', gd, update);
     }
 
     function moveShape(dx, dy) {
@@ -32263,7 +33002,7 @@ function movePath(pathIn, moveX, moveY) {
     });
 }
 
-},{"../../lib":152,"../../lib/setcursor":171,"../../plotly":190,"../../plots/cartesian/axes":195,"../color":35,"../dragelement":57,"../drawing":60,"./constants":115,"./helpers":118}],118:[function(require,module,exports){
+},{"../../lib":155,"../../lib/setcursor":174,"../../plots/cartesian/axes":197,"../../registry":237,"../color":36,"../dragelement":58,"../drawing":61,"./constants":118,"./helpers":121}],121:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -32344,7 +33083,7 @@ exports.getPixelToData = function(gd, axis, isVertical) {
     return pixelToData;
 };
 
-},{}],119:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -32371,7 +33110,7 @@ module.exports = {
     drawOne: drawModule.drawOne
 };
 
-},{"../../plots/cartesian/include_components":205,"./attributes":113,"./calc_autorange":114,"./defaults":116,"./draw":117}],120:[function(require,module,exports){
+},{"../../plots/cartesian/include_components":207,"./attributes":116,"./calc_autorange":117,"./defaults":119,"./draw":120}],123:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -32470,7 +33209,7 @@ module.exports = function handleShapeDefaults(shapeIn, shapeOut, fullLayout, opt
     return shapeOut;
 };
 
-},{"../../lib":152,"../../plots/cartesian/axes":195,"./attributes":113,"./helpers":118}],121:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/axes":197,"./attributes":116,"./helpers":121}],124:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -32760,7 +33499,7 @@ module.exports = overrideAll({
     }
 }, 'arraydraw', 'from-root');
 
-},{"../../lib/extend":146,"../../plot_api/edit_types":179,"../../plots/animation_attributes":191,"../../plots/font_attributes":221,"../../plots/pad_attributes":226,"./constants":122}],122:[function(require,module,exports){
+},{"../../lib/extend":149,"../../plot_api/edit_types":182,"../../plots/animation_attributes":192,"../../plots/font_attributes":224,"../../plots/pad_attributes":229,"./constants":125}],125:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -32854,7 +33593,7 @@ module.exports = {
     currentValueInset: 0,
 };
 
-},{}],123:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -32969,7 +33708,7 @@ function stepsDefaults(sliderIn, sliderOut) {
     return valuesOut;
 }
 
-},{"../../lib":152,"../../plots/array_container_defaults":192,"./attributes":121,"./constants":122}],124:[function(require,module,exports){
+},{"../../lib":155,"../../plots/array_container_defaults":193,"./attributes":124,"./constants":125}],127:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -32990,7 +33729,10 @@ var svgTextUtils = require('../../lib/svg_text_utils');
 var anchorUtils = require('../legend/anchor_utils');
 
 var constants = require('./constants');
-var LINE_SPACING = require('../../constants/alignment').LINE_SPACING;
+var alignmentConstants = require('../../constants/alignment');
+var LINE_SPACING = alignmentConstants.LINE_SPACING;
+var FROM_TL = alignmentConstants.FROM_TL;
+var FROM_BR = alignmentConstants.FROM_BR;
 
 
 module.exports = function draw(gd) {
@@ -33070,7 +33812,7 @@ function makeSliderData(fullLayout, gd) {
     for(var i = 0; i < contOpts.length; i++) {
         var item = contOpts[i];
         if(!item.visible || !item.steps.length) continue;
-        item.gd = gd;
+        item._gd = gd;
         sliderData.push(item);
     }
 
@@ -33108,7 +33850,9 @@ function findDimensions(gd, sliderOpts) {
 
     sliderLabels.remove();
 
-    sliderOpts.inputAreaWidth = Math.max(
+    var dims = sliderOpts._dims = {};
+
+    dims.inputAreaWidth = Math.max(
         constants.railWidth,
         constants.gripHeight
     );
@@ -33116,37 +33860,33 @@ function findDimensions(gd, sliderOpts) {
     // calculate some overall dimensions - some of these are needed for
     // calculating the currentValue dimensions
     var graphSize = gd._fullLayout._size;
-    sliderOpts.lx = graphSize.l + graphSize.w * sliderOpts.x;
-    sliderOpts.ly = graphSize.t + graphSize.h * (1 - sliderOpts.y);
+    dims.lx = graphSize.l + graphSize.w * sliderOpts.x;
+    dims.ly = graphSize.t + graphSize.h * (1 - sliderOpts.y);
 
     if(sliderOpts.lenmode === 'fraction') {
         // fraction:
-        sliderOpts.outerLength = Math.round(graphSize.w * sliderOpts.len);
+        dims.outerLength = Math.round(graphSize.w * sliderOpts.len);
     } else {
         // pixels:
-        sliderOpts.outerLength = sliderOpts.len;
+        dims.outerLength = sliderOpts.len;
     }
 
-    // Set the length-wise padding so that the grip ends up *on* the end of
-    // the bar when at either extreme
-    sliderOpts.lenPad = Math.round(constants.gripWidth * 0.5);
-
     // The length of the rail, *excluding* padding on either end:
-    sliderOpts.inputAreaStart = 0;
-    sliderOpts.inputAreaLength = Math.round(sliderOpts.outerLength - sliderOpts.pad.l - sliderOpts.pad.r);
+    dims.inputAreaStart = 0;
+    dims.inputAreaLength = Math.round(dims.outerLength - sliderOpts.pad.l - sliderOpts.pad.r);
 
-    var textableInputLength = sliderOpts.inputAreaLength - 2 * constants.stepInset;
+    var textableInputLength = dims.inputAreaLength - 2 * constants.stepInset;
     var availableSpacePerLabel = textableInputLength / (sliderOpts.steps.length - 1);
     var computedSpacePerLabel = maxLabelWidth + constants.labelPadding;
-    sliderOpts.labelStride = Math.max(1, Math.ceil(computedSpacePerLabel / availableSpacePerLabel));
-    sliderOpts.labelHeight = labelHeight;
+    dims.labelStride = Math.max(1, Math.ceil(computedSpacePerLabel / availableSpacePerLabel));
+    dims.labelHeight = labelHeight;
 
     // loop over all possible values for currentValue to find the
     // area we need for it
-    sliderOpts.currentValueMaxWidth = 0;
-    sliderOpts.currentValueHeight = 0;
-    sliderOpts.currentValueTotalHeight = 0;
-    sliderOpts.currentValueMaxLines = 1;
+    dims.currentValueMaxWidth = 0;
+    dims.currentValueHeight = 0;
+    dims.currentValueTotalHeight = 0;
+    dims.currentValueMaxLines = 1;
 
     if(sliderOpts.currentvalue.visible) {
         // Get the dimensions of the current value label:
@@ -33156,50 +33896,50 @@ function findDimensions(gd, sliderOpts) {
             var curValPrefix = drawCurrentValue(dummyGroup, sliderOpts, stepOpts.label);
             var curValSize = (curValPrefix.node() && Drawing.bBox(curValPrefix.node())) || {width: 0, height: 0};
             var lines = svgTextUtils.lineCount(curValPrefix);
-            sliderOpts.currentValueMaxWidth = Math.max(sliderOpts.currentValueMaxWidth, Math.ceil(curValSize.width));
-            sliderOpts.currentValueHeight = Math.max(sliderOpts.currentValueHeight, Math.ceil(curValSize.height));
-            sliderOpts.currentValueMaxLines = Math.max(sliderOpts.currentValueMaxLines, lines);
+            dims.currentValueMaxWidth = Math.max(dims.currentValueMaxWidth, Math.ceil(curValSize.width));
+            dims.currentValueHeight = Math.max(dims.currentValueHeight, Math.ceil(curValSize.height));
+            dims.currentValueMaxLines = Math.max(dims.currentValueMaxLines, lines);
         });
 
-        sliderOpts.currentValueTotalHeight = sliderOpts.currentValueHeight + sliderOpts.currentvalue.offset;
+        dims.currentValueTotalHeight = dims.currentValueHeight + sliderOpts.currentvalue.offset;
 
         dummyGroup.remove();
     }
 
-    sliderOpts.height = sliderOpts.currentValueTotalHeight + constants.tickOffset + sliderOpts.ticklen + constants.labelOffset + sliderOpts.labelHeight + sliderOpts.pad.t + sliderOpts.pad.b;
+    dims.height = dims.currentValueTotalHeight + constants.tickOffset + sliderOpts.ticklen + constants.labelOffset + dims.labelHeight + sliderOpts.pad.t + sliderOpts.pad.b;
 
     var xanchor = 'left';
     if(anchorUtils.isRightAnchor(sliderOpts)) {
-        sliderOpts.lx -= sliderOpts.outerLength;
+        dims.lx -= dims.outerLength;
         xanchor = 'right';
     }
     if(anchorUtils.isCenterAnchor(sliderOpts)) {
-        sliderOpts.lx -= sliderOpts.outerLength / 2;
+        dims.lx -= dims.outerLength / 2;
         xanchor = 'center';
     }
 
     var yanchor = 'top';
     if(anchorUtils.isBottomAnchor(sliderOpts)) {
-        sliderOpts.ly -= sliderOpts.height;
+        dims.ly -= dims.height;
         yanchor = 'bottom';
     }
     if(anchorUtils.isMiddleAnchor(sliderOpts)) {
-        sliderOpts.ly -= sliderOpts.height / 2;
+        dims.ly -= dims.height / 2;
         yanchor = 'middle';
     }
 
-    sliderOpts.outerLength = Math.ceil(sliderOpts.outerLength);
-    sliderOpts.height = Math.ceil(sliderOpts.height);
-    sliderOpts.lx = Math.round(sliderOpts.lx);
-    sliderOpts.ly = Math.round(sliderOpts.ly);
+    dims.outerLength = Math.ceil(dims.outerLength);
+    dims.height = Math.ceil(dims.height);
+    dims.lx = Math.round(dims.lx);
+    dims.ly = Math.round(dims.ly);
 
     Plots.autoMargin(gd, constants.autoMarginIdRoot + sliderOpts._index, {
         x: sliderOpts.x,
         y: sliderOpts.y,
-        l: sliderOpts.outerLength * ({right: 1, center: 0.5}[xanchor] || 0),
-        r: sliderOpts.outerLength * ({left: 1, center: 0.5}[xanchor] || 0),
-        b: sliderOpts.height * ({top: 1, middle: 0.5}[yanchor] || 0),
-        t: sliderOpts.height * ({bottom: 1, middle: 0.5}[yanchor] || 0)
+        l: dims.outerLength * FROM_TL[xanchor],
+        r: dims.outerLength * FROM_BR[xanchor],
+        b: dims.height * FROM_BR[yanchor],
+        t: dims.height * FROM_TL[yanchor]
     });
 }
 
@@ -33222,8 +33962,10 @@ function drawSlider(gd, sliderGroup, sliderOpts) {
         .call(drawTouchRect, gd, sliderOpts)
         .call(drawGrip, gd, sliderOpts);
 
+    var dims = sliderOpts._dims;
+
     // Position the rectangle:
-    Drawing.setTranslate(sliderGroup, sliderOpts.lx + sliderOpts.pad.l, sliderOpts.ly + sliderOpts.pad.t);
+    Drawing.setTranslate(sliderGroup, dims.lx + sliderOpts.pad.l, dims.ly + sliderOpts.pad.t);
 
     sliderGroup.call(setGripPosition, sliderOpts, sliderOpts.active / (sliderOpts.steps.length - 1), false);
     sliderGroup.call(drawCurrentValue, sliderOpts);
@@ -33236,17 +33978,18 @@ function drawCurrentValue(sliderGroup, sliderOpts, valueOverride) {
     var x0, textAnchor;
     var text = sliderGroup.selectAll('text')
         .data([0]);
+    var dims = sliderOpts._dims;
 
     switch(sliderOpts.currentvalue.xanchor) {
         case 'right':
             // This is anchored left and adjusted by the width of the longest label
             // so that the prefix doesn't move. The goal of this is to emphasize
             // what's actually changing and make the update less distracting.
-            x0 = sliderOpts.inputAreaLength - constants.currentValueInset - sliderOpts.currentValueMaxWidth;
+            x0 = dims.inputAreaLength - constants.currentValueInset - dims.currentValueMaxWidth;
             textAnchor = 'left';
             break;
         case 'center':
-            x0 = sliderOpts.inputAreaLength * 0.5;
+            x0 = dims.inputAreaLength * 0.5;
             textAnchor = 'middle';
             break;
         default:
@@ -33277,11 +34020,11 @@ function drawCurrentValue(sliderGroup, sliderOpts, valueOverride) {
 
     text.call(Drawing.font, sliderOpts.currentvalue.font)
         .text(str)
-        .call(svgTextUtils.convertToTspans, sliderOpts.gd);
+        .call(svgTextUtils.convertToTspans, sliderOpts._gd);
 
     var lines = svgTextUtils.lineCount(text);
 
-    var y0 = (sliderOpts.currentValueMaxLines + 1 - lines) *
+    var y0 = (dims.currentValueMaxLines + 1 - lines) *
         sliderOpts.currentvalue.font.size * LINE_SPACING;
 
     svgTextUtils.positionText(text, x0, y0);
@@ -33323,7 +34066,7 @@ function drawLabel(item, data, sliderOpts) {
 
     text.call(Drawing.font, sliderOpts.font)
         .text(data.step.label)
-        .call(svgTextUtils.convertToTspans, sliderOpts.gd);
+        .call(svgTextUtils.convertToTspans, sliderOpts._gd);
 
     return text;
 }
@@ -33331,12 +34074,13 @@ function drawLabel(item, data, sliderOpts) {
 function drawLabelGroup(sliderGroup, sliderOpts) {
     var labels = sliderGroup.selectAll('g.' + constants.labelsClass)
         .data([0]);
+    var dims = sliderOpts._dims;
 
     labels.enter().append('g')
         .classed(constants.labelsClass, true);
 
     var labelItems = labels.selectAll('g.' + constants.labelGroupClass)
-        .data(sliderOpts.labelSteps);
+        .data(dims.labelSteps);
 
     labelItems.enter().append('g')
         .classed(constants.labelGroupClass, true);
@@ -33356,7 +34100,7 @@ function drawLabelGroup(sliderGroup, sliderOpts) {
                 // if the label spans multiple lines
                 sliderOpts.font.size * LINE_SPACING +
                 constants.labelOffset +
-                sliderOpts.currentValueTotalHeight
+                dims.currentValueTotalHeight
         );
     });
 
@@ -33460,6 +34204,7 @@ function attachGripEvents(item, gd, sliderGroup) {
 function drawTicks(sliderGroup, sliderOpts) {
     var tick = sliderGroup.selectAll('rect.' + constants.tickRectClass)
         .data(sliderOpts.steps);
+    var dims = sliderOpts._dims;
 
     tick.enter().append('rect')
         .classed(constants.tickRectClass, true);
@@ -33472,7 +34217,7 @@ function drawTicks(sliderGroup, sliderOpts) {
     });
 
     tick.each(function(d, i) {
-        var isMajor = i % sliderOpts.labelStride === 0;
+        var isMajor = i % dims.labelStride === 0;
         var item = d3.select(this);
 
         item
@@ -33481,19 +34226,20 @@ function drawTicks(sliderGroup, sliderOpts) {
 
         Drawing.setTranslate(item,
             normalizedValueToPosition(sliderOpts, i / (sliderOpts.steps.length - 1)) - 0.5 * sliderOpts.tickwidth,
-            (isMajor ? constants.tickOffset : constants.minorTickOffset) + sliderOpts.currentValueTotalHeight
+            (isMajor ? constants.tickOffset : constants.minorTickOffset) + dims.currentValueTotalHeight
         );
     });
 
 }
 
 function computeLabelSteps(sliderOpts) {
-    sliderOpts.labelSteps = [];
+    var dims = sliderOpts._dims;
+    dims.labelSteps = [];
     var i0 = 0;
     var nsteps = sliderOpts.steps.length;
 
-    for(var i = i0; i < nsteps; i += sliderOpts.labelStride) {
-        sliderOpts.labelSteps.push({
+    for(var i = i0; i < nsteps; i += dims.labelStride) {
+        dims.labelSteps.push({
             fraction: i / (nsteps - 1),
             step: sliderOpts.steps[i]
         });
@@ -33518,23 +34264,26 @@ function setGripPosition(sliderGroup, sliderOpts, position, doTransition) {
 
     // Drawing.setTranslate doesn't work here becasue of the transition duck-typing.
     // It's also not necessary because there are no other transitions to preserve.
-    el.attr('transform', 'translate(' + (x - constants.gripWidth * 0.5) + ',' + (sliderOpts.currentValueTotalHeight) + ')');
+    el.attr('transform', 'translate(' + (x - constants.gripWidth * 0.5) + ',' + (sliderOpts._dims.currentValueTotalHeight) + ')');
 }
 
 // Convert a number from [0-1] to a pixel position relative to the slider group container:
 function normalizedValueToPosition(sliderOpts, normalizedPosition) {
-    return sliderOpts.inputAreaStart + constants.stepInset +
-        (sliderOpts.inputAreaLength - 2 * constants.stepInset) * Math.min(1, Math.max(0, normalizedPosition));
+    var dims = sliderOpts._dims;
+    return dims.inputAreaStart + constants.stepInset +
+        (dims.inputAreaLength - 2 * constants.stepInset) * Math.min(1, Math.max(0, normalizedPosition));
 }
 
 // Convert a position relative to the slider group to a nubmer in [0, 1]
 function positionToNormalizedValue(sliderOpts, position) {
-    return Math.min(1, Math.max(0, (position - constants.stepInset - sliderOpts.inputAreaStart) / (sliderOpts.inputAreaLength - 2 * constants.stepInset - 2 * sliderOpts.inputAreaStart)));
+    var dims = sliderOpts._dims;
+    return Math.min(1, Math.max(0, (position - constants.stepInset - dims.inputAreaStart) / (dims.inputAreaLength - 2 * constants.stepInset - 2 * dims.inputAreaStart)));
 }
 
 function drawTouchRect(sliderGroup, gd, sliderOpts) {
     var rect = sliderGroup.selectAll('rect.' + constants.railTouchRectClass)
         .data([0]);
+    var dims = sliderOpts._dims;
 
     rect.enter().append('rect')
         .classed(constants.railTouchRectClass, true)
@@ -33542,23 +34291,24 @@ function drawTouchRect(sliderGroup, gd, sliderOpts) {
         .style('pointer-events', 'all');
 
     rect.attr({
-        width: sliderOpts.inputAreaLength,
-        height: Math.max(sliderOpts.inputAreaWidth, constants.tickOffset + sliderOpts.ticklen + sliderOpts.labelHeight)
+        width: dims.inputAreaLength,
+        height: Math.max(dims.inputAreaWidth, constants.tickOffset + sliderOpts.ticklen + dims.labelHeight)
     })
         .call(Color.fill, sliderOpts.bgcolor)
         .attr('opacity', 0);
 
-    Drawing.setTranslate(rect, 0, sliderOpts.currentValueTotalHeight);
+    Drawing.setTranslate(rect, 0, dims.currentValueTotalHeight);
 }
 
 function drawRail(sliderGroup, sliderOpts) {
     var rect = sliderGroup.selectAll('rect.' + constants.railRectClass)
         .data([0]);
+    var dims = sliderOpts._dims;
 
     rect.enter().append('rect')
         .classed(constants.railRectClass, true);
 
-    var computedLength = sliderOpts.inputAreaLength - constants.railInset * 2;
+    var computedLength = dims.inputAreaLength - constants.railInset * 2;
 
     rect.attr({
         width: computedLength,
@@ -33573,7 +34323,7 @@ function drawRail(sliderGroup, sliderOpts) {
 
     Drawing.setTranslate(rect,
         constants.railInset,
-        (sliderOpts.inputAreaWidth - constants.railWidth) * 0.5 + sliderOpts.currentValueTotalHeight
+        (dims.inputAreaWidth - constants.railWidth) * 0.5 + dims.currentValueTotalHeight
     );
 }
 
@@ -33590,7 +34340,7 @@ function clearPushMargins(gd) {
     }
 }
 
-},{"../../constants/alignment":133,"../../lib/svg_text_utils":173,"../../plots/plots":227,"../color":35,"../drawing":60,"../legend/anchor_utils":86,"./constants":122,"d3":3}],125:[function(require,module,exports){
+},{"../../constants/alignment":136,"../../lib/svg_text_utils":176,"../../plots/plots":230,"../color":36,"../drawing":61,"../legend/anchor_utils":88,"./constants":125,"d3":3}],128:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -33613,7 +34363,7 @@ module.exports = {
     draw: require('./draw')
 };
 
-},{"./attributes":121,"./constants":122,"./defaults":123,"./draw":124}],126:[function(require,module,exports){
+},{"./attributes":124,"./constants":125,"./defaults":126,"./draw":127}],129:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -33628,15 +34378,17 @@ module.exports = {
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
-var Plotly = require('../../plotly');
 var Plots = require('../../plots/plots');
+var Registry = require('../../registry');
 var Lib = require('../../lib');
 var Drawing = require('../drawing');
 var Color = require('../color');
 var svgTextUtils = require('../../lib/svg_text_utils');
 var interactConstants = require('../../constants/interactions');
 
-var Titles = module.exports = {};
+module.exports = {
+    draw: draw
+};
 
 var numStripRE = / [XY][0-9]* /;
 
@@ -33670,7 +34422,7 @@ var numStripRE = / [XY][0-9]* /;
  *
  *  @return {selection} d3 selection of title container group
  */
-Titles.draw = function(gd, titleClass, options) {
+function draw(gd, titleClass, options) {
     var cont = options.propContainer;
     var prop = options.propName;
     var placeholder = options.placeholder;
@@ -33853,8 +34605,11 @@ Titles.draw = function(gd, titleClass, options) {
 
         el.call(svgTextUtils.makeEditable, {gd: gd})
             .on('edit', function(text) {
-                if(traceIndex !== undefined) Plotly.restyle(gd, prop, text, traceIndex);
-                else Plotly.relayout(gd, prop, text);
+                if(traceIndex !== undefined) {
+                    Registry.call('restyle', gd, prop, text, traceIndex);
+                } else {
+                    Registry.call('relayout', gd, prop, text);
+                }
             })
             .on('cancel', function() {
                 this.text(this.attr('data-unformatted'))
@@ -33868,9 +34623,9 @@ Titles.draw = function(gd, titleClass, options) {
     el.classed('js-placeholder', isplaceholder);
 
     return group;
-};
+}
 
-},{"../../constants/interactions":134,"../../lib":152,"../../lib/svg_text_utils":173,"../../plotly":190,"../../plots/plots":227,"../color":35,"../drawing":60,"d3":3,"fast-isnumeric":5}],127:[function(require,module,exports){
+},{"../../constants/interactions":137,"../../lib":155,"../../lib/svg_text_utils":176,"../../plots/plots":230,"../../registry":237,"../color":36,"../drawing":61,"d3":3,"fast-isnumeric":5}],130:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -34061,7 +34816,7 @@ module.exports = overrideAll({
     }
 }, 'arraydraw', 'from-root');
 
-},{"../../lib/extend":146,"../../plot_api/edit_types":179,"../../plots/font_attributes":221,"../../plots/pad_attributes":226,"../color/attributes":34}],128:[function(require,module,exports){
+},{"../../lib/extend":149,"../../plot_api/edit_types":182,"../../plots/font_attributes":224,"../../plots/pad_attributes":229,"../color/attributes":35}],131:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -34142,7 +34897,7 @@ module.exports = {
     }
 };
 
-},{}],129:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -34238,7 +34993,7 @@ function buttonsDefaults(menuIn, menuOut) {
     return buttonsOut;
 }
 
-},{"../../lib":152,"../../plots/array_container_defaults":192,"./attributes":127,"./constants":128}],130:[function(require,module,exports){
+},{"../../lib":155,"../../plots/array_container_defaults":193,"./attributes":130,"./constants":131}],133:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -34433,6 +35188,7 @@ function setActive(gd, menuOpts, buttonOpts, gHeader, gButton, scrollBox, button
 function drawHeader(gd, gHeader, gButton, scrollBox, menuOpts) {
     var header = gHeader.selectAll('g.' + constants.headerClassName)
         .data([0]);
+    var dims = menuOpts._dims;
 
     header.enter().append('g')
         .classed(constants.headerClassName, true)
@@ -34442,8 +35198,8 @@ function drawHeader(gd, gHeader, gButton, scrollBox, menuOpts) {
         headerOpts = menuOpts.buttons[active] || constants.blankHeaderOpts,
         posOpts = { y: menuOpts.pad.t, yPad: 0, x: menuOpts.pad.l, xPad: 0, index: 0 },
         positionOverrides = {
-            width: menuOpts.headerWidth,
-            height: menuOpts.headerHeight
+            width: dims.headerWidth,
+            height: dims.headerHeight
         };
 
     header
@@ -34462,8 +35218,8 @@ function drawHeader(gd, gHeader, gButton, scrollBox, menuOpts) {
         .text(constants.arrowSymbol[menuOpts.direction]);
 
     arrow.attr({
-        x: menuOpts.headerWidth - constants.arrowOffsetX + menuOpts.pad.l,
-        y: menuOpts.headerHeight / 2 + constants.textOffsetY + menuOpts.pad.t
+        x: dims.headerWidth - constants.arrowOffsetX + menuOpts.pad.l,
+        y: dims.headerHeight / 2 + constants.textOffsetY + menuOpts.pad.t
     });
 
     header.on('click', function() {
@@ -34491,7 +35247,7 @@ function drawHeader(gd, gHeader, gButton, scrollBox, menuOpts) {
     });
 
     // translate header group
-    Drawing.setTranslate(gHeader, menuOpts.lx, menuOpts.ly);
+    Drawing.setTranslate(gHeader, dims.lx, dims.ly);
 }
 
 function drawButtons(gd, gHeader, gButton, scrollBox, menuOpts) {
@@ -34531,28 +35287,29 @@ function drawButtons(gd, gHeader, gButton, scrollBox, menuOpts) {
 
     var x0 = 0;
     var y0 = 0;
+    var dims = menuOpts._dims;
 
     var isVertical = ['up', 'down'].indexOf(menuOpts.direction) !== -1;
 
     if(menuOpts.type === 'dropdown') {
         if(isVertical) {
-            y0 = menuOpts.headerHeight + constants.gapButtonHeader;
+            y0 = dims.headerHeight + constants.gapButtonHeader;
         } else {
-            x0 = menuOpts.headerWidth + constants.gapButtonHeader;
+            x0 = dims.headerWidth + constants.gapButtonHeader;
         }
     }
 
     if(menuOpts.type === 'dropdown' && menuOpts.direction === 'up') {
-        y0 = -constants.gapButtonHeader + constants.gapButton - menuOpts.openHeight;
+        y0 = -constants.gapButtonHeader + constants.gapButton - dims.openHeight;
     }
 
     if(menuOpts.type === 'dropdown' && menuOpts.direction === 'left') {
-        x0 = -constants.gapButtonHeader + constants.gapButton - menuOpts.openWidth;
+        x0 = -constants.gapButtonHeader + constants.gapButton - dims.openWidth;
     }
 
     var posOpts = {
-        x: menuOpts.lx + x0 + menuOpts.pad.l,
-        y: menuOpts.ly + y0 + menuOpts.pad.t,
+        x: dims.lx + x0 + menuOpts.pad.l,
+        y: dims.ly + y0 + menuOpts.pad.t,
         yPad: constants.gapButton,
         xPad: constants.gapButton,
         index: 0,
@@ -34596,12 +35353,12 @@ function drawButtons(gd, gHeader, gButton, scrollBox, menuOpts) {
     buttons.call(styleButtons, menuOpts);
 
     if(isVertical) {
-        scrollBoxPosition.w = Math.max(menuOpts.openWidth, menuOpts.headerWidth);
+        scrollBoxPosition.w = Math.max(dims.openWidth, dims.headerWidth);
         scrollBoxPosition.h = posOpts.y - scrollBoxPosition.t;
     }
     else {
         scrollBoxPosition.w = posOpts.x - scrollBoxPosition.l;
-        scrollBoxPosition.h = Math.max(menuOpts.openHeight, menuOpts.headerHeight);
+        scrollBoxPosition.h = Math.max(dims.openHeight, dims.headerHeight);
     }
 
     scrollBoxPosition.direction = menuOpts.direction;
@@ -34618,8 +35375,9 @@ function drawButtons(gd, gHeader, gButton, scrollBox, menuOpts) {
 
 function drawScrollBox(gd, gHeader, gButton, scrollBox, menuOpts, position) {
     // enable the scrollbox
-    var direction = menuOpts.direction,
-        isVertical = (direction === 'up' || direction === 'down');
+    var direction = menuOpts.direction;
+    var isVertical = (direction === 'up' || direction === 'down');
+    var dims = menuOpts._dims;
 
     var active = menuOpts.active,
         translateX, translateY,
@@ -34627,13 +35385,13 @@ function drawScrollBox(gd, gHeader, gButton, scrollBox, menuOpts, position) {
     if(isVertical) {
         translateY = 0;
         for(i = 0; i < active; i++) {
-            translateY += menuOpts.heights[i] + constants.gapButton;
+            translateY += dims.heights[i] + constants.gapButton;
         }
     }
     else {
         translateX = 0;
         for(i = 0; i < active; i++) {
-            translateX += menuOpts.widths[i] + constants.gapButton;
+            translateX += dims.widths[i] + constants.gapButton;
         }
     }
 
@@ -34743,16 +35501,18 @@ function styleOnMouseOut(item, menuOpts) {
 
 // find item dimensions (this mutates menuOpts)
 function findDimensions(gd, menuOpts) {
-    menuOpts.width1 = 0;
-    menuOpts.height1 = 0;
-    menuOpts.heights = [];
-    menuOpts.widths = [];
-    menuOpts.totalWidth = 0;
-    menuOpts.totalHeight = 0;
-    menuOpts.openWidth = 0;
-    menuOpts.openHeight = 0;
-    menuOpts.lx = 0;
-    menuOpts.ly = 0;
+    var dims = menuOpts._dims = {
+        width1: 0,
+        height1: 0,
+        heights: [],
+        widths: [],
+        totalWidth: 0,
+        totalHeight: 0,
+        openWidth: 0,
+        openHeight: 0,
+        lx: 0,
+        ly: 0
+    };
 
     var fakeButtons = Drawing.tester.selectAll('g.' + constants.dropdownButtonClassName)
         .data(menuOpts.buttons);
@@ -34784,79 +35544,79 @@ function findDimensions(gd, menuOpts) {
 
         // Store per-item sizes since a row of horizontal buttons, for example,
         // don't all need to be the same width:
-        menuOpts.widths[i] = wEff;
-        menuOpts.heights[i] = hEff;
+        dims.widths[i] = wEff;
+        dims.heights[i] = hEff;
 
         // Height and width of individual element:
-        menuOpts.height1 = Math.max(menuOpts.height1, hEff);
-        menuOpts.width1 = Math.max(menuOpts.width1, wEff);
+        dims.height1 = Math.max(dims.height1, hEff);
+        dims.width1 = Math.max(dims.width1, wEff);
 
         if(isVertical) {
-            menuOpts.totalWidth = Math.max(menuOpts.totalWidth, wEff);
-            menuOpts.openWidth = menuOpts.totalWidth;
-            menuOpts.totalHeight += hEff + constants.gapButton;
-            menuOpts.openHeight += hEff + constants.gapButton;
+            dims.totalWidth = Math.max(dims.totalWidth, wEff);
+            dims.openWidth = dims.totalWidth;
+            dims.totalHeight += hEff + constants.gapButton;
+            dims.openHeight += hEff + constants.gapButton;
         } else {
-            menuOpts.totalWidth += wEff + constants.gapButton;
-            menuOpts.openWidth += wEff + constants.gapButton;
-            menuOpts.totalHeight = Math.max(menuOpts.totalHeight, hEff);
-            menuOpts.openHeight = menuOpts.totalHeight;
+            dims.totalWidth += wEff + constants.gapButton;
+            dims.openWidth += wEff + constants.gapButton;
+            dims.totalHeight = Math.max(dims.totalHeight, hEff);
+            dims.openHeight = dims.totalHeight;
         }
     });
 
     if(isVertical) {
-        menuOpts.totalHeight -= constants.gapButton;
+        dims.totalHeight -= constants.gapButton;
     } else {
-        menuOpts.totalWidth -= constants.gapButton;
+        dims.totalWidth -= constants.gapButton;
     }
 
 
-    menuOpts.headerWidth = menuOpts.width1 + constants.arrowPadX;
-    menuOpts.headerHeight = menuOpts.height1;
+    dims.headerWidth = dims.width1 + constants.arrowPadX;
+    dims.headerHeight = dims.height1;
 
     if(menuOpts.type === 'dropdown') {
         if(isVertical) {
-            menuOpts.width1 += constants.arrowPadX;
-            menuOpts.totalHeight = menuOpts.height1;
+            dims.width1 += constants.arrowPadX;
+            dims.totalHeight = dims.height1;
         } else {
-            menuOpts.totalWidth = menuOpts.width1;
+            dims.totalWidth = dims.width1;
         }
-        menuOpts.totalWidth += constants.arrowPadX;
+        dims.totalWidth += constants.arrowPadX;
     }
 
     fakeButtons.remove();
 
-    var paddedWidth = menuOpts.totalWidth + menuOpts.pad.l + menuOpts.pad.r;
-    var paddedHeight = menuOpts.totalHeight + menuOpts.pad.t + menuOpts.pad.b;
+    var paddedWidth = dims.totalWidth + menuOpts.pad.l + menuOpts.pad.r;
+    var paddedHeight = dims.totalHeight + menuOpts.pad.t + menuOpts.pad.b;
 
     var graphSize = gd._fullLayout._size;
-    menuOpts.lx = graphSize.l + graphSize.w * menuOpts.x;
-    menuOpts.ly = graphSize.t + graphSize.h * (1 - menuOpts.y);
+    dims.lx = graphSize.l + graphSize.w * menuOpts.x;
+    dims.ly = graphSize.t + graphSize.h * (1 - menuOpts.y);
 
     var xanchor = 'left';
     if(anchorUtils.isRightAnchor(menuOpts)) {
-        menuOpts.lx -= paddedWidth;
+        dims.lx -= paddedWidth;
         xanchor = 'right';
     }
     if(anchorUtils.isCenterAnchor(menuOpts)) {
-        menuOpts.lx -= paddedWidth / 2;
+        dims.lx -= paddedWidth / 2;
         xanchor = 'center';
     }
 
     var yanchor = 'top';
     if(anchorUtils.isBottomAnchor(menuOpts)) {
-        menuOpts.ly -= paddedHeight;
+        dims.ly -= paddedHeight;
         yanchor = 'bottom';
     }
     if(anchorUtils.isMiddleAnchor(menuOpts)) {
-        menuOpts.ly -= paddedHeight / 2;
+        dims.ly -= paddedHeight / 2;
         yanchor = 'middle';
     }
 
-    menuOpts.totalWidth = Math.ceil(menuOpts.totalWidth);
-    menuOpts.totalHeight = Math.ceil(menuOpts.totalHeight);
-    menuOpts.lx = Math.round(menuOpts.lx);
-    menuOpts.ly = Math.round(menuOpts.ly);
+    dims.totalWidth = Math.ceil(dims.totalWidth);
+    dims.totalHeight = Math.ceil(dims.totalHeight);
+    dims.lx = Math.round(dims.lx);
+    dims.ly = Math.round(dims.ly);
 
     Plots.autoMargin(gd, constants.autoMarginIdRoot + menuOpts._index, {
         x: menuOpts.x,
@@ -34875,16 +35635,17 @@ function setItemPosition(item, menuOpts, posOpts, overrideOpts) {
     var text = item.select('.' + constants.itemTextClassName);
     var borderWidth = menuOpts.borderwidth;
     var index = posOpts.index;
+    var dims = menuOpts._dims;
 
     Drawing.setTranslate(item, borderWidth + posOpts.x, borderWidth + posOpts.y);
 
     var isVertical = ['up', 'down'].indexOf(menuOpts.direction) !== -1;
-    var finalHeight = overrideOpts.height || (isVertical ? menuOpts.heights[index] : menuOpts.height1);
+    var finalHeight = overrideOpts.height || (isVertical ? dims.heights[index] : dims.height1);
 
     rect.attr({
         x: 0,
         y: 0,
-        width: overrideOpts.width || (isVertical ? menuOpts.width1 : menuOpts.widths[index]),
+        width: overrideOpts.width || (isVertical ? dims.width1 : dims.widths[index]),
         height: finalHeight
     });
 
@@ -34896,9 +35657,9 @@ function setItemPosition(item, menuOpts, posOpts, overrideOpts) {
         finalHeight / 2 - spanOffset + constants.textOffsetY);
 
     if(isVertical) {
-        posOpts.y += menuOpts.heights[index] + posOpts.yPad;
+        posOpts.y += dims.heights[index] + posOpts.yPad;
     } else {
-        posOpts.x += menuOpts.widths[index] + posOpts.xPad;
+        posOpts.x += dims.widths[index] + posOpts.xPad;
     }
 
     posOpts.index++;
@@ -34921,9 +35682,9 @@ function clearPushMargins(gd) {
     }
 }
 
-},{"../../constants/alignment":133,"../../lib/svg_text_utils":173,"../../plots/plots":227,"../color":35,"../drawing":60,"../legend/anchor_utils":86,"./constants":128,"./scrollbox":132,"d3":3}],131:[function(require,module,exports){
-arguments[4][125][0].apply(exports,arguments)
-},{"./attributes":127,"./constants":128,"./defaults":129,"./draw":130,"dup":125}],132:[function(require,module,exports){
+},{"../../constants/alignment":136,"../../lib/svg_text_utils":176,"../../plots/plots":230,"../color":36,"../drawing":61,"../legend/anchor_utils":88,"./constants":131,"./scrollbox":135,"d3":3}],134:[function(require,module,exports){
+arguments[4][128][0].apply(exports,arguments)
+},{"./attributes":130,"./constants":131,"./defaults":132,"./draw":133,"dup":128}],135:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35394,7 +36155,7 @@ ScrollBox.prototype.setTranslate = function setTranslate(translateX, translateY)
     }
 };
 
-},{"../../lib":152,"../color":35,"../drawing":60,"d3":3}],133:[function(require,module,exports){
+},{"../../lib":155,"../color":36,"../drawing":61,"d3":3}],136:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35426,6 +36187,15 @@ module.exports = {
         middle: 0.5,
         top: 0
     },
+    // from bottom right: sometimes you just need the opposite of ^^
+    FROM_BR: {
+        left: 1,
+        center: 0.5,
+        right: 0,
+        bottom: 0,
+        middle: 0.5,
+        top: 1
+    },
     // multiple of fontSize to get the vertical offset between lines
     LINE_SPACING: 1.3,
 
@@ -35445,7 +36215,7 @@ module.exports = {
     }
 };
 
-},{}],134:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35472,7 +36242,7 @@ module.exports = {
     DESELECTDIM: 0.2
 };
 
-},{}],135:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35531,7 +36301,7 @@ module.exports = {
     MINUS_SIGN: '\u2212'
 };
 
-},{}],136:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35574,7 +36344,7 @@ module.exports = {
     }
 };
 
-},{}],137:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35598,7 +36368,7 @@ exports.svgAttrs = {
     'xmlns:xlink': exports.xlink
 };
 
-},{}],138:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35609,14 +36379,8 @@ exports.svgAttrs = {
 
 'use strict';
 
-/*
- * Export the plotly.js API methods.
- */
-
-var Plotly = require('./plotly');
-
 // package version injected by `npm run preprocess`
-exports.version = '1.33.1';
+exports.version = '1.35.2';
 
 // inject promise polyfill
 require('es6-promise').polyfill();
@@ -35627,33 +36391,28 @@ require('../build/plotcss');
 // inject default MathJax config
 require('./fonts/mathjax_config');
 
-// plot api
-exports.plot = Plotly.plot;
-exports.newPlot = Plotly.newPlot;
-exports.restyle = Plotly.restyle;
-exports.relayout = Plotly.relayout;
-exports.redraw = Plotly.redraw;
-exports.update = Plotly.update;
-exports.extendTraces = Plotly.extendTraces;
-exports.prependTraces = Plotly.prependTraces;
-exports.addTraces = Plotly.addTraces;
-exports.deleteTraces = Plotly.deleteTraces;
-exports.moveTraces = Plotly.moveTraces;
-exports.purge = Plotly.purge;
-exports.setPlotConfig = require('./plot_api/set_plot_config');
-exports.register = require('./plot_api/register');
-exports.toImage = require('./plot_api/to_image');
-exports.downloadImage = require('./snapshot/download');
-exports.validate = require('./plot_api/validate');
-exports.addFrames = Plotly.addFrames;
-exports.deleteFrames = Plotly.deleteFrames;
-exports.animate = Plotly.animate;
+// include registry module and expose register method
+var Registry = require('./registry');
+var register = exports.register = Registry.register;
+
+// expose plot api methods
+var plotApi = require('./plot_api');
+var methodNames = Object.keys(plotApi);
+for(var i = 0; i < methodNames.length; i++) {
+    var name = methodNames[i];
+    exports[name] = plotApi[name];
+    register({
+        moduleType: 'apiMethod',
+        name: name,
+        fn: plotApi[name]
+    });
+}
 
 // scatter is the only trace included by default
-exports.register(require('./traces/scatter'));
+register(require('./traces/scatter'));
 
 // register all registrable components modules
-exports.register([
+register([
     require('./components/fx'),
     require('./components/legend'),
     require('./components/annotations'),
@@ -35663,11 +36422,13 @@ exports.register([
     require('./components/updatemenus'),
     require('./components/sliders'),
     require('./components/rangeslider'),
-    require('./components/rangeselector')
+    require('./components/rangeselector'),
+    require('./components/grid'),
+    require('./components/errorbars')
 ]);
 
 // locales en and en-US are required for default behavior
-exports.register([
+register([
     require('./locale-en'),
     require('./locale-en-us')
 ]);
@@ -35676,7 +36437,7 @@ exports.register([
 exports.Icons = require('../build/ploticon');
 
 // unofficial 'beta' plot methods, use at your own risk
-exports.Plots = Plotly.Plots;
+exports.Plots = require('./plots/plots');
 exports.Fx = require('./components/fx');
 exports.Snapshot = require('./snapshot');
 exports.PlotSchema = require('./plot_api/plot_schema');
@@ -35685,7 +36446,7 @@ exports.Queue = require('./lib/queue');
 // export d3 used in the bundle
 exports.d3 = require('d3');
 
-},{"../build/plotcss":14,"../build/ploticon":15,"./components/annotations":28,"./components/annotations3d":33,"./components/fx":77,"./components/images":85,"./components/legend":94,"./components/rangeselector":106,"./components/rangeslider":112,"./components/shapes":119,"./components/sliders":125,"./components/updatemenus":131,"./fonts/mathjax_config":139,"./lib/queue":166,"./locale-en":177,"./locale-en-us":176,"./plot_api/plot_schema":184,"./plot_api/register":185,"./plot_api/set_plot_config":186,"./plot_api/to_image":188,"./plot_api/validate":189,"./plotly":190,"./snapshot":239,"./snapshot/download":236,"./traces/scatter":281,"d3":3,"es6-promise":4}],139:[function(require,module,exports){
+},{"../build/plotcss":15,"../build/ploticon":16,"./components/annotations":29,"./components/annotations3d":34,"./components/errorbars":67,"./components/fx":78,"./components/grid":82,"./components/images":87,"./components/legend":96,"./components/rangeselector":108,"./components/rangeslider":114,"./components/shapes":122,"./components/sliders":128,"./components/updatemenus":134,"./fonts/mathjax_config":142,"./lib/queue":169,"./locale-en":180,"./locale-en-us":179,"./plot_api":184,"./plot_api/plot_schema":188,"./plots/plots":230,"./registry":237,"./snapshot":242,"./traces/scatter":284,"d3":3,"es6-promise":4}],142:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35718,7 +36479,7 @@ if(typeof MathJax !== 'undefined') {
     exports.MathJax = false;
 }
 
-},{}],140:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35749,7 +36510,7 @@ exports.wrap180 = function(deg) {
     return deg;
 };
 
-},{}],141:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35782,7 +36543,7 @@ module.exports = function cleanNumber(v) {
     return BADNUM;
 };
 
-},{"../constants/numerical":135,"fast-isnumeric":5}],142:[function(require,module,exports){
+},{"../constants/numerical":138,"fast-isnumeric":5}],145:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -35804,18 +36565,21 @@ var nestedProperty = require('./nested_property');
 var counterRegex = require('./regex').counter;
 var DESELECTDIM = require('../constants/interactions').DESELECTDIM;
 var wrap180 = require('./angles').wrap180;
+var isArrayOrTypedArray = require('./is_array').isArrayOrTypedArray;
 
 exports.valObjectMeta = {
     data_array: {
         // You can use *dflt=[] to force said array to exist though.
         description: [
             'An {array} of data.',
-            'The value MUST be an {array}, or we ignore it.'
+            'The value MUST be an {array}, or we ignore it.',
+            'Note that typed arrays (e.g. Float32Array) are supported.'
         ].join(' '),
         requiredOpts: [],
         otherOpts: ['dflt'],
         coerceFunction: function(v, propOut, dflt) {
-            if(Array.isArray(v)) propOut.set(v);
+            // TODO maybe `v: {type: 'float32', vals: [/* ... */]}` also
+            if(isArrayOrTypedArray(v)) propOut.set(v);
             else if(dflt !== undefined) propOut.set(dflt);
         }
     },
@@ -36042,19 +36806,56 @@ exports.valObjectMeta = {
             'An {array} of plot information.'
         ].join(' '),
         requiredOpts: ['items'],
-        otherOpts: ['dflt', 'freeLength'],
+        // set dimensions=2 for a 2D array
+        // `items` may be a single object instead of an array, in which case
+        // `freeLength` must be true.
+        otherOpts: ['dflt', 'freeLength', 'dimensions'],
         coerceFunction: function(v, propOut, dflt, opts) {
+
+            // simplified coerce function just for array items
+            function coercePart(v, opts, dflt) {
+                var out;
+                var propPart = {set: function(v) { out = v; }};
+
+                if(dflt === undefined) dflt = opts.dflt;
+
+                exports.valObjectMeta[opts.valType].coerceFunction(v, propPart, dflt, opts);
+
+                return out;
+            }
+
+            var twoD = opts.dimensions === 2;
+
             if(!Array.isArray(v)) {
                 propOut.set(dflt);
                 return;
             }
 
-            var items = opts.items,
-                vOut = [];
+            var items = opts.items;
+            var vOut = [];
+            var arrayItems = Array.isArray(items);
+            var len = arrayItems ? items.length : v.length;
+
+            var i, j, len2, vNew;
+
             dflt = Array.isArray(dflt) ? dflt : [];
 
-            for(var i = 0; i < items.length; i++) {
-                exports.coerce(v, vOut, items, '[' + i + ']', dflt[i]);
+            if(twoD) {
+                for(i = 0; i < len; i++) {
+                    vOut[i] = [];
+                    var row = Array.isArray(v[i]) ? v[i] : [];
+                    len2 = arrayItems ? items[i].length : row.length;
+                    for(j = 0; j < len2; j++) {
+                        vNew = coercePart(row[j], arrayItems ? items[i][j] : items, (dflt[i] || [])[j]);
+                        if(vNew !== undefined) vOut[i][j] = vNew;
+                    }
+                }
+            }
+            else {
+                for(i = 0; i < len; i++) {
+                    vNew = coercePart(v[i], arrayItems ? items[i] : items, dflt[i]);
+                    if(vNew !== undefined) vOut[i] = vNew;
+                }
             }
 
             propOut.set(vOut);
@@ -36063,15 +36864,25 @@ exports.valObjectMeta = {
             if(!Array.isArray(v)) return false;
 
             var items = opts.items;
+            var arrayItems = Array.isArray(items);
+            var twoD = opts.dimensions === 2;
 
             // when free length is off, input and declared lengths must match
             if(!opts.freeLength && v.length !== items.length) return false;
 
             // valid when all input items are valid
             for(var i = 0; i < v.length; i++) {
-                var isItemValid = exports.validate(v[i], opts.items[i]);
-
-                if(!isItemValid) return false;
+                if(twoD) {
+                    if(!Array.isArray(v[i]) || (!opts.freeLength && v[i].length !== items[i].length)) {
+                        return false;
+                    }
+                    for(var j = 0; j < v[i].length; j++) {
+                        if(!exports.validate(v[i][j], arrayItems ? items[i][j] : items)) {
+                            return false;
+                        }
+                    }
+                }
+                else if(!exports.validate(v[i], arrayItems ? items[i] : items)) return false;
             }
 
             return true;
@@ -36105,7 +36916,7 @@ exports.coerce = function(containerIn, containerOut, attributes, attribute, dflt
      * individual form (eg. some array vals can be numbers, even if the
      * single values must be color strings)
      */
-    if(opts.arrayOk && Array.isArray(v)) {
+    if(opts.arrayOk && isArrayOrTypedArray(v)) {
         propOut.set(v);
         return v;
     }
@@ -36191,6 +37002,9 @@ exports.coerceSelectionMarkerOpacity = function(traceOut, coerce) {
     if(!traceOut.marker) return;
 
     var mo = traceOut.marker.opacity;
+    // you can still have a `marker` container with no markers if there's text
+    if(mo === undefined) return;
+
     var smoDflt;
     var usmoDflt;
 
@@ -36199,7 +37013,7 @@ exports.coerceSelectionMarkerOpacity = function(traceOut, coerce) {
     //
     // Only give [un]selected.marker.opacity a default value if you don't
     // set any other [un]selected attributes.
-    if(!Array.isArray(mo) && !traceOut.selected && !traceOut.unselected) {
+    if(!isArrayOrTypedArray(mo) && !traceOut.selected && !traceOut.unselected) {
         smoDflt = mo;
         usmoDflt = DESELECTDIM * mo;
     }
@@ -36211,7 +37025,7 @@ exports.coerceSelectionMarkerOpacity = function(traceOut, coerce) {
 exports.validate = function(value, opts) {
     var valObjectDef = exports.valObjectMeta[opts.valType];
 
-    if(opts.arrayOk && Array.isArray(value)) return true;
+    if(opts.arrayOk && isArrayOrTypedArray(value)) return true;
 
     if(valObjectDef.validateFunction) {
         return valObjectDef.validateFunction(value, opts);
@@ -36227,7 +37041,7 @@ exports.validate = function(value, opts) {
     return out !== failed;
 };
 
-},{"../components/colorscale/get_scale":48,"../components/colorscale/scales":54,"../constants/interactions":134,"../plots/attributes":193,"./angles":140,"./nested_property":160,"./regex":167,"fast-isnumeric":5,"tinycolor2":302}],143:[function(require,module,exports){
+},{"../components/colorscale/get_scale":49,"../components/colorscale/scales":55,"../constants/interactions":137,"../plots/attributes":194,"./angles":143,"./is_array":156,"./nested_property":163,"./regex":170,"fast-isnumeric":5,"tinycolor2":305}],146:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -36663,18 +37477,6 @@ function formatTime(x, tr) {
     return timeStr;
 }
 
-// TODO: do these strings need to be localized?
-// ie this gives "Dec 13, 2017" but some languages may want eg "13-Dec 2017"
-var yearFormatD3 = '%Y';
-var monthFormatD3 = '%b %Y';
-var dayFormatD3 = '%b %-d';
-var yearMonthDayFormatD3 = '%b %-d, %Y';
-
-function yearFormatWorld(cDate) { return cDate.formatDate('yyyy'); }
-function monthFormatWorld(cDate) { return cDate.formatDate('M yyyy'); }
-function dayFormatWorld(cDate) { return cDate.formatDate('M d'); }
-function yearMonthDayFormatWorld(cDate) { return cDate.formatDate('M d, yyyy'); }
-
 /*
  * formatDate: turn a date into tick or hover label text.
  *
@@ -36692,49 +37494,21 @@ function yearMonthDayFormatWorld(cDate) { return cDate.formatDate('M d, yyyy'); 
  * the axis may choose to strip things after it when they don't change from
  * one tick to the next (as it does with automatic formatting)
  */
-exports.formatDate = function(x, fmt, tr, formatter, calendar) {
-    var headStr,
-        dateStr;
-
+exports.formatDate = function(x, fmt, tr, formatter, calendar, extraFormat) {
     calendar = isWorldCalendar(calendar) && calendar;
 
-    if(fmt) return modDateFormat(fmt, x, formatter, calendar);
-
-    if(calendar) {
-        try {
-            var dateJD = Math.floor((x + 0.05) / ONEDAY) + EPOCHJD,
-                cDate = Registry.getComponentMethod('calendars', 'getCal')(calendar)
-                    .fromJD(dateJD);
-
-            if(tr === 'y') dateStr = yearFormatWorld(cDate);
-            else if(tr === 'm') dateStr = monthFormatWorld(cDate);
-            else if(tr === 'd') {
-                headStr = yearFormatWorld(cDate);
-                dateStr = dayFormatWorld(cDate);
-            }
-            else {
-                headStr = yearMonthDayFormatWorld(cDate);
-                dateStr = formatTime(x, tr);
-            }
-        }
-        catch(e) { return 'Invalid'; }
-    }
-    else {
-        var d = new Date(Math.floor(x + 0.05));
-
-        if(tr === 'y') dateStr = formatter(yearFormatD3)(d);
-        else if(tr === 'm') dateStr = formatter(monthFormatD3)(d);
+    if(!fmt) {
+        if(tr === 'y') fmt = extraFormat.year;
+        else if(tr === 'm') fmt = extraFormat.month;
         else if(tr === 'd') {
-            headStr = formatter(yearFormatD3)(d);
-            dateStr = formatter(dayFormatD3)(d);
+            fmt = extraFormat.dayMonth + '\n' + extraFormat.year;
         }
         else {
-            headStr = formatter(yearMonthDayFormatD3)(d);
-            dateStr = formatTime(x, tr);
+            return formatTime(x, tr) + '\n' + modDateFormat(extraFormat.dayMonthYear, x, formatter, calendar);
         }
     }
 
-    return dateStr + (headStr ? '\n' + headStr : '');
+    return modDateFormat(fmt, x, formatter, calendar);
 };
 
 /*
@@ -36859,7 +37633,7 @@ exports.findExactDates = function(data, calendar) {
     };
 };
 
-},{"../constants/numerical":135,"../registry":234,"./loggers":157,"./mod":159,"d3":3,"fast-isnumeric":5}],144:[function(require,module,exports){
+},{"../constants/numerical":138,"../registry":237,"./loggers":160,"./mod":162,"d3":3,"fast-isnumeric":5}],147:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -36888,7 +37662,7 @@ module.exports = function ensureArray(out, n) {
     return out;
 };
 
-},{}],145:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37054,7 +37828,7 @@ var Events = {
 
 module.exports = Events;
 
-},{"events":305}],146:[function(require,module,exports){
+},{"events":308}],149:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37122,6 +37896,8 @@ function _extend(inputs, isDeep, keepAllKeys, noArrayCopies) {
 
     var input, key, src, copy, copyIsArray, clone, allPrimitives;
 
+    // TODO does this do the right thing for typed arrays?
+
     if(length === 2 && isArray(target) && isArray(inputs[1]) && target.length === 0) {
 
         allPrimitives = primitivesLoopSplice(inputs[1], target);
@@ -37168,7 +37944,7 @@ function _extend(inputs, isDeep, keepAllKeys, noArrayCopies) {
     return target;
 }
 
-},{"./is_plain_object.js":154}],147:[function(require,module,exports){
+},{"./is_plain_object.js":157}],150:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37219,7 +37995,7 @@ module.exports = function filterUnique(array) {
     return out;
 };
 
-},{}],148:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37266,7 +38042,7 @@ function isCalcData(cont) {
     );
 }
 
-},{}],149:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37512,7 +38288,7 @@ exports.findPointOnPath = function findPointOnPath(path, val, coord, opts) {
     return pt;
 };
 
-},{"./mod":159}],150:[function(require,module,exports){
+},{"./mod":162}],153:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37550,7 +38326,7 @@ module.exports = function(gd) {
     return gd;  // otherwise assume that gd is a DOM element
 };
 
-},{}],151:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37566,7 +38342,7 @@ module.exports = function(gd) {
 
 module.exports = function identity(d) { return d; };
 
-},{}],152:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -37591,11 +38367,14 @@ lib.nestedProperty = require('./nested_property');
 lib.keyedContainer = require('./keyed_container');
 lib.relativeAttr = require('./relative_attr');
 lib.isPlainObject = require('./is_plain_object');
-lib.isArray = require('./is_array');
 lib.mod = require('./mod');
 lib.toLogRange = require('./to_log_range');
 lib.relinkPrivateKeys = require('./relink_private');
 lib.ensureArray = require('./ensure_array');
+
+var isArrayModule = require('./is_array');
+lib.isTypedArray = isArrayModule.isTypedArray;
+lib.isArrayOrTypedArray = isArrayModule.isArrayOrTypedArray;
 
 var coerceModule = require('./coerce');
 lib.valObjectMeta = coerceModule.valObjectMeta;
@@ -37717,20 +38496,6 @@ lib.swapAttrs = function(cont, attrList, part1, part2) {
         xp.set(yp.get());
         yp.set(temp);
     }
-};
-
-/**
- * to prevent event bubbling, in particular text selection during drag.
- * see http://stackoverflow.com/questions/5429827/
- *      how-can-i-prevent-text-element-selection-with-cursor-drag
- * for maximum effect use:
- *      return pauseEvent(e);
- */
-lib.pauseEvent = function(e) {
-    if(e.stopPropagation) e.stopPropagation();
-    if(e.preventDefault) e.preventDefault();
-    e.cancelBubble = true;
-    return false;
 };
 
 /**
@@ -37972,7 +38737,7 @@ lib.noneOrAll = function(containerIn, containerOut, attrList) {
  * @param {string} cdAttr : calcdata key
  */
 lib.mergeArray = function(traceAttr, cd, cdAttr) {
-    if(Array.isArray(traceAttr)) {
+    if(lib.isArrayOrTypedArray(traceAttr)) {
         var imax = Math.min(traceAttr.length, cd.length);
         for(var i = 0; i < imax; i++) cd[i][cdAttr] = traceAttr[i];
     }
@@ -37991,7 +38756,7 @@ lib.mergeArray = function(traceAttr, cd, cdAttr) {
 lib.fillArray = function(traceAttr, cd, cdAttr, fn) {
     fn = fn || lib.identity;
 
-    if(Array.isArray(traceAttr)) {
+    if(lib.isArrayOrTypedArray(traceAttr)) {
         for(var i = 0; i < cd.length; i++) {
             cd[i][cdAttr] = fn(traceAttr[i]);
         }
@@ -38012,8 +38777,8 @@ lib.castOption = function(trace, ptNumber, astr, fn) {
 
     var val = lib.nestedProperty(trace, astr).get();
 
-    if(Array.isArray(val)) {
-        if(Array.isArray(ptNumber) && Array.isArray(val[ptNumber[0]])) {
+    if(lib.isArrayOrTypedArray(val)) {
+        if(Array.isArray(ptNumber) && lib.isArrayOrTypedArray(val[ptNumber[0]])) {
             return fn(val[ptNumber[0]][ptNumber[1]]);
         } else {
             return fn(val[ptNumber]);
@@ -38460,29 +39225,23 @@ lib.subplotSort = function(a, b) {
     return numB - numA;
 };
 
-/*
- * test if event listener options supported
- */
-lib.eventListenerOptionsSupported = function() {
-    var supported = false;
+// repeatable pseudorandom generator
+var randSeed = 2000000000;
 
-    try {
-        var opts = Object.defineProperty({}, 'passive', {
-            get: function() {
-                supported = true;
-            }
-        });
-
-        window.addEventListener('test', null, opts);
-        window.removeEventListener('test', null, opts);
-    } catch(e) {
-        supported = false;
-    }
-
-    return supported;
+lib.seedPseudoRandom = function() {
+    randSeed = 2000000000;
 };
 
-},{"../constants/numerical":135,"./angles":140,"./clean_number":141,"./coerce":142,"./dates":143,"./ensure_array":144,"./extend":146,"./filter_unique":147,"./filter_visible":148,"./geometry2d":149,"./get_graph_div":150,"./identity":151,"./is_array":153,"./is_plain_object":154,"./keyed_container":155,"./localize":156,"./loggers":157,"./matrix":158,"./mod":159,"./nested_property":160,"./noop":161,"./notifier":162,"./push_unique":165,"./regex":167,"./relative_attr":168,"./relink_private":169,"./search":170,"./stats":172,"./throttle":174,"./to_log_range":175,"d3":3,"fast-isnumeric":5}],153:[function(require,module,exports){
+lib.pseudoRandom = function() {
+    var lastVal = randSeed;
+    randSeed = (69069 * randSeed + 1) % 4294967296;
+    // don't let consecutive vals be too close together
+    // gets away from really trying to be random, in favor of better local uniformity
+    if(Math.abs(randSeed - lastVal) < 429496729) return lib.pseudoRandom();
+    return randSeed / 4294967296;
+};
+
+},{"../constants/numerical":138,"./angles":143,"./clean_number":144,"./coerce":145,"./dates":146,"./ensure_array":147,"./extend":149,"./filter_unique":150,"./filter_visible":151,"./geometry2d":152,"./get_graph_div":153,"./identity":154,"./is_array":156,"./is_plain_object":157,"./keyed_container":158,"./localize":159,"./loggers":160,"./matrix":161,"./mod":162,"./nested_property":163,"./noop":164,"./notifier":165,"./push_unique":168,"./regex":170,"./relative_attr":171,"./relink_private":172,"./search":173,"./stats":175,"./throttle":177,"./to_log_range":178,"d3":3,"fast-isnumeric":5}],156:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38493,20 +39252,25 @@ lib.eventListenerOptionsSupported = function() {
 
 'use strict';
 
-/**
- * Return true for arrays, whether they're untyped or not.
- */
+// IE9 fallbacks
 
-// IE9 fallback
 var ab = (typeof ArrayBuffer === 'undefined' || !ArrayBuffer.isView) ?
     {isView: function() { return false; }} :
     ArrayBuffer;
 
-module.exports = function isArray(a) {
-    return Array.isArray(a) || ab.isView(a);
+var dv = (typeof DataView === 'undefined') ?
+    function() {} :
+    DataView;
+
+exports.isTypedArray = function(a) {
+    return ab.isView(a) && !(a instanceof dv);
 };
 
-},{}],154:[function(require,module,exports){
+exports.isArrayOrTypedArray = function(a) {
+    return Array.isArray(a) || exports.isTypedArray(a);
+};
+
+},{}],157:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38535,7 +39299,7 @@ module.exports = function isPlainObject(obj) {
     );
 };
 
-},{}],155:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38714,7 +39478,7 @@ module.exports = function keyedContainer(baseObj, path, keyName, valueName) {
     return obj;
 };
 
-},{"./nested_property":160}],156:[function(require,module,exports){
+},{"./nested_property":163}],159:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38770,7 +39534,7 @@ module.exports = function localize(gd, s) {
     return s;
 };
 
-},{"../registry":234}],157:[function(require,module,exports){
+},{"../registry":237}],160:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38844,7 +39608,7 @@ function apply(f, args) {
     }
 }
 
-},{"../plot_api/plot_config":183}],158:[function(require,module,exports){
+},{"../plot_api/plot_config":187}],161:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38954,7 +39718,7 @@ exports.apply2DTransform2 = function(transform) {
     };
 };
 
-},{}],159:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38974,7 +39738,7 @@ module.exports = function mod(v, d) {
     return out < 0 ? out + d : out;
 };
 
-},{}],160:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -38987,7 +39751,7 @@ module.exports = function mod(v, d) {
 'use strict';
 
 var isNumeric = require('fast-isnumeric');
-var isArray = require('./is_array');
+var isArrayOrTypedArray = require('./is_array').isArrayOrTypedArray;
 var isPlainObject = require('./is_plain_object');
 var containerArrayMatch = require('../plot_api/container_array_match');
 
@@ -39073,7 +39837,7 @@ function npGet(cont, parts) {
                 }
                 return allSame ? out[0] : out;
             }
-            if(typeof curPart === 'number' && !isArray(curCont)) {
+            if(typeof curPart === 'number' && !isArrayOrTypedArray(curCont)) {
                 return undefined;
             }
             curCont = curCont[curPart];
@@ -39121,7 +39885,7 @@ function isDeletable(val, propStr) {
     ) {
         return false;
     }
-    if(!isArray(val)) return true;
+    if(!isArrayOrTypedArray(val)) return true;
 
     if(propStr.match(INFO_PATTERNS)) return true;
 
@@ -39144,7 +39908,7 @@ function npSet(cont, parts, propStr) {
         for(i = 0; i < parts.length - 1; i++) {
             curPart = parts[i];
 
-            if(typeof curPart === 'number' && !isArray(curCont)) {
+            if(typeof curPart === 'number' && !isArrayOrTypedArray(curCont)) {
                 throw 'array index but container is not an array';
             }
 
@@ -39188,7 +39952,7 @@ function joinPropStr(propStr, newPart) {
 
 // handle special -1 array index
 function setArrayAll(containerArray, innerParts, val, propStr) {
-    var arrayVal = isArray(val),
+    var arrayVal = isArrayOrTypedArray(val),
         allSet = true,
         thisVal = val,
         thisPropStr = propStr.replace('-1', 0),
@@ -39238,7 +40002,7 @@ function pruneContainers(containerLevels) {
         propPart = containerLevels[i][1];
 
         remainingKeys = false;
-        if(isArray(curCont)) {
+        if(isArrayOrTypedArray(curCont)) {
             for(j = curCont.length - 1; j >= 0; j--) {
                 if(isDeletable(curCont[j], joinPropStr(propPart, j))) {
                     if(remainingKeys) curCont[j] = undefined;
@@ -39264,7 +40028,7 @@ function pruneContainers(containerLevels) {
 function emptyObj(obj) {
     if(obj === undefined || obj === null) return true;
     if(typeof obj !== 'object') return false; // any plain value
-    if(isArray(obj)) return !obj.length; // []
+    if(isArrayOrTypedArray(obj)) return !obj.length; // []
     return !Object.keys(obj).length; // {}
 }
 
@@ -39278,7 +40042,7 @@ function badContainer(container, propStr, propParts) {
     };
 }
 
-},{"../plot_api/container_array_match":178,"./is_array":153,"./is_plain_object":154,"fast-isnumeric":5}],161:[function(require,module,exports){
+},{"../plot_api/container_array_match":181,"./is_array":156,"./is_plain_object":157,"fast-isnumeric":5}],164:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -39294,7 +40058,7 @@ function badContainer(container, propStr, propParts) {
 
 module.exports = function noop() {};
 
-},{}],162:[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -39376,7 +40140,7 @@ module.exports = function(text, displayLength) {
         });
 };
 
-},{"d3":3,"fast-isnumeric":5}],163:[function(require,module,exports){
+},{"d3":3,"fast-isnumeric":5}],166:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -39425,7 +40189,7 @@ module.exports = function overrideCursor(el3, csr) {
     }
 };
 
-},{"./setcursor":171}],164:[function(require,module,exports){
+},{"./setcursor":174}],167:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -39724,7 +40488,7 @@ polygon.filter = function filter(pts, tolerance) {
     };
 };
 
-},{"../constants/numerical":135,"./matrix":158}],165:[function(require,module,exports){
+},{"../constants/numerical":138,"./matrix":161}],168:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -39737,6 +40501,8 @@ polygon.filter = function filter(pts, tolerance) {
 
 /**
  * Push array with unique items
+ *
+ * Ignores falsy items, except 0 so we can use it to construct arrays of indices.
  *
  * @param {array} array
  *  array to be filled
@@ -39757,12 +40523,12 @@ module.exports = function pushUnique(array, item) {
         }
         array.push(item);
     }
-    else if(item && array.indexOf(item) === -1) array.push(item);
+    else if((item || item === 0) && array.indexOf(item) === -1) array.push(item);
 
     return array;
 };
 
-},{}],166:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -39973,7 +40739,7 @@ queue.plotDo = function(gd, func, args) {
 
 module.exports = queue;
 
-},{"../lib":152,"../plot_api/plot_config":183}],167:[function(require,module,exports){
+},{"../lib":155,"../plot_api/plot_config":187}],170:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -39984,21 +40750,24 @@ module.exports = queue;
 
 'use strict';
 
-// Simple helper functions
-// none of these need any external deps
-
 /*
  * make a regex for matching counter ids/names ie xaxis, xaxis2, xaxis10...
- *  eg: regexCounter('x')
- * tail is an optional piece after the id
- *  eg regexCounter('scene', '.annotations') for scene2.annotations etc.
+ *
+ * @param {string} head: the head of the pattern, eg 'x' matches 'x', 'x2', 'x10' etc.
+ *      'xy' is a special case for cartesian subplots: it matches 'x2y3' etc
+ * @param {Optional(string)} tail: a fixed piece after the id
+ *      eg counterRegex('scene', '.annotations') for scene2.annotations etc.
+ * @param {boolean} openEnded: if true, the string may continue past the match.
  */
 exports.counter = function(head, tail, openEnded) {
-    return new RegExp('^' + head + '([2-9]|[1-9][0-9]+)?' +
-        (tail || '') + (openEnded ? '' : '$'));
+    var fullTail = (tail || '') + (openEnded ? '' : '$');
+    if(head === 'xy') {
+        return new RegExp('^x([2-9]|[1-9][0-9]+)?y([2-9]|[1-9][0-9]+)?' + fullTail);
+    }
+    return new RegExp('^' + head + '([2-9]|[1-9][0-9]+)?' + fullTail);
 };
 
-},{}],168:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -40051,7 +40820,7 @@ module.exports = function(baseAttr, relativeAttr) {
     return baseAttr + relativeAttr;
 };
 
-},{}],169:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -40063,7 +40832,7 @@ module.exports = function(baseAttr, relativeAttr) {
 
 'use strict';
 
-var isArray = require('./is_array');
+var isArrayOrTypedArray = require('./is_array').isArrayOrTypedArray;
 var isPlainObject = require('./is_plain_object');
 
 /**
@@ -40074,13 +40843,13 @@ var isPlainObject = require('./is_plain_object');
  * This prevents deepCopying massive structures like a webgl context.
  */
 module.exports = function relinkPrivateKeys(toContainer, fromContainer) {
-    var keys = Object.keys(fromContainer || {});
+    for(var k in fromContainer) {
+        var fromVal = fromContainer[k];
+        var toVal = toContainer[k];
 
-    for(var i = 0; i < keys.length; i++) {
-        var k = keys[i],
-            fromVal = fromContainer[k],
-            toVal = toContainer[k];
-
+        if(toVal === fromVal) {
+            continue;
+        }
         if(k.charAt(0) === '_' || typeof fromVal === 'function') {
 
             // if it already exists at this point, it's something
@@ -40089,11 +40858,17 @@ module.exports = function relinkPrivateKeys(toContainer, fromContainer) {
 
             toContainer[k] = fromVal;
         }
-        else if(isArray(fromVal) && isArray(toVal) && isPlainObject(fromVal[0])) {
+        else if(isArrayOrTypedArray(fromVal) && isArrayOrTypedArray(toVal) && isPlainObject(fromVal[0])) {
+
+            // filter out data_array items that can contain user objects
+            // most of the time the toVal === fromVal check will catch these early
+            // but if the user makes new ones we also don't want to recurse in.
+            if(k === 'customdata' || k === 'ids') continue;
 
             // recurse into arrays containers
-            for(var j = 0; j < fromVal.length; j++) {
-                if(isPlainObject(fromVal[j]) && isPlainObject(toVal[j])) {
+            var minLen = Math.min(fromVal.length, toVal.length);
+            for(var j = 0; j < minLen; j++) {
+                if((toVal[j] !== fromVal[j]) && isPlainObject(fromVal[j]) && isPlainObject(toVal[j])) {
                     relinkPrivateKeys(toVal[j], fromVal[j]);
                 }
             }
@@ -40108,7 +40883,7 @@ module.exports = function relinkPrivateKeys(toContainer, fromContainer) {
     }
 };
 
-},{"./is_array":153,"./is_plain_object":154}],170:[function(require,module,exports){
+},{"./is_array":156,"./is_plain_object":157}],173:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -40225,7 +41000,7 @@ exports.roundUp = function(val, arrayIn, reverse) {
     return arrayIn[low];
 };
 
-},{"./loggers":157,"fast-isnumeric":5}],171:[function(require,module,exports){
+},{"./loggers":160,"fast-isnumeric":5}],174:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -40248,7 +41023,7 @@ module.exports = function setCursor(el3, csr) {
     if(csr) el3.classed('cursor-' + csr, true);
 };
 
-},{}],172:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -40261,7 +41036,7 @@ module.exports = function setCursor(el3, csr) {
 'use strict';
 
 var isNumeric = require('fast-isnumeric');
-
+var isArrayOrTypedArray = require('./is_array').isArrayOrTypedArray;
 
 /**
  * aggNums() returns the result of an aggregate function applied to an array of
@@ -40279,9 +41054,9 @@ var isNumeric = require('fast-isnumeric');
 exports.aggNums = function(f, v, a, len) {
     var i,
         b;
-    if(!len) len = a.length;
+    if(!len || len > a.length) len = a.length;
     if(!isNumeric(v)) v = false;
-    if(Array.isArray(a[0])) {
+    if(isArrayOrTypedArray(a[0])) {
         b = new Array(len);
         for(i = 0; i < len; i++) b[i] = exports.aggNums(f, v, a[i]);
         a = b;
@@ -40344,7 +41119,7 @@ exports.interp = function(arr, n) {
     return frac * arr[Math.ceil(n)] + (1 - frac) * arr[Math.floor(n)];
 };
 
-},{"fast-isnumeric":5}],173:[function(require,module,exports){
+},{"./is_array":156,"fast-isnumeric":5}],176:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41018,7 +41793,7 @@ exports.makeEditable = function(context, options) {
     return d3.rebind(context, dispatch, 'on');
 };
 
-},{"../constants/alignment":133,"../constants/string_mappings":136,"../constants/xmlns_namespaces":137,"../lib":152,"d3":3}],174:[function(require,module,exports){
+},{"../constants/alignment":136,"../constants/string_mappings":139,"../constants/xmlns_namespaces":140,"../lib":155,"d3":3}],177:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41122,7 +41897,7 @@ function _clearTimeout(cache) {
     }
 }
 
-},{}],175:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41150,7 +41925,7 @@ module.exports = function toLogRange(val, range) {
     return newVal;
 };
 
-},{"fast-isnumeric":5}],176:[function(require,module,exports){
+},{"fast-isnumeric":5}],179:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41172,7 +41947,7 @@ module.exports = {
     }
 };
 
-},{}],177:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41207,11 +41982,15 @@ module.exports = {
         decimal: '.',
         thousands: ',',
         grouping: [3],
-        currency: ['$', '']
+        currency: ['$', ''],
+        year: '%Y',
+        month: '%b %Y',
+        dayMonth: '%b %-d',
+        dayMonthYear: '%b %-d, %Y'
     }
 };
 
-},{}],178:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41269,7 +42048,7 @@ module.exports = function containerArrayMatch(astr) {
     return {array: arrayStr, index: Number(match[1]), property: match[3] || ''};
 };
 
-},{"../registry":234}],179:[function(require,module,exports){
+},{"../registry":237}],182:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41307,7 +42086,7 @@ var layoutOpts = {
     valType: 'flaglist',
     extras: ['none'],
     flags: [
-        'calc', 'calcIfAutorange', 'plot', 'legend', 'ticks',
+        'calc', 'calcIfAutorange', 'plot', 'legend', 'ticks', 'margins',
         'layoutstyle', 'modebar', 'camera', 'arraydraw'
     ],
     description: [
@@ -41319,6 +42098,7 @@ var layoutOpts = {
         '*plot* calls `Plotly.plot` but without first clearing `gd.calcdata`.',
         '*legend* only redraws the legend.',
         '*ticks* only redraws axis ticks, labels, and gridlines.',
+        '*margins* recomputes ticklabel automargins.',
         '*layoutstyle* reapplies global and SVG cartesian axis styles.',
         '*modebar* just updates the modebar.',
         '*camera* just updates the camera settings for gl3d scenes.',
@@ -41421,7 +42201,7 @@ function overrideOne(attr, editTypeOverride, overrideContainers, key) {
     }
 }
 
-},{"../lib":152}],180:[function(require,module,exports){
+},{"../lib":155}],183:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -41620,8 +42400,14 @@ function cleanAxRef(container, attr) {
     }
 }
 
-// Make a few changes to the data right away
-// before it gets used for anything
+/*
+ * cleanData: Make a few changes to the data right away
+ * before it gets used for anything
+ * Mostly for backward compatibility, modifies the data traces users provide.
+ *
+ * Important: if you're going to add something here that modifies a data array,
+ * update it in place so the new array === the old one.
+ */
 exports.cleanData = function(data, existingData) {
     // Enforce unique IDs
     var suids = [], // seen uids --- so we can weed out incoming repeats
@@ -41707,7 +42493,9 @@ exports.cleanData = function(data, existingData) {
 
         if(!Registry.traceIs(trace, 'pie') && !Registry.traceIs(trace, 'bar')) {
             if(Array.isArray(trace.textposition)) {
-                trace.textposition = trace.textposition.map(cleanTextPosition);
+                for(i = 0; i < trace.textposition.length; i++) {
+                    trace.textposition[i] = cleanTextPosition(trace.textposition[i]);
+                }
             }
             else if(trace.textposition) {
                 trace.textposition = cleanTextPosition(trace.textposition);
@@ -41978,7 +42766,51 @@ exports.clearAxisTypes = function(gd, traces, layoutUpdate) {
     }
 };
 
-},{"../components/color":35,"../lib":152,"../plots/cartesian/axis_ids":198,"../plots/plots":227,"../registry":234,"fast-isnumeric":5,"gl-mat4/fromQuat":6}],181:[function(require,module,exports){
+exports.clearAxisAutomargins = function(gd) {
+    var keys = Object.keys(gd._fullLayout._pushmargin);
+    for(var i = 0; i < keys.length; i++) {
+        if(keys[i].indexOf('automargin') !== -1) {
+            delete gd._fullLayout._pushmargin[keys[i]];
+        }
+    }
+};
+
+},{"../components/color":36,"../lib":155,"../plots/cartesian/axis_ids":200,"../plots/plots":230,"../registry":237,"fast-isnumeric":5,"gl-mat4/fromQuat":6}],184:[function(require,module,exports){
+/**
+* Copyright 2012-2018, Plotly, Inc.
+* All rights reserved.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+
+'use strict';
+
+var main = require('./plot_api');
+
+exports.plot = main.plot;
+exports.newPlot = main.newPlot;
+exports.restyle = main.restyle;
+exports.relayout = main.relayout;
+exports.redraw = main.redraw;
+exports.update = main.update;
+exports.react = main.react;
+exports.extendTraces = main.extendTraces;
+exports.prependTraces = main.prependTraces;
+exports.addTraces = main.addTraces;
+exports.deleteTraces = main.deleteTraces;
+exports.moveTraces = main.moveTraces;
+exports.purge = main.purge;
+exports.addFrames = main.addFrames;
+exports.deleteFrames = main.deleteFrames;
+exports.animate = main.animate;
+exports.setPlotConfig = main.setPlotConfig;
+
+exports.toImage = require('./to_image');
+exports.validate = require('./validate');
+exports.downloadImage = require('../snapshot/download');
+
+},{"../snapshot/download":239,"./plot_api":186,"./to_image":190,"./validate":191}],185:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -42192,7 +43024,7 @@ exports.applyContainerArrayChanges = function applyContainerArrayChanges(gd, np,
     return true;
 };
 
-},{"../lib/is_plain_object":154,"../lib/loggers":157,"../lib/nested_property":160,"../lib/noop":161,"../lib/search":170,"../registry":234,"./container_array_match":178}],182:[function(require,module,exports){
+},{"../lib/is_plain_object":157,"../lib/loggers":160,"../lib/nested_property":163,"../lib/noop":164,"../lib/search":173,"../registry":237,"./container_array_match":181}],186:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -42209,7 +43041,6 @@ var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 var hasHover = require('has-hover');
 
-var Plotly = require('../plotly');
 var Lib = require('../lib');
 var Events = require('../lib/events');
 var Queue = require('../lib/queue');
@@ -42220,12 +43051,13 @@ var Plots = require('../plots/plots');
 var Polar = require('../plots/polar/legacy');
 var initInteractions = require('../plots/cartesian/graph_interact');
 
+var Axes = require('../plots/cartesian/axes');
 var Drawing = require('../components/drawing');
 var Color = require('../components/color');
-var ErrorBars = require('../components/errorbars');
 var xmlnsNamespaces = require('../constants/xmlns_namespaces');
 var svgTextUtils = require('../lib/svg_text_utils');
 
+var defaultConfig = require('./plot_config');
 var manageArrays = require('./manage_arrays');
 var helpers = require('./helpers');
 var subroutines = require('./subroutines');
@@ -42235,8 +43067,10 @@ var cartesianConstants = require('../plots/cartesian/constants');
 var axisConstraints = require('../plots/cartesian/constraints');
 var enforceAxisConstraints = axisConstraints.enforce;
 var cleanAxisConstraints = axisConstraints.clean;
-var axisIds = require('../plots/cartesian/axis_ids');
+var doAutoRange = require('../plots/cartesian/autorange').doAutoRange;
 
+var numericNameWarningCount = 0;
+var numericNameWarningCountLimit = 5;
 
 /**
  * Main plot-creation function
@@ -42251,8 +43085,15 @@ var axisIds = require('../plots/cartesian/axis_ids');
  * @param {object} config
  *      configuration options (see ./plot_config.js for more info)
  *
+ * OR
+ *
+ * @param {string id or DOM element} gd
+ *      the id or DOM element of the graph container div
+ * @param {object} figure
+ *      object containing `data`, `layout`, `config`, and `frames` members
+ *
  */
-Plotly.plot = function(gd, data, layout, config) {
+exports.plot = function(gd, data, layout, config) {
     var frames;
 
     gd = Lib.getGraphDiv(gd);
@@ -42280,7 +43121,7 @@ Plotly.plot = function(gd, data, layout, config) {
 
     function addFrames() {
         if(frames) {
-            return Plotly.addFrames(gd, frames);
+            return exports.addFrames(gd, frames);
         }
     }
 
@@ -42339,6 +43180,8 @@ Plotly.plot = function(gd, data, layout, config) {
 
     var fullLayout = gd._fullLayout;
 
+    var hasCartesian = fullLayout._has('cartesian');
+
     // Legacy polar plots
     if(!fullLayout._has('polar') && data && data[0] && data[0].r) {
         Lib.log('Legacy polar charts are deprecated!');
@@ -42362,7 +43205,7 @@ Plotly.plot = function(gd, data, layout, config) {
     Drawing.initGradients(gd);
 
     // save initial show spikes once per graph
-    if(graphWasEmpty) Plotly.Axes.saveShowSpikeInitial(gd);
+    if(graphWasEmpty) Axes.saveShowSpikeInitial(gd);
 
     // prepare the data and find the autorange
 
@@ -42469,7 +43312,7 @@ Plotly.plot = function(gd, data, layout, config) {
 
     function positionAndAutorange() {
         if(!recalc) {
-            enforceAxisConstraints(gd);
+            doAutoRangeAndConstraints();
             return;
         }
 
@@ -42498,7 +43341,7 @@ Plotly.plot = function(gd, data, layout, config) {
         }
 
         // calc and autorange for errorbars
-        ErrorBars.calc(gd);
+        Registry.getComponentMethod('errorbars', 'calc')(gd);
 
         // TODO: autosize extra for text markers and images
         // see https://github.com/plotly/plotly.js/issues/1111
@@ -42513,24 +43356,24 @@ Plotly.plot = function(gd, data, layout, config) {
     function doAutoRangeAndConstraints() {
         if(gd._transitioning) return;
 
-        var axList = Plotly.Axes.list(gd, '', true);
+        var axList = Axes.list(gd, '', true);
         for(var i = 0; i < axList.length; i++) {
             var ax = axList[i];
             cleanAxisConstraints(gd, ax);
 
-            Plotly.Axes.doAutoRange(ax);
+            doAutoRange(ax);
         }
 
         enforceAxisConstraints(gd);
 
         // store initial ranges *after* enforcing constraints, otherwise
         // we will never look like we're at the initial ranges
-        if(graphWasEmpty) Plotly.Axes.saveRangeInitial(gd);
+        if(graphWasEmpty) Axes.saveRangeInitial(gd);
     }
 
     // draw ticks, titles, and calculate axis scaling (._b, ._m)
     function drawAxes() {
-        return Plotly.Axes.doTicks(gd, 'redraw');
+        return Axes.doTicks(gd, 'redraw');
     }
 
     // Now plot the data
@@ -42612,16 +43455,18 @@ Plotly.plot = function(gd, data, layout, config) {
         addFrames,
         drawFramework,
         marginPushers,
-        marginPushersAgain,
-        positionAndAutorange,
-        subroutines.layoutStyles,
-        drawAxes,
+        marginPushersAgain
+    ];
+    if(hasCartesian) seq.push(positionAndAutorange);
+    seq.push(subroutines.layoutStyles);
+    if(hasCartesian) seq.push(drawAxes);
+    seq.push(
         drawData,
         finalDraw,
         initInteractions,
         Plots.rehover,
         Plots.previousPromises
-    ];
+    );
 
     // even if everything we did was synchronous, return a promise
     // so that the caller doesn't care which route we took
@@ -42632,6 +43477,10 @@ Plotly.plot = function(gd, data, layout, config) {
         gd.emit('plotly_afterplot');
         return gd;
     });
+};
+
+exports.setPlotConfig = function setPlotConfig(obj) {
+    return Lib.extendFlat(defaultConfig, obj);
 };
 
 function setBackground(gd, bgColor) {
@@ -42648,7 +43497,7 @@ function opaqueSetBackground(gd, bgColor) {
 }
 
 function setPlotContext(gd, config) {
-    if(!gd._context) gd._context = Lib.extendDeep({}, Plotly.defaultConfig);
+    if(!gd._context) gd._context = Lib.extendDeep({}, defaultConfig);
     var context = gd._context;
 
     var i, keys, key;
@@ -42814,7 +43663,7 @@ function plotPolar(gd, data, layout) {
 }
 
 // convenience function to force a full redraw, mostly for use by plotly.js
-Plotly.redraw = function(gd) {
+exports.redraw = function(gd) {
     gd = Lib.getGraphDiv(gd);
 
     if(!Lib.isPlotDiv(gd)) {
@@ -42825,7 +43674,7 @@ Plotly.redraw = function(gd) {
     helpers.cleanLayout(gd.layout);
 
     gd.calcdata = undefined;
-    return Plotly.plot(gd).then(function() {
+    return exports.plot(gd).then(function() {
         gd.emit('plotly_redraw');
         return gd;
     });
@@ -42839,14 +43688,14 @@ Plotly.redraw = function(gd) {
  * @param {Object} layout
  * @param {Object} config
  */
-Plotly.newPlot = function(gd, data, layout, config) {
+exports.newPlot = function(gd, data, layout, config) {
     gd = Lib.getGraphDiv(gd);
 
     // remove gl contexts
     Plots.cleanPlot([], {}, gd._fullData || {}, gd._fullLayout || {});
 
     Plots.purge(gd);
-    return Plotly.plot(gd, data, layout, config);
+    return exports.plot(gd, data, layout, config);
 };
 
 /**
@@ -43076,11 +43925,14 @@ function getExtendProperties(gd, update, indices, maxPoints) {
             target = prop.get();
             insert = update[key][j];
 
-            if(!Array.isArray(insert)) {
+            if(!Lib.isArrayOrTypedArray(insert)) {
                 throw new Error('attribute: ' + key + ' index: ' + j + ' must be an array');
             }
-            if(!Array.isArray(target)) {
+            if(!Lib.isArrayOrTypedArray(target)) {
                 throw new Error('cannot extend missing or non-array attribute: ' + key);
+            }
+            if(target.constructor !== insert.constructor) {
+                throw new Error('cannot extend array with an array of a different type: ' + key);
             }
 
             /*
@@ -43117,62 +43969,41 @@ function getExtendProperties(gd, update, indices, maxPoints) {
  * @param {Object} update
  * @param {Number[]} indices
  * @param {Number||Object} maxPoints
- * @param {Function} lengthenArray
- * @param {Function} spliceArray
+ * @param {Function} updateArray
  * @return {Object}
  */
-function spliceTraces(gd, update, indices, maxPoints, lengthenArray, spliceArray) {
-
+function spliceTraces(gd, update, indices, maxPoints, updateArray) {
     assertExtendTracesArgs(gd, update, indices, maxPoints);
 
-    var updateProps = getExtendProperties(gd, update, indices, maxPoints),
-        remainder = [],
-        undoUpdate = {},
-        undoPoints = {};
-    var target, prop, maxp;
+    var updateProps = getExtendProperties(gd, update, indices, maxPoints);
+    var undoUpdate = {};
+    var undoPoints = {};
 
     for(var i = 0; i < updateProps.length; i++) {
+        var prop = updateProps[i].prop;
+        var maxp = updateProps[i].maxp;
 
-        /*
-         * prop is the object returned by Lib.nestedProperties
-         */
-        prop = updateProps[i].prop;
-        maxp = updateProps[i].maxp;
+        // return new array and remainder
+        var out = updateArray(updateProps[i].target, updateProps[i].insert, maxp);
+        prop.set(out[0]);
 
-        target = lengthenArray(updateProps[i].target, updateProps[i].insert);
-
-        /*
-         * If maxp is set within post-extension trace.length, splice to maxp length.
-         * Otherwise skip function call as splice op will have no effect anyway.
-         */
-        if(maxp >= 0 && maxp < target.length) remainder = spliceArray(target, maxp);
-
-        /*
-         * to reverse this operation we need the size of the original trace as the reverse
-         * operation will need to window out any lengthening operation performed in this pass.
-         */
-        maxp = updateProps[i].target.length;
-
-        /*
-         * Magic happens here! update gd.data.trace[key] with new array data.
-         */
-        prop.set(target);
-
+        // build the inverse update object for the undo operation
         if(!Array.isArray(undoUpdate[prop.astr])) undoUpdate[prop.astr] = [];
+        undoUpdate[prop.astr].push(out[1]);
+
+         // build the matching maxPoints undo object containing original trace lengths
         if(!Array.isArray(undoPoints[prop.astr])) undoPoints[prop.astr] = [];
-
-        /*
-         * build the inverse update object for the undo operation
-         */
-        undoUpdate[prop.astr].push(remainder);
-
-        /*
-         * build the matching maxPoints undo object containing original trace lengths.
-         */
-        undoPoints[prop.astr].push(maxp);
+        undoPoints[prop.astr].push(updateProps[i].target.length);
     }
 
     return {update: undoUpdate, maxPoints: undoPoints};
+}
+
+function concatTypedArray(arr0, arr1) {
+    var arr2 = new arr0.constructor(arr0.length + arr1.length);
+    arr2.set(arr0);
+    arr2.set(arr1, arr0.length);
+    return arr2;
 }
 
 /**
@@ -43192,56 +44023,117 @@ function spliceTraces(gd, update, indices, maxPoints, lengthenArray, spliceArray
  * @param {Number|Object} [maxPoints] Number of points for trace window after lengthening.
  *
  */
-Plotly.extendTraces = function extendTraces(gd, update, indices, maxPoints) {
+exports.extendTraces = function extendTraces(gd, update, indices, maxPoints) {
     gd = Lib.getGraphDiv(gd);
 
-    var undo = spliceTraces(gd, update, indices, maxPoints,
+    function updateArray(target, insert, maxp) {
+        var newArray, remainder;
 
-                           /*
-                            * The Lengthen operation extends trace from end with insert
-                            */
-                            function(target, insert) {
-                                return target.concat(insert);
-                            },
+        if(Lib.isTypedArray(target)) {
+            if(maxp < 0) {
+                var none = new target.constructor(0);
+                var both = concatTypedArray(target, insert);
 
-                            /*
-                             * Window the trace keeping maxPoints, counting back from the end
-                             */
-                            function(target, maxPoints) {
-                                return target.splice(0, target.length - maxPoints);
-                            });
+                if(maxp < 0) {
+                    newArray = both;
+                    remainder = none;
+                } else {
+                    newArray = none;
+                    remainder = both;
+                }
+            } else {
+                newArray = new target.constructor(maxp);
+                remainder = new target.constructor(target.length + insert.length - maxp);
 
-    var promise = Plotly.redraw(gd);
+                if(maxp === insert.length) {
+                    newArray.set(insert);
+                    remainder.set(target);
+                } else if(maxp < insert.length) {
+                    var numberOfItemsFromInsert = insert.length - maxp;
 
+                    newArray.set(insert.subarray(numberOfItemsFromInsert));
+                    remainder.set(target);
+                    remainder.set(insert.subarray(0, numberOfItemsFromInsert), target.length);
+                } else {
+                    var numberOfItemsFromTarget = maxp - insert.length;
+                    var targetBegin = target.length - numberOfItemsFromTarget;
+
+                    newArray.set(target.subarray(targetBegin));
+                    newArray.set(insert, numberOfItemsFromTarget);
+                    remainder.set(target.subarray(0, targetBegin));
+                }
+            }
+        } else {
+            newArray = target.concat(insert);
+            remainder = (maxp >= 0 && maxp < newArray.length) ?
+                newArray.splice(0, newArray.length - maxp) :
+                [];
+        }
+
+        return [newArray, remainder];
+    }
+
+    var undo = spliceTraces(gd, update, indices, maxPoints, updateArray);
+    var promise = exports.redraw(gd);
     var undoArgs = [gd, undo.update, indices, undo.maxPoints];
-    Queue.add(gd, Plotly.prependTraces, undoArgs, extendTraces, arguments);
+    Queue.add(gd, exports.prependTraces, undoArgs, extendTraces, arguments);
 
     return promise;
 };
 
-Plotly.prependTraces = function prependTraces(gd, update, indices, maxPoints) {
+exports.prependTraces = function prependTraces(gd, update, indices, maxPoints) {
     gd = Lib.getGraphDiv(gd);
 
-    var undo = spliceTraces(gd, update, indices, maxPoints,
+    function updateArray(target, insert, maxp) {
+        var newArray, remainder;
 
-                           /*
-                            * The Lengthen operation extends trace by appending insert to start
-                            */
-                            function(target, insert) {
-                                return insert.concat(target);
-                            },
+        if(Lib.isTypedArray(target)) {
+            if(maxp <= 0) {
+                var none = new target.constructor(0);
+                var both = concatTypedArray(insert, target);
 
-                            /*
-                             * Window the trace keeping maxPoints, counting forward from the start
-                             */
-                            function(target, maxPoints) {
-                                return target.splice(maxPoints, target.length);
-                            });
+                if(maxp < 0) {
+                    newArray = both;
+                    remainder = none;
+                } else {
+                    newArray = none;
+                    remainder = both;
+                }
+            } else {
+                newArray = new target.constructor(maxp);
+                remainder = new target.constructor(target.length + insert.length - maxp);
 
-    var promise = Plotly.redraw(gd);
+                if(maxp === insert.length) {
+                    newArray.set(insert);
+                    remainder.set(target);
+                } else if(maxp < insert.length) {
+                    var numberOfItemsFromInsert = insert.length - maxp;
 
+                    newArray.set(insert.subarray(0, numberOfItemsFromInsert));
+                    remainder.set(insert.subarray(numberOfItemsFromInsert));
+                    remainder.set(target, numberOfItemsFromInsert);
+                } else {
+                    var numberOfItemsFromTarget = maxp - insert.length;
+
+                    newArray.set(insert);
+                    newArray.set(target.subarray(0, numberOfItemsFromTarget), insert.length);
+                    remainder.set(target.subarray(numberOfItemsFromTarget));
+                }
+            }
+        } else {
+            newArray = insert.concat(target);
+            remainder = (maxp >= 0 && maxp < newArray.length) ?
+                newArray.splice(maxp, newArray.length) :
+                [];
+        }
+
+        return [newArray, remainder];
+    }
+
+    var undo = spliceTraces(gd, update, indices, maxPoints, updateArray);
+    var promise = exports.redraw(gd);
     var undoArgs = [gd, undo.update, indices, undo.maxPoints];
-    Queue.add(gd, Plotly.extendTraces, undoArgs, prependTraces, arguments);
+    Queue.add(gd, exports.extendTraces, undoArgs, prependTraces, arguments);
 
     return promise;
 };
@@ -43255,11 +44147,11 @@ Plotly.prependTraces = function prependTraces(gd, update, indices, maxPoints) {
  * @param {Number[]|Number} [newIndices=[gd.data.length]] Locations to add traces
  *
  */
-Plotly.addTraces = function addTraces(gd, traces, newIndices) {
+exports.addTraces = function addTraces(gd, traces, newIndices) {
     gd = Lib.getGraphDiv(gd);
 
     var currentIndices = [],
-        undoFunc = Plotly.deleteTraces,
+        undoFunc = exports.deleteTraces,
         redoFunc = addTraces,
         undoArgs = [gd, currentIndices],
         redoArgs = [gd, traces],  // no newIndices here
@@ -43294,7 +44186,7 @@ Plotly.addTraces = function addTraces(gd, traces, newIndices) {
     // if the user didn't define newIndices, they just want the traces appended
     // i.e., we can simply redraw and be done
     if(typeof newIndices === 'undefined') {
-        promise = Plotly.redraw(gd);
+        promise = exports.redraw(gd);
         Queue.add(gd, undoFunc, undoArgs, redoFunc, redoArgs);
         return promise;
     }
@@ -43320,7 +44212,7 @@ Plotly.addTraces = function addTraces(gd, traces, newIndices) {
     // this requires some extra work that moveTraces will do
     Queue.startSequence(gd);
     Queue.add(gd, undoFunc, undoArgs, redoFunc, redoArgs);
-    promise = Plotly.moveTraces(gd, currentIndices, newIndices);
+    promise = exports.moveTraces(gd, currentIndices, newIndices);
     Queue.stopSequence(gd);
     return promise;
 };
@@ -43332,11 +44224,11 @@ Plotly.addTraces = function addTraces(gd, traces, newIndices) {
  * @param {Object[]} gd.data The array of traces we're removing from
  * @param {Number|Number[]} indices The indices
  */
-Plotly.deleteTraces = function deleteTraces(gd, indices) {
+exports.deleteTraces = function deleteTraces(gd, indices) {
     gd = Lib.getGraphDiv(gd);
 
     var traces = [],
-        undoFunc = Plotly.addTraces,
+        undoFunc = exports.addTraces,
         redoFunc = deleteTraces,
         undoArgs = [gd, traces, indices],
         redoArgs = [gd, indices],
@@ -43361,7 +44253,7 @@ Plotly.deleteTraces = function deleteTraces(gd, indices) {
         traces.push(deletedTrace);
     }
 
-    var promise = Plotly.redraw(gd);
+    var promise = exports.redraw(gd);
     Queue.add(gd, undoFunc, undoArgs, redoFunc, redoArgs);
 
     return promise;
@@ -43398,7 +44290,7 @@ Plotly.deleteTraces = function deleteTraces(gd, indices) {
  *      // reorder all traces (assume there are 5--a, b, c, d, e)
  *      Plotly.moveTraces(gd, [b, d, e, a, c])  // same as 'move to end'
  */
-Plotly.moveTraces = function moveTraces(gd, currentIndices, newIndices) {
+exports.moveTraces = function moveTraces(gd, currentIndices, newIndices) {
     gd = Lib.getGraphDiv(gd);
 
     var newData = [],
@@ -43459,7 +44351,7 @@ Plotly.moveTraces = function moveTraces(gd, currentIndices, newIndices) {
 
     gd.data = newData;
 
-    var promise = Plotly.redraw(gd);
+    var promise = exports.redraw(gd);
     Queue.add(gd, undoFunc, undoArgs, redoFunc, redoArgs);
 
     return promise;
@@ -43495,7 +44387,7 @@ Plotly.moveTraces = function moveTraces(gd, currentIndices, newIndices) {
  * If the array is too short, it will wrap around (useful for
  * style files that want to specify cyclical default values).
  */
-Plotly.restyle = function restyle(gd, astr, val, _traces) {
+exports.restyle = function restyle(gd, astr, val, _traces) {
     gd = Lib.getGraphDiv(gd);
     helpers.clearPromiseQueue(gd);
 
@@ -43526,7 +44418,7 @@ Plotly.restyle = function restyle(gd, astr, val, _traces) {
     var seq = [];
 
     if(flags.fullReplot) {
-        seq.push(Plotly.plot);
+        seq.push(exports.plot);
     } else {
         seq.push(Plots.previousPromises);
 
@@ -43572,15 +44464,14 @@ function _restyle(gd, aobj, traces) {
     // for the undo / redo queue
     var redoit = {},
         undoit = {},
-        axlist,
-        flagAxForDelete = {};
+        axlist;
 
     // make a new empty vals array for undoit
     function a0() { return traces.map(function() { return undefined; }); }
 
     // for autoranging multiple axes
     function addToAxlist(axid) {
-        var axName = Plotly.Axes.id2name(axid);
+        var axName = Axes.id2name(axid);
         if(axlist.indexOf(axName) === -1) axlist.push(axName);
     }
 
@@ -43716,9 +44607,6 @@ function _restyle(gd, aobj, traces) {
                 } else if(Registry.traceIs(cont, 'cartesian')) {
                     Lib.nestedProperty(cont, 'marker.colors')
                         .set(Lib.nestedProperty(cont, 'marker.color').get());
-                    // look for axes that are no longer in use and delete them
-                    flagAxForDelete[cont.xaxis || 'x'] = true;
-                    flagAxForDelete[cont.yaxis || 'y'] = true;
                 }
             }
 
@@ -43758,7 +44646,9 @@ function _restyle(gd, aobj, traces) {
             else {
                 if(valObject) {
                     // must redo calcdata when restyling array values of arrayOk attributes
-                    if(valObject.arrayOk && (Array.isArray(newVal) || Array.isArray(oldVal))) {
+                    if(valObject.arrayOk && (
+                        Lib.isArrayOrTypedArray(newVal) || Lib.isArrayOrTypedArray(oldVal))
+                    ) {
                         flags.calc = true;
                     }
                     else editTypes.update(flags, valObject);
@@ -43780,7 +44670,7 @@ function _restyle(gd, aobj, traces) {
 
         // swap the data attributes of the relevant x and y axes?
         if(['swapxyaxes', 'orientationaxes'].indexOf(ai) !== -1) {
-            Plotly.Axes.swap(gd, traces);
+            Axes.swap(gd, traces);
         }
 
         // swap hovermode if set to "compare x/y data"
@@ -43817,32 +44707,12 @@ function _restyle(gd, aobj, traces) {
 
     // do we need to force a recalc?
     var autorangeOn = false;
-    var axList = Plotly.Axes.list(gd);
+    var axList = Axes.list(gd);
     for(i = 0; i < axList.length; i++) {
         if(axList[i].autorange) {
             autorangeOn = true;
             break;
         }
-    }
-
-    // check axes we've flagged for possible deletion
-    // flagAxForDelete is a hash so we can make sure we only get each axis once
-    var axListForDelete = Object.keys(flagAxForDelete);
-    axisLoop:
-    for(i = 0; i < axListForDelete.length; i++) {
-        var axId = axListForDelete[i],
-            axLetter = axId.charAt(0),
-            axAttr = axLetter + 'axis';
-
-        for(var j = 0; j < data.length; j++) {
-            if(Registry.traceIs(data[j], 'cartesian') &&
-                    (data[j][axAttr] || axLetter) === axId) {
-                continue axisLoop;
-            }
-        }
-
-        // no data on this axis - delete it.
-        doextra('LAYOUT' + Plotly.Axes.id2name(axId), null, 0);
     }
 
     // combine a few flags together;
@@ -43882,7 +44752,7 @@ function _restyle(gd, aobj, traces) {
  *  attribute object `{astr1: val1, astr2: val2 ...}`
  *  allows setting multiple attributes simultaneously
  */
-Plotly.relayout = function relayout(gd, astr, val) {
+exports.relayout = function relayout(gd, astr, val) {
     gd = Lib.getGraphDiv(gd);
     helpers.clearPromiseQueue(gd);
 
@@ -43907,6 +44777,7 @@ Plotly.relayout = function relayout(gd, astr, val) {
 
     // clear calcdata if required
     if(flags.calc) gd.calcdata = undefined;
+    if(flags.margins) helpers.clearAxisAutomargins(gd);
 
     // fill in redraw sequence
 
@@ -43948,7 +44819,7 @@ function _relayout(gd, aobj) {
     var layout = gd.layout,
         fullLayout = gd._fullLayout,
         keys = Object.keys(aobj),
-        axes = Plotly.Axes.list(gd),
+        axes = Axes.list(gd),
         arrayEdits = {},
         arrayStr,
         i,
@@ -43999,25 +44870,6 @@ function _relayout(gd, aobj) {
         if(val !== undefined) p.set(val);
     }
 
-    // for editing annotations or shapes - is it on autoscaled axes?
-    function refAutorange(obj, axLetter) {
-        if(!Lib.isPlainObject(obj)) return false;
-        var axRef = obj[axLetter + 'ref'] || axLetter,
-            ax = Plotly.Axes.getFromId(gd, axRef);
-
-        if(!ax && axRef.charAt(0) === axLetter) {
-            // fall back on the primary axis in case we've referenced a
-            // nonexistent axis (as we do above if axRef is missing).
-            // This assumes the object defaults to data referenced, which
-            // is the case for shapes and annotations but not for images.
-            // The only thing this is used for is to determine whether to
-            // do a full `recalc`, so the only ill effect of this error is
-            // to waste some time.
-            ax = Plotly.Axes.getFromId(gd, axLetter);
-        }
-        return (ax || {}).autorange;
-    }
-
     // for constraint enforcement: keep track of all axes (as {id: name})
     // we're editing the (auto)range of, so we can tell the others constrained
     // to scale with them that it's OK for them to shrink
@@ -44025,7 +44877,7 @@ function _relayout(gd, aobj) {
     var axId;
 
     function recordAlteredAxis(pleafPlus) {
-        var axId = axisIds.name2id(pleafPlus.split('.')[0]);
+        var axId = Axes.name2id(pleafPlus.split('.')[0]);
         rangesAltered[axId] = 1;
         return axId;
     }
@@ -44036,20 +44888,21 @@ function _relayout(gd, aobj) {
             throw new Error('cannot set ' + ai + 'and a parent attribute simultaneously');
         }
 
-        var p = Lib.nestedProperty(layout, ai),
-            vi = aobj[ai],
-            plen = p.parts.length,
-            // p.parts may end with an index integer if the property is an array
-            pend = typeof p.parts[plen - 1] === 'string' ? (plen - 1) : (plen - 2),
-            // last property in chain (leaf node)
-            pleaf = p.parts[pend],
-            // leaf plus immediate parent
-            pleafPlus = p.parts[pend - 1] + '.' + pleaf,
-            // trunk nodes (everything except the leaf)
-            ptrunk = p.parts.slice(0, pend).join('.'),
-            parentIn = Lib.nestedProperty(gd.layout, ptrunk).get(),
-            parentFull = Lib.nestedProperty(fullLayout, ptrunk).get(),
-            vOld = p.get();
+        var p = Lib.nestedProperty(layout, ai);
+        var vi = aobj[ai];
+        var plen = p.parts.length;
+        // p.parts may end with an index integer if the property is an array
+        var pend = plen - 1;
+        while(pend > 0 && typeof p.parts[plen - 1] !== 'string') { pend--; }
+        // last property in chain (leaf node)
+        var pleaf = p.parts[pend];
+        // leaf plus immediate parent
+        var pleafPlus = p.parts[pend - 1] + '.' + pleaf;
+        // trunk nodes (everything except the leaf)
+        var ptrunk = p.parts.slice(0, pend).join('.');
+        var parentIn = Lib.nestedProperty(gd.layout, ptrunk).get();
+        var parentFull = Lib.nestedProperty(fullLayout, ptrunk).get();
+        var vOld = p.get();
 
         if(vi === undefined) continue;
 
@@ -44211,7 +45064,7 @@ function _relayout(gd, aobj) {
                 else Lib.warn('unrecognized full object value', aobj);
             }
 
-            if(checkForAutorange && (refAutorange(objToAutorange, 'x') || refAutorange(objToAutorange, 'y'))) {
+            if(checkForAutorange && (refAutorange(gd, objToAutorange, 'x') || refAutorange(gd, objToAutorange, 'y'))) {
                 flags.calc = true;
             }
             else editTypes.update(flags, updateValObject);
@@ -44237,12 +45090,12 @@ function _relayout(gd, aobj) {
             else flags.plot = true;
         }
         else {
-            if((fullLayout._has('gl2d') || fullLayout._has('regl')) &&
+            if((fullLayout._has('scatter-like') && fullLayout._has('regl')) &&
                 (ai === 'dragmode' &&
                 (vi === 'lasso' || vi === 'select') &&
                 !(vOld === 'lasso' || vOld === 'select'))
             ) {
-                flags.calc = true;
+                flags.plot = true;
             }
             else if(valObject) editTypes.update(flags, valObject);
             else flags.calc = true;
@@ -44272,25 +45125,18 @@ function _relayout(gd, aobj) {
                 flags.calc = true;
                 for(var groupAxId in group) {
                     if(!rangesAltered[groupAxId]) {
-                        axisIds.getFromId(gd, groupAxId)._constraintShrinkable = true;
+                        Axes.getFromId(gd, groupAxId)._constraintShrinkable = true;
                     }
                 }
             }
         }
     }
 
-    var oldWidth = fullLayout.width,
-        oldHeight = fullLayout.height;
-
-    // calculate autosizing
-    if(gd.layout.autosize) Plots.plotAutoSize(gd, gd.layout, fullLayout);
-
-    // avoid unnecessary redraws
-    var hasSizechanged = aobj.height || aobj.width ||
-        (fullLayout.width !== oldWidth) ||
-        (fullLayout.height !== oldHeight);
-
-    if(hasSizechanged) flags.calc = true;
+    // If the autosize changed or height or width was explicitly specified,
+    // this triggers a redraw
+    // TODO: do we really need special aobj.height/width handling here?
+    // couldn't editType do this?
+    if(updateAutosize(gd) || aobj.height || aobj.width) flags.plot = true;
 
     if(flags.plot || flags.calc) {
         flags.layoutReplot = true;
@@ -44305,6 +45151,41 @@ function _relayout(gd, aobj) {
         redoit: redoit,
         eventData: Lib.extendDeep({}, redoit)
     };
+}
+
+/*
+ * updateAutosize: we made a change, does it change the autosize result?
+ * puts the new size into fullLayout
+ * returns true if either height or width changed
+ */
+function updateAutosize(gd) {
+    var fullLayout = gd._fullLayout;
+    var oldWidth = fullLayout.width;
+    var oldHeight = fullLayout.height;
+
+    // calculate autosizing
+    if(gd.layout.autosize) Plots.plotAutoSize(gd, gd.layout, fullLayout);
+
+    return (fullLayout.width !== oldWidth) || (fullLayout.height !== oldHeight);
+}
+
+// for editing annotations or shapes - is it on autoscaled axes?
+function refAutorange(gd, obj, axLetter) {
+    if(!Lib.isPlainObject(obj)) return false;
+    var axRef = obj[axLetter + 'ref'] || axLetter,
+        ax = Axes.getFromId(gd, axRef);
+
+    if(!ax && axRef.charAt(0) === axLetter) {
+        // fall back on the primary axis in case we've referenced a
+        // nonexistent axis (as we do above if axRef is missing).
+        // This assumes the object defaults to data referenced, which
+        // is the case for shapes and annotations but not for images.
+        // The only thing this is used for is to determine whether to
+        // do a full `recalc`, so the only ill effect of this error is
+        // to waste some time.
+        ax = Axes.getFromId(gd, axLetter);
+    }
+    return (ax || {}).autorange;
 }
 
 /**
@@ -44322,7 +45203,7 @@ function _relayout(gd, aobj) {
  *  integer or array of integers for the traces to alter (all if omitted)
  *
  */
-Plotly.update = function update(gd, traceUpdate, layoutUpdate, _traces) {
+exports.update = function update(gd, traceUpdate, layoutUpdate, _traces) {
     gd = Lib.getGraphDiv(gd);
     helpers.clearPromiseQueue(gd);
 
@@ -44347,6 +45228,7 @@ Plotly.update = function update(gd, traceUpdate, layoutUpdate, _traces) {
     // clear calcdata and/or axis types if required
     if(restyleFlags.clearCalc || relayoutFlags.calc) gd.calcdata = undefined;
     if(restyleFlags.clearAxisTypes) helpers.clearAxisTypes(gd, traces, layoutUpdate);
+    if(relayoutFlags.margins) helpers.clearAxisAutomargins(gd);
 
     // fill in redraw sequence
     var seq = [];
@@ -44360,10 +45242,10 @@ Plotly.update = function update(gd, traceUpdate, layoutUpdate, _traces) {
         gd.data = undefined;
         gd.layout = undefined;
 
-        seq.push(function() { return Plotly.plot(gd, data, layout); });
+        seq.push(function() { return exports.plot(gd, data, layout); });
     }
     else if(restyleFlags.fullReplot) {
-        seq.push(Plotly.plot);
+        seq.push(exports.plot);
     }
     else if(relayoutFlags.layoutReplot) {
         seq.push(subroutines.layoutReplot);
@@ -44402,6 +45284,416 @@ Plotly.update = function update(gd, traceUpdate, layoutUpdate, _traces) {
 };
 
 /**
+ * Plotly.react:
+ * A plot/update method that takes the full plot state (same API as plot/newPlot)
+ * and diffs to determine the minimal update pathway
+ *
+ * @param {string id or DOM element} gd
+ *      the id or DOM element of the graph container div
+ * @param {array of objects} data
+ *      array of traces, containing the data and display information for each trace
+ * @param {object} layout
+ *      object describing the overall display of the plot,
+ *      all the stuff that doesn't pertain to any individual trace
+ * @param {object} config
+ *      configuration options (see ./plot_config.js for more info)
+ *
+ * OR
+ *
+ * @param {string id or DOM element} gd
+ *      the id or DOM element of the graph container div
+ * @param {object} figure
+ *      object containing `data`, `layout`, `config`, and `frames` members
+ *
+ */
+exports.react = function(gd, data, layout, config) {
+    var frames, plotDone;
+
+    function addFrames() { return exports.addFrames(gd, frames); }
+
+    gd = Lib.getGraphDiv(gd);
+
+    var oldFullData = gd._fullData;
+    var oldFullLayout = gd._fullLayout;
+
+    // you can use this as the initial draw as well as to update
+    if(!Lib.isPlotDiv(gd) || !oldFullData || !oldFullLayout) {
+        plotDone = exports.newPlot(gd, data, layout, config);
+    }
+    else {
+
+        if(Lib.isPlainObject(data)) {
+            var obj = data;
+            data = obj.data;
+            layout = obj.layout;
+            config = obj.config;
+            frames = obj.frames;
+        }
+
+        var configChanged = false;
+        // assume that if there's a config at all, we're reacting to it too,
+        // and completely replace the previous config
+        if(config) {
+            var oldConfig = Lib.extendDeep({}, gd._context);
+            gd._context = undefined;
+            setPlotContext(gd, config);
+            configChanged = diffConfig(oldConfig, gd._context);
+        }
+
+        gd.data = data || [];
+        helpers.cleanData(gd.data, []);
+        gd.layout = layout || {};
+        helpers.cleanLayout(gd.layout);
+
+        Plots.supplyDefaults(gd);
+
+        var newFullData = gd._fullData;
+        var newFullLayout = gd._fullLayout;
+        var immutable = newFullLayout.datarevision === undefined;
+
+        var restyleFlags = diffData(gd, oldFullData, newFullData, immutable);
+        var relayoutFlags = diffLayout(gd, oldFullLayout, newFullLayout, immutable);
+
+        // TODO: how to translate this part of relayout to Plotly.react?
+        // // Setting width or height to null must reset the graph's width / height
+        // // back to its initial value as computed during the first pass in Plots.plotAutoSize.
+        // //
+        // // To do so, we must manually set them back here using the _initialAutoSize cache.
+        // if(['width', 'height'].indexOf(ai) !== -1 && vi === null) {
+        //     fullLayout[ai] = gd._initialAutoSize[ai];
+        // }
+
+        if(updateAutosize(gd)) relayoutFlags.layoutReplot = true;
+
+        // clear calcdata if required
+        if(restyleFlags.calc || relayoutFlags.calc) gd.calcdata = undefined;
+        if(relayoutFlags.margins) helpers.clearAxisAutomargins(gd);
+
+        // Note: what restyle/relayout use impliedEdits and clearAxisTypes for
+        // must be handled by the user when using Plotly.react.
+
+        // fill in redraw sequence
+        var seq = [];
+
+        if(frames) {
+            gd._transitionData = {};
+            Plots.createTransitionData(gd);
+            seq.push(addFrames);
+        }
+
+        if(restyleFlags.fullReplot || relayoutFlags.layoutReplot || configChanged) {
+            gd._fullLayout._skipDefaults = true;
+            seq.push(exports.plot);
+        }
+        else {
+            for(var componentType in relayoutFlags.arrays) {
+                var indices = relayoutFlags.arrays[componentType];
+                if(indices.length) {
+                    var drawOne = Registry.getComponentMethod(componentType, 'drawOne');
+                    if(drawOne !== Lib.noop) {
+                        for(var i = 0; i < indices.length; i++) {
+                            drawOne(gd, indices[i]);
+                        }
+                    }
+                    else {
+                        var draw = Registry.getComponentMethod(componentType, 'draw');
+                        if(draw === Lib.noop) {
+                            throw new Error('cannot draw components: ' + componentType);
+                        }
+                        draw(gd);
+                    }
+                }
+            }
+
+            seq.push(Plots.previousPromises);
+            if(restyleFlags.style) seq.push(subroutines.doTraceStyle);
+            if(restyleFlags.colorbars) seq.push(subroutines.doColorBars);
+            if(relayoutFlags.legend) seq.push(subroutines.doLegend);
+            if(relayoutFlags.layoutstyle) seq.push(subroutines.layoutStyles);
+            if(relayoutFlags.ticks) seq.push(subroutines.doTicksRelayout);
+            if(relayoutFlags.modebar) seq.push(subroutines.doModeBar);
+            if(relayoutFlags.camera) seq.push(subroutines.doCamera);
+        }
+
+        seq.push(Plots.rehover);
+
+        plotDone = Lib.syncOrAsync(seq, gd);
+        if(!plotDone || !plotDone.then) plotDone = Promise.resolve(gd);
+    }
+
+    return plotDone.then(function() {
+        gd.emit('plotly_react', {
+            data: data,
+            layout: layout
+        });
+
+        return gd;
+    });
+
+};
+
+function diffData(gd, oldFullData, newFullData, immutable) {
+    if(oldFullData.length !== newFullData.length) {
+        return {
+            fullReplot: true,
+            clearCalc: true
+        };
+    }
+
+    var flags = editTypes.traceFlags();
+    flags.arrays = {};
+    var i, trace;
+
+    function getTraceValObject(parts) {
+        return PlotSchema.getTraceValObject(trace, parts);
+    }
+
+    var diffOpts = {
+        getValObject: getTraceValObject,
+        flags: flags,
+        immutable: immutable,
+        gd: gd
+    };
+
+    for(i = 0; i < oldFullData.length; i++) {
+        trace = newFullData[i];
+        diffOpts.autoranged = trace.xaxis ? (
+            Axes.getFromId(gd, trace.xaxis).autorange ||
+            Axes.getFromId(gd, trace.yaxis).autorange
+        ) : false;
+        getDiffFlags(oldFullData[i], trace, [], diffOpts);
+    }
+
+    if(flags.calc || flags.plot || flags.calcIfAutorange) {
+        flags.fullReplot = true;
+    }
+
+    return flags;
+}
+
+function diffLayout(gd, oldFullLayout, newFullLayout, immutable) {
+    var flags = editTypes.layoutFlags();
+    flags.arrays = {};
+
+    function getLayoutValObject(parts) {
+        return PlotSchema.getLayoutValObject(newFullLayout, parts);
+    }
+
+    var diffOpts = {
+        getValObject: getLayoutValObject,
+        flags: flags,
+        immutable: immutable,
+        gd: gd
+    };
+
+    getDiffFlags(oldFullLayout, newFullLayout, [], diffOpts);
+
+    if(flags.plot || flags.calc) {
+        flags.layoutReplot = true;
+    }
+
+    return flags;
+}
+
+function getDiffFlags(oldContainer, newContainer, outerparts, opts) {
+    var valObject, key;
+
+    var getValObject = opts.getValObject;
+    var flags = opts.flags;
+    var immutable = opts.immutable;
+    var inArray = opts.inArray;
+    var arrayIndex = opts.arrayIndex;
+    var gd = opts.gd;
+    var autoranged = opts.autoranged;
+
+    function changed() {
+        var editType = valObject.editType;
+        if(editType.indexOf('calcIfAutorange') !== -1 && (autoranged || (autoranged === undefined && (
+            refAutorange(gd, newContainer, 'x') || refAutorange(gd, newContainer, 'y')
+        )))) {
+            flags.calc = true;
+            return;
+        }
+        if(inArray && editType.indexOf('arraydraw') !== -1) {
+            Lib.pushUnique(flags.arrays[inArray], arrayIndex);
+            return;
+        }
+        editTypes.update(flags, valObject);
+    }
+
+    function valObjectCanBeDataArray(valObject) {
+        return valObject.valType === 'data_array' || valObject.arrayOk;
+    }
+
+    // for transforms: look at _fullInput rather than the transform result, which often
+    // contains generated arrays.
+    var newFullInput = newContainer._fullInput;
+    var oldFullInput = oldContainer._fullInput;
+    if(newFullInput && newFullInput !== newContainer) newContainer = newFullInput;
+    if(oldFullInput && oldFullInput !== oldContainer) oldContainer = oldFullInput;
+
+    for(key in oldContainer) {
+        // short-circuit based on previous calls or previous keys that already maximized the pathway
+        if(flags.calc) return;
+
+        var oldVal = oldContainer[key];
+        var newVal = newContainer[key];
+
+        if(key.charAt(0) === '_' || typeof oldVal === 'function' || oldVal === newVal) continue;
+
+        // FIXME: ax.tick0 and dtick get filled in during plotting, and unlike other auto values
+        // they don't make it back into the input, so newContainer won't have them.
+        // similar for axis ranges for 3D
+        // contourcarpet doesn't HAVE zmin/zmax, they're just auto-added. It needs them.
+        if(key === 'tick0' || key === 'dtick') {
+            var tickMode = newContainer.tickmode;
+            if(tickMode === 'auto' || tickMode === 'array' || !tickMode) continue;
+        }
+        if(key === 'range' && newContainer.autorange) continue;
+        if((key === 'zmin' || key === 'zmax') && newContainer.type === 'contourcarpet') continue;
+
+        var parts = outerparts.concat(key);
+        valObject = getValObject(parts);
+
+        // in case type changed, we may not even *have* a valObject.
+        if(!valObject) continue;
+
+        var valType = valObject.valType;
+        var i;
+
+        var canBeDataArray = valObjectCanBeDataArray(valObject);
+        var wasArray = Array.isArray(oldVal);
+        var nowArray = Array.isArray(newVal);
+
+        // hack for traces that modify the data in supplyDefaults, like
+        // converting 1D to 2D arrays, which will always create new objects
+        if(wasArray && nowArray) {
+            var inputKey = '_input_' + key;
+            var oldValIn = oldContainer[inputKey];
+            var newValIn = newContainer[inputKey];
+            if(Array.isArray(oldValIn) && oldValIn === newValIn) continue;
+        }
+
+        if(newVal === undefined) {
+            if(canBeDataArray && wasArray) flags.calc = true;
+            else changed();
+        }
+        else if(valObject._isLinkedToArray) {
+            var arrayEditIndices = [];
+            var extraIndices = false;
+            if(!inArray) flags.arrays[key] = arrayEditIndices;
+
+            var minLen = Math.min(oldVal.length, newVal.length);
+            var maxLen = Math.max(oldVal.length, newVal.length);
+            if(minLen !== maxLen) {
+                if(valObject.editType === 'arraydraw') {
+                    extraIndices = true;
+                }
+                else {
+                    changed();
+                    continue;
+                }
+            }
+
+            for(i = 0; i < minLen; i++) {
+                getDiffFlags(oldVal[i], newVal[i], parts.concat(i),
+                    // add array indices, but not if we're already in an array
+                    Lib.extendFlat({inArray: key, arrayIndex: i}, opts));
+            }
+
+            // put this at the end so that we know our collected array indices are sorted
+            // but the check for length changes happens up front so we can short-circuit
+            // diffing if appropriate
+            if(extraIndices) {
+                for(i = minLen; i < maxLen; i++) {
+                    arrayEditIndices.push(i);
+                }
+            }
+        }
+        else if(!valType && Lib.isPlainObject(oldVal)) {
+            getDiffFlags(oldVal, newVal, parts, opts);
+        }
+        else if(canBeDataArray) {
+            if(wasArray && nowArray) {
+
+                // don't try to diff two data arrays. If immutable we know the data changed,
+                // if not, assume it didn't and let `layout.datarevision` tell us if it did
+                if(immutable) {
+                    flags.calc = true;
+                }
+            }
+            else if(wasArray !== nowArray) {
+                flags.calc = true;
+            }
+            else changed();
+        }
+        else if(wasArray && nowArray) {
+            // info array, colorscale, 'any' - these are short, just stringify.
+            // I don't *think* that covers up any real differences post-validation, does it?
+            // otherwise we need to dive in 1 (info_array) or 2 (colorscale) levels and compare
+            // all elements.
+            if(oldVal.length !== newVal.length || String(oldVal) !== String(newVal)) {
+                changed();
+            }
+        }
+        else {
+            changed();
+        }
+    }
+
+    for(key in newContainer) {
+        if(!(key in oldContainer || key.charAt(0) === '_' || typeof newContainer[key] === 'function')) {
+            valObject = getValObject(outerparts.concat(key));
+
+            if(valObjectCanBeDataArray(valObject) && Array.isArray(newContainer[key])) {
+                flags.calc = true;
+                return;
+            }
+            else changed();
+        }
+    }
+}
+
+/*
+ * simple diff for config - for now, just treat all changes as equivalent
+ */
+function diffConfig(oldConfig, newConfig) {
+    var key;
+
+    for(key in oldConfig) {
+        var oldVal = oldConfig[key];
+        var newVal = newConfig[key];
+        if(oldVal !== newVal) {
+            if(Lib.isPlainObject(oldVal) && Lib.isPlainObject(newVal)) {
+                if(diffConfig(oldVal, newVal)) {
+                    return true;
+                }
+            }
+            else if(Array.isArray(oldVal) && Array.isArray(newVal)) {
+                if(oldVal.length !== newVal.length) {
+                    return true;
+                }
+                for(var i = 0; i < oldVal.length; i++) {
+                    if(oldVal[i] !== newVal[i]) {
+                        if(Lib.isPlainObject(oldVal[i]) && Lib.isPlainObject(newVal[i])) {
+                            if(diffConfig(oldVal[i], newVal[i])) {
+                                return true;
+                            }
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                }
+            }
+            else {
+                return true;
+            }
+        }
+    }
+}
+
+/**
  * Animate to a frame, sequence of frame, frame group, or frame definition
  *
  * @param {string id or DOM element} gd
@@ -44428,7 +45720,7 @@ Plotly.update = function update(gd, traceUpdate, layoutUpdate, _traces) {
  * @param {object} animationOpts
  *      configuration for the animation
  */
-Plotly.animate = function(gd, frameOrGroupNameOrFrameList, animationOpts) {
+exports.animate = function(gd, frameOrGroupNameOrFrameList, animationOpts) {
     gd = Lib.getGraphDiv(gd);
 
     if(!Lib.isPlotDiv(gd)) {
@@ -44787,15 +46079,13 @@ Plotly.animate = function(gd, frameOrGroupNameOrFrameList, animationOpts) {
  *      - traces {array} trace indices
  *      - baseframe {string} name of frame from which this frame gets defaults
  *
- *  @param {array of integers) indices
+ *  @param {array of integers} indices
  *      an array of integer indices matching the respective frames in `frameList`. If not
  *      provided, an index will be provided in serial order. If already used, the frame
  *      will be overwritten.
  */
-Plotly.addFrames = function(gd, frameList, indices) {
+exports.addFrames = function(gd, frameList, indices) {
     gd = Lib.getGraphDiv(gd);
-
-    var numericNameWarningCount = 0;
 
     if(frameList === null || frameList === undefined) {
         return Promise.resolve();
@@ -44811,7 +46101,7 @@ Plotly.addFrames = function(gd, frameList, indices) {
 
     var i, frame, j, idx;
     var _frames = gd._transitionData._frames;
-    var _hash = gd._transitionData._frameHash;
+    var _frameHash = gd._transitionData._frameHash;
 
 
     if(!Array.isArray(frameList)) {
@@ -44826,27 +46116,34 @@ Plotly.addFrames = function(gd, frameList, indices) {
     var bigIndex = _frames.length + frameList.length * 2;
 
     var insertions = [];
+    var _frameHashLocal = {};
     for(i = frameList.length - 1; i >= 0; i--) {
         if(!Lib.isPlainObject(frameList[i])) continue;
 
-        var name = (_hash[frameList[i].name] || {}).name;
+        // The entire logic for checking for this type of name collision can be removed once we migrate to ES6 and
+        // use a Map instead of an Object instance, as Map keys aren't converted to strings.
+        var lookupName = frameList[i].name;
+        var name = (_frameHash[lookupName] || _frameHashLocal[lookupName] || {}).name;
         var newName = frameList[i].name;
+        var collisionPresent = _frameHash[name] || _frameHashLocal[name];
 
-        if(name && newName && typeof newName === 'number' && _hash[name]) {
+        if(name && newName && typeof newName === 'number' && collisionPresent && numericNameWarningCount < numericNameWarningCountLimit) {
             numericNameWarningCount++;
 
-            Lib.warn('addFrames: overwriting frame "' + _hash[name].name +
+            Lib.warn('addFrames: overwriting frame "' + (_frameHash[name] || _frameHashLocal[name]).name +
                 '" with a frame whose name of type "number" also equates to "' +
                 name + '". This is valid but may potentially lead to unexpected ' +
                 'behavior since all plotly.js frame names are stored internally ' +
                 'as strings.');
 
-            if(numericNameWarningCount > 5) {
-                Lib.warn('addFrames: This API call has yielded too many warnings. ' +
+            if(numericNameWarningCount === numericNameWarningCountLimit) {
+                Lib.warn('addFrames: This API call has yielded too many of these warnings. ' +
                     'For the rest of this call, further warnings about numeric frame ' +
                     'names will be suppressed.');
             }
         }
+
+        _frameHashLocal[lookupName] = {name: lookupName};
 
         insertions.push({
             frame: Plots.supplyFrameDefaults(frameList[i]),
@@ -44877,10 +46174,10 @@ Plotly.addFrames = function(gd, frameList, indices) {
         if(!frame.name) {
             // Repeatedly assign a default name, incrementing the counter each time until
             // we get a name that's not in the hashed lookup table:
-            while(_hash[(frame.name = 'frame ' + gd._transitionData._counter++)]);
+            while(_frameHash[(frame.name = 'frame ' + gd._transitionData._counter++)]);
         }
 
-        if(_hash[frame.name]) {
+        if(_frameHash[frame.name]) {
             // If frame is present, overwrite its definition:
             for(j = 0; j < _frames.length; j++) {
                 if((_frames[j] || {}).name === frame.name) break;
@@ -44916,7 +46213,7 @@ Plotly.addFrames = function(gd, frameList, indices) {
  * @param {array of integers} frameList
  *      list of integer indices of frames to be deleted
  */
-Plotly.deleteFrames = function(gd, frameList) {
+exports.deleteFrames = function(gd, frameList) {
     gd = Lib.getGraphDiv(gd);
 
     if(!Lib.isPlotDiv(gd)) {
@@ -44960,7 +46257,7 @@ Plotly.deleteFrames = function(gd, frameList) {
  * @param {string id or DOM element} gd
  *      the id or DOM element of the graph container div
  */
-Plotly.purge = function purge(gd) {
+exports.purge = function purge(gd) {
     gd = Lib.getGraphDiv(gd);
 
     var fullLayout = gd._fullLayout || {},
@@ -45107,7 +46404,7 @@ function makePlotFramework(gd) {
     gd.emit('plotly_framework');
 }
 
-},{"../components/color":35,"../components/drawing":60,"../components/errorbars":66,"../constants/xmlns_namespaces":137,"../lib":152,"../lib/events":145,"../lib/queue":166,"../lib/svg_text_utils":173,"../plotly":190,"../plots/cartesian/axis_ids":198,"../plots/cartesian/constants":200,"../plots/cartesian/constraints":202,"../plots/cartesian/graph_interact":204,"../plots/plots":227,"../plots/polar/legacy":230,"../registry":234,"./edit_types":179,"./helpers":180,"./manage_arrays":181,"./plot_schema":184,"./subroutines":187,"d3":3,"fast-isnumeric":5,"has-hover":7}],183:[function(require,module,exports){
+},{"../components/color":36,"../components/drawing":61,"../constants/xmlns_namespaces":140,"../lib":155,"../lib/events":148,"../lib/queue":169,"../lib/svg_text_utils":176,"../plots/cartesian/autorange":196,"../plots/cartesian/axes":197,"../plots/cartesian/constants":202,"../plots/cartesian/constraints":204,"../plots/cartesian/graph_interact":206,"../plots/plots":230,"../plots/polar/legacy":233,"../registry":237,"./edit_types":182,"./helpers":183,"./manage_arrays":185,"./plot_config":187,"./plot_schema":188,"./subroutines":189,"d3":3,"fast-isnumeric":5,"has-hover":7}],187:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -45294,7 +46591,7 @@ module.exports = {
     locales: {}
 };
 
-},{}],184:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -45488,7 +46785,7 @@ exports.findArrayAttributes = function(trace) {
 
         var astr = toAttrString(stack);
         var val = Lib.nestedProperty(trace, astr).get();
-        if(!Array.isArray(val)) return;
+        if(!Lib.isArrayOrTypedArray(val)) return;
 
         arrayAttributes.push(astr);
     }
@@ -45680,7 +46977,8 @@ function recurseIntoValObject(valObject, parts, i) {
     }
 
     // now recurse as far as we can. Occasionally we have an attribute
-    // setting an internal part below what's
+    // setting an internal part below what's in the schema; just return
+    // the innermost schema item we find.
     for(; i < parts.length; i++) {
         var newValObject = valObject[parts[i]];
         if(Lib.isPlainObject(newValObject)) valObject = newValObject;
@@ -45695,8 +46993,23 @@ function recurseIntoValObject(valObject, parts, i) {
         else if(valObject.valType === 'info_array') {
             i++;
             var index = parts[i];
-            if(!isIndex(index) || index >= valObject.items.length) return false;
-            valObject = valObject.items[index];
+            if(!isIndex(index)) return false;
+
+            var items = valObject.items;
+            if(Array.isArray(items)) {
+                if(index >= items.length) return false;
+                if(valObject.dimensions === 2) {
+                    i++;
+                    if(parts.length === i) return valObject;
+                    var index2 = parts[i];
+                    if(!isIndex(index2)) return false;
+                    valObject = items[index][index2];
+                }
+                else valObject = items[index];
+            }
+            else {
+                valObject = items;
+            }
         }
     }
 
@@ -45930,7 +47243,7 @@ function insertAttrs(baseAttrs, newAttrs, astr) {
     np.set(extendDeepAll(np.get() || {}, newAttrs));
 }
 
-},{"../lib":152,"../plots/animation_attributes":191,"../plots/attributes":193,"../plots/frame_attributes":222,"../plots/layout_attributes":225,"../plots/polar/legacy/area_attributes":228,"../plots/polar/legacy/axis_attributes":229,"../registry":234,"./edit_types":179}],185:[function(require,module,exports){
+},{"../lib":155,"../plots/animation_attributes":192,"../plots/attributes":194,"../plots/frame_attributes":225,"../plots/layout_attributes":228,"../plots/polar/legacy/area_attributes":231,"../plots/polar/legacy/axis_attributes":232,"../registry":237,"./edit_types":182}],189:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -45938,141 +47251,10 @@ function insertAttrs(baseAttrs, newAttrs, astr) {
 * This source code is licensed under the MIT license found in the
 * LICENSE file in the root directory of this source tree.
 */
-
-'use strict';
-
-var Registry = require('../registry');
-var Lib = require('../lib');
-
-
-module.exports = function register(_modules) {
-    if(!_modules) {
-        throw new Error('No argument passed to Plotly.register.');
-    }
-    else if(_modules && !Array.isArray(_modules)) {
-        _modules = [_modules];
-    }
-
-    for(var i = 0; i < _modules.length; i++) {
-        var newModule = _modules[i];
-
-        if(!newModule) {
-            throw new Error('Invalid module was attempted to be registered!');
-        }
-
-        switch(newModule.moduleType) {
-            case 'trace':
-                registerTraceModule(newModule);
-                break;
-
-            case 'transform':
-                registerTransformModule(newModule);
-                break;
-
-            case 'component':
-                registerComponentModule(newModule);
-                break;
-
-            case 'locale':
-                Registry.registerLocale(newModule);
-                break;
-
-            default:
-                throw new Error('Invalid module was attempted to be registered!');
-        }
-    }
-};
-
-function registerTraceModule(newModule) {
-    Registry.register(newModule, newModule.name, newModule.categories, newModule.meta);
-
-    if(!Registry.subplotsRegistry[newModule.basePlotModule.name]) {
-        Registry.registerSubplot(newModule.basePlotModule);
-    }
-}
-
-function registerTransformModule(newModule) {
-    if(typeof newModule.name !== 'string') {
-        throw new Error('Transform module *name* must be a string.');
-    }
-
-    var prefix = 'Transform module ' + newModule.name;
-
-    var hasTransform = typeof newModule.transform === 'function',
-        hasCalcTransform = typeof newModule.calcTransform === 'function';
-
-
-    if(!hasTransform && !hasCalcTransform) {
-        throw new Error(prefix + ' is missing a *transform* or *calcTransform* method.');
-    }
-
-    if(hasTransform && hasCalcTransform) {
-        Lib.log([
-            prefix + ' has both a *transform* and *calcTransform* methods.',
-            'Please note that all *transform* methods are executed',
-            'before all *calcTransform* methods.'
-        ].join(' '));
-    }
-
-    if(!Lib.isPlainObject(newModule.attributes)) {
-        Lib.log(prefix + ' registered without an *attributes* object.');
-    }
-
-    if(typeof newModule.supplyDefaults !== 'function') {
-        Lib.log(prefix + ' registered without a *supplyDefaults* method.');
-    }
-
-    Registry.registerTransform(newModule);
-}
-
-function registerComponentModule(newModule) {
-    if(typeof newModule.name !== 'string') {
-        throw new Error('Component module *name* must be a string.');
-    }
-
-    Registry.registerComponent(newModule);
-}
-
-},{"../lib":152,"../registry":234}],186:[function(require,module,exports){
-/**
-* Copyright 2012-2018, Plotly, Inc.
-* All rights reserved.
-*
-* This source code is licensed under the MIT license found in the
-* LICENSE file in the root directory of this source tree.
-*/
-
-
-'use strict';
-
-var Plotly = require('../plotly');
-var Lib = require('../lib');
-
-/**
- * Extends the plot config
- *
- * @param {object} configObj partial plot configuration object
- *      to extend the current plot configuration.
- *
- */
-module.exports = function setPlotConfig(configObj) {
-    return Lib.extendFlat(Plotly.defaultConfig, configObj);
-};
-
-},{"../lib":152,"../plotly":190}],187:[function(require,module,exports){
-/**
-* Copyright 2012-2018, Plotly, Inc.
-* All rights reserved.
-*
-* This source code is licensed under the MIT license found in the
-* LICENSE file in the root directory of this source tree.
-*/
-
 
 'use strict';
 
 var d3 = require('d3');
-var Plotly = require('../plotly');
 var Registry = require('../registry');
 var Plots = require('../plots/plots');
 var Lib = require('../lib');
@@ -46081,6 +47263,7 @@ var Color = require('../components/color');
 var Drawing = require('../components/drawing');
 var Titles = require('../components/titles');
 var ModeBar = require('../components/modebar');
+var Axes = require('../plots/cartesian/axes');
 var initInteractions = require('../plots/cartesian/graph_interact');
 var cartesianConstants = require('../plots/cartesian/constants');
 var alignmentConstants = require('../constants/alignment');
@@ -46108,7 +47291,7 @@ exports.lsInner = function(gd) {
     var fullLayout = gd._fullLayout;
     var gs = fullLayout._size;
     var pad = gs.p;
-    var axList = Plotly.Axes.list(gd);
+    var axList = Axes.list(gd);
 
     // _has('cartesian') means SVG specifically, not GL2D - but GL2D
     // can still get here because it makes some of the SVG structure
@@ -46278,7 +47461,7 @@ exports.lsInner = function(gd) {
 
         for(i = 0; i < cartesianConstants.traceLayerClasses.length; i++) {
             var layer = cartesianConstants.traceLayerClasses[i];
-            if(layer !== 'scatterlayer') {
+            if(layer !== 'scatterlayer' && layer !== 'barlayer') {
                 plotinfo.plot.selectAll('g.' + layer).call(Drawing.setClipUrl, layerClipId);
             }
         }
@@ -46334,6 +47517,7 @@ exports.lsInner = function(gd) {
          *    -----
          *     x2
          */
+        var xPath = 'M0,0';
         if(shouldShowLinesOrTicks(xa, subplot)) {
             leftYLineWidth = findCounterAxisLineWidth(xa, 'left', ya, axList);
             xLinesXLeft = xa._offset - (leftYLineWidth ? (pad + leftYLineWidth) : 0);
@@ -46350,17 +47534,17 @@ exports.lsInner = function(gd) {
                 xa._linepositions[subplot] = [xLinesYBottom, xLinesYTop];
             }
 
-            var xPath = mainPath(xa, xLinePath, xLinePathFree);
+            xPath = mainPath(xa, xLinePath, xLinePathFree);
             if(extraSubplot && xa.showline && (xa.mirror === 'all' || xa.mirror === 'allticks')) {
                 xPath += xLinePath(xLinesYBottom) + xLinePath(xLinesYTop);
             }
 
             plotinfo.xlines
-                .attr('d', xPath || 'M0,0')
                 .style('stroke-width', xa._lw + 'px')
                 .call(Color.stroke, xa.showline ?
                     xa.linecolor : 'rgba(0,0,0,0)');
         }
+        plotinfo.xlines.attr('d', xPath);
 
         /*
          * y lines that meet x axes get longer only by margin.pad, because
@@ -46373,6 +47557,7 @@ exports.lsInner = function(gd) {
          *       |
          *       +-----
          */
+        var yPath = 'M0,0';
         if(shouldShowLinesOrTicks(ya, subplot)) {
             connectYBottom = findCounterAxisLineWidth(ya, 'bottom', xa, axList);
             yLinesYBottom = ya._offset + ya._length + (connectYBottom ? pad : 0);
@@ -46386,20 +47571,20 @@ exports.lsInner = function(gd) {
                 ya._linepositions[subplot] = [yLinesXLeft, yLinesXRight];
             }
 
-            var yPath = mainPath(ya, yLinePath, yLinePathFree);
+            yPath = mainPath(ya, yLinePath, yLinePathFree);
             if(extraSubplot && ya.showline && (ya.mirror === 'all' || ya.mirror === 'allticks')) {
                 yPath += yLinePath(yLinesXLeft) + yLinePath(yLinesXRight);
             }
 
             plotinfo.ylines
-                .attr('d', yPath || 'M0,0')
                 .style('stroke-width', ya._lw + 'px')
                 .call(Color.stroke, ya.showline ?
                     ya.linecolor : 'rgba(0,0,0,0)');
         }
+        plotinfo.ylines.attr('d', yPath);
     });
 
-    Plotly.Axes.makeClipPaths(gd);
+    Axes.makeClipPaths(gd);
     exports.drawMainTitle(gd);
     ModeBar.manage(gd);
 
@@ -46522,7 +47707,7 @@ exports.doColorBars = function(gd) {
 exports.layoutReplot = function(gd) {
     var layout = gd.layout;
     gd.layout = undefined;
-    return Plotly.plot(gd, '', layout);
+    return Registry.call('plot', gd, '', layout);
 };
 
 exports.doLegend = function(gd) {
@@ -46531,7 +47716,7 @@ exports.doLegend = function(gd) {
 };
 
 exports.doTicksRelayout = function(gd) {
-    Plotly.Axes.doTicks(gd, 'redraw');
+    Axes.doTicks(gd, 'redraw');
     exports.drawMainTitle(gd);
     return Plots.previousPromises(gd);
 };
@@ -46562,7 +47747,7 @@ exports.doCamera = function(gd) {
     }
 };
 
-},{"../components/color":35,"../components/drawing":60,"../components/modebar":97,"../components/titles":126,"../constants/alignment":133,"../lib":152,"../plotly":190,"../plots/cartesian/constants":200,"../plots/cartesian/graph_interact":204,"../plots/plots":227,"../registry":234,"d3":3}],188:[function(require,module,exports){
+},{"../components/color":36,"../components/drawing":61,"../components/modebar":99,"../components/titles":129,"../constants/alignment":136,"../lib":155,"../plots/cartesian/axes":197,"../plots/cartesian/constants":202,"../plots/cartesian/graph_interact":206,"../plots/plots":230,"../registry":237,"d3":3}],190:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -46573,7 +47758,7 @@ exports.doCamera = function(gd) {
 
 'use strict';
 
-var Plotly = require('../plotly');
+var plotApi = require('./plot_api');
 var Lib = require('../lib');
 
 var helpers = require('../snapshot/helpers');
@@ -46720,7 +47905,7 @@ function toImage(gd, opts) {
             var width = clonedGd._fullLayout.width;
             var height = clonedGd._fullLayout.height;
 
-            Plotly.purge(clonedGd);
+            plotApi.purge(clonedGd);
             document.body.removeChild(clonedGd);
 
             if(format === 'svg') {
@@ -46761,7 +47946,7 @@ function toImage(gd, opts) {
     }
 
     return new Promise(function(resolve, reject) {
-        Plotly.plot(clonedGd, data, layoutImage, configImage)
+        plotApi.plot(clonedGd, data, layoutImage, configImage)
             .then(redrawFunc)
             .then(wait)
             .then(convert)
@@ -46772,7 +47957,7 @@ function toImage(gd, opts) {
 
 module.exports = toImage;
 
-},{"../lib":152,"../plotly":190,"../snapshot/helpers":238,"../snapshot/svgtoimg":240,"../snapshot/tosvg":242}],189:[function(require,module,exports){
+},{"../lib":155,"../snapshot/helpers":241,"../snapshot/svgtoimg":243,"../snapshot/tosvg":245,"./plot_api":186}],191:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -46781,9 +47966,7 @@ module.exports = toImage;
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
-
 
 var Lib = require('../lib');
 var Plots = require('../plots/plots');
@@ -46792,7 +47975,7 @@ var dfltConfig = require('./plot_config');
 
 var isPlainObject = Lib.isPlainObject;
 var isArray = Array.isArray;
-
+var isArrayOrTypedArray = Lib.isArrayOrTypedArray;
 
 /**
  * Validate a data array and layout object.
@@ -46939,9 +48122,10 @@ function crawl(objIn, objOut, schema, list, base, path) {
         var valIn = objIn[k],
             valOut = objOut[k];
 
-        var nestedSchema = getNestedSchema(schema, k),
-            isInfoArray = (nestedSchema || {}).valType === 'info_array',
-            isColorscale = (nestedSchema || {}).valType === 'colorscale';
+        var nestedSchema = getNestedSchema(schema, k);
+        var isInfoArray = (nestedSchema || {}).valType === 'info_array';
+        var isColorscale = (nestedSchema || {}).valType === 'colorscale';
+        var items = (nestedSchema || {}).items;
 
         if(!isInSchema(schema, k)) {
             list.push(format('schema', base, p));
@@ -46949,9 +48133,54 @@ function crawl(objIn, objOut, schema, list, base, path) {
         else if(isPlainObject(valIn) && isPlainObject(valOut)) {
             crawl(valIn, valOut, nestedSchema, list, base, p);
         }
+        else if(isInfoArray && isArray(valIn)) {
+            if(valIn.length > valOut.length) {
+                list.push(format('unused', base, p.concat(valOut.length)));
+            }
+            var len = valOut.length;
+            var arrayItems = Array.isArray(items);
+            if(arrayItems) len = Math.min(len, items.length);
+            var m, n, item, valInPart, valOutPart;
+            if(nestedSchema.dimensions === 2) {
+                for(n = 0; n < len; n++) {
+                    if(isArray(valIn[n])) {
+                        if(valIn[n].length > valOut[n].length) {
+                            list.push(format('unused', base, p.concat(n, valOut[n].length)));
+                        }
+                        var len2 = valOut[n].length;
+                        for(m = 0; m < (arrayItems ? Math.min(len2, items[n].length) : len2); m++) {
+                            item = arrayItems ? items[n][m] : items;
+                            valInPart = valIn[n][m];
+                            valOutPart = valOut[n][m];
+                            if(!Lib.validate(valInPart, item)) {
+                                list.push(format('value', base, p.concat(n, m), valInPart));
+                            }
+                            else if(valOutPart !== valInPart && valOutPart !== +valInPart) {
+                                list.push(format('dynamic', base, p.concat(n, m), valInPart, valOutPart));
+                            }
+                        }
+                    }
+                    else {
+                        list.push(format('array', base, p.concat(n), valIn[n]));
+                    }
+                }
+            }
+            else {
+                for(n = 0; n < len; n++) {
+                    item = arrayItems ? items[n] : items;
+                    valInPart = valIn[n];
+                    valOutPart = valOut[n];
+                    if(!Lib.validate(valInPart, item)) {
+                        list.push(format('value', base, p.concat(n), valInPart));
+                    }
+                    else if(valOutPart !== valInPart && valOutPart !== +valInPart) {
+                        list.push(format('dynamic', base, p.concat(n), valInPart, valOutPart));
+                    }
+                }
+            }
+        }
         else if(nestedSchema.items && !isInfoArray && isArray(valIn)) {
-            var items = nestedSchema.items,
-                _nestedSchema = items[Object.keys(items)[0]],
+            var _nestedSchema = items[Object.keys(items)[0]],
                 indexList = [];
 
             var j, _p;
@@ -46986,7 +48215,7 @@ function crawl(objIn, objOut, schema, list, base, path) {
         else if(!isPlainObject(valIn) && isPlainObject(valOut)) {
             list.push(format('object', base, p, valIn));
         }
-        else if(!isArray(valIn) && isArray(valOut) && !isInfoArray && !isColorscale) {
+        else if(!isArrayOrTypedArray(valIn) && isArrayOrTypedArray(valOut) && !isInfoArray && !isColorscale) {
             list.push(format('array', base, p, valIn));
         }
         else if(!(k in objOut)) {
@@ -47158,41 +48387,7 @@ function convertPathToAttributeString(path) {
     return astr;
 }
 
-},{"../lib":152,"../plots/plots":227,"./plot_config":183,"./plot_schema":184}],190:[function(require,module,exports){
-/**
-* Copyright 2012-2018, Plotly, Inc.
-* All rights reserved.
-*
-* This source code is licensed under the MIT license found in the
-* LICENSE file in the root directory of this source tree.
-*/
-
-'use strict';
-
-/*
- * Pack internal modules unto an object.
- *
- * This object is require'ed in as 'Plotly' in numerous src and test files.
- * Require'ing 'Plotly' bypasses circular dependencies.
- *
- * Future development should move away from this pattern.
- *
- */
-
-// configuration
-exports.defaultConfig = require('./plot_api/plot_config');
-
-// plots
-exports.Plots = require('./plots/plots');
-exports.Axes = require('./plots/cartesian/axes');
-
-// components
-exports.ModeBar = require('./components/modebar');
-
-// plot api
-require('./plot_api/plot_api');
-
-},{"./components/modebar":97,"./plot_api/plot_api":182,"./plot_api/plot_config":183,"./plots/cartesian/axes":195,"./plots/plots":227}],191:[function(require,module,exports){
+},{"../lib":155,"../plots/plots":230,"./plot_config":187,"./plot_schema":188}],192:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -47316,7 +48511,7 @@ module.exports = {
     }
 };
 
-},{}],192:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -47328,7 +48523,6 @@ module.exports = {
 'use strict';
 
 var Lib = require('../lib');
-
 
 /** Convenience wrapper for making array container logic DRY and consistent
  *
@@ -47365,7 +48559,7 @@ module.exports = function handleArrayContainerDefaults(parentObjIn, parentObjOut
 
     var previousContOut = parentObjOut[name];
 
-    var contIn = Lib.isArray(parentObjIn[name]) ? parentObjIn[name] : [],
+    var contIn = Lib.isArrayOrTypedArray(parentObjIn[name]) ? parentObjIn[name] : [],
         contOut = parentObjOut[name] = [],
         i;
 
@@ -47389,7 +48583,7 @@ module.exports = function handleArrayContainerDefaults(parentObjIn, parentObjOut
 
     // in case this array gets its defaults rebuilt independent of the whole layout,
     // relink the private keys just for this array.
-    if(Lib.isArray(previousContOut)) {
+    if(Lib.isArrayOrTypedArray(previousContOut)) {
         var len = Math.min(previousContOut.length, contOut.length);
         for(i = 0; i < len; i++) {
             Lib.relinkPrivateKeys(contOut[i], previousContOut[i]);
@@ -47397,7 +48591,7 @@ module.exports = function handleArrayContainerDefaults(parentObjIn, parentObjOut
     }
 };
 
-},{"../lib":152}],193:[function(require,module,exports){
+},{"../lib":155}],194:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -47481,7 +48675,8 @@ module.exports = {
         editType: 'calc',
         description: [
             'Assigns id labels to each datum.',
-            'These ids for object constancy of data points during animation.'
+            'These ids for object constancy of data points during animation.',
+            'Should be an array of strings, not numbers or any other type.'
         ].join(' ')
     },
     customdata: {
@@ -47558,7 +48753,7 @@ module.exports = {
     }
 };
 
-},{"../components/fx/attributes":69}],194:[function(require,module,exports){
+},{"../components/fx/attributes":70}],195:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -47599,7 +48794,387 @@ module.exports = {
     }
 };
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
+/**
+* Copyright 2012-2018, Plotly, Inc.
+* All rights reserved.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+
+
+'use strict';
+
+var isNumeric = require('fast-isnumeric');
+
+var Lib = require('../../lib');
+var FP_SAFE = require('../../constants/numerical').FP_SAFE;
+
+module.exports = {
+    getAutoRange: getAutoRange,
+    makePadFn: makePadFn,
+    doAutoRange: doAutoRange,
+    expand: expand
+};
+
+// Find the autorange for this axis
+//
+// assumes ax._min and ax._max have already been set by calling axes.expand
+// using calcdata from all traces. These are arrays of objects:
+// {
+//    val: calcdata value,
+//    pad: extra pixels beyond this value,
+//    extrapad: bool, does this point want 5% extra padding
+// }
+//
+// Returns an array of [min, max]. These are calcdata for log and category axes
+// and data for linear and date axes.
+//
+// TODO: we want to change log to data as well, but it's hard to do this
+// maintaining backward compatibility. category will always have to use calcdata
+// though, because otherwise values between categories (or outside all categories)
+// would be impossible.
+function getAutoRange(ax) {
+    var newRange = [];
+    var minmin = ax._min[0].val;
+    var maxmax = ax._max[0].val;
+    var mbest = 0;
+    var axReverse = false;
+
+    var getPad = makePadFn(ax);
+
+    var i, j, minpt, maxpt, minbest, maxbest, dp, dv;
+
+    for(i = 1; i < ax._min.length; i++) {
+        if(minmin !== maxmax) break;
+        minmin = Math.min(minmin, ax._min[i].val);
+    }
+    for(i = 1; i < ax._max.length; i++) {
+        if(minmin !== maxmax) break;
+        maxmax = Math.max(maxmax, ax._max[i].val);
+    }
+
+    if(ax.range) {
+        var rng = Lib.simpleMap(ax.range, ax.r2l);
+        axReverse = rng[1] < rng[0];
+    }
+
+    // one-time setting to easily reverse the axis
+    // when plotting from code
+    if(ax.autorange === 'reversed') {
+        axReverse = true;
+        ax.autorange = true;
+    }
+
+    for(i = 0; i < ax._min.length; i++) {
+        minpt = ax._min[i];
+        for(j = 0; j < ax._max.length; j++) {
+            maxpt = ax._max[j];
+            dv = maxpt.val - minpt.val;
+            dp = ax._length - getPad(minpt) - getPad(maxpt);
+            if(dv > 0 && dp > 0 && dv / dp > mbest) {
+                minbest = minpt;
+                maxbest = maxpt;
+                mbest = dv / dp;
+            }
+        }
+    }
+
+    if(minmin === maxmax) {
+        var lower = minmin - 1;
+        var upper = minmin + 1;
+        if(ax.rangemode === 'tozero') {
+            newRange = minmin < 0 ? [lower, 0] : [0, upper];
+        }
+        else if(ax.rangemode === 'nonnegative') {
+            newRange = [Math.max(0, lower), Math.max(0, upper)];
+        }
+        else {
+            newRange = [lower, upper];
+        }
+    }
+    else if(mbest) {
+        if(ax.type === 'linear' || ax.type === '-') {
+            if(ax.rangemode === 'tozero') {
+                if(minbest.val >= 0) {
+                    minbest = {val: 0, pad: 0};
+                }
+                if(maxbest.val <= 0) {
+                    maxbest = {val: 0, pad: 0};
+                }
+            }
+            else if(ax.rangemode === 'nonnegative') {
+                if(minbest.val - mbest * getPad(minbest) < 0) {
+                    minbest = {val: 0, pad: 0};
+                }
+                if(maxbest.val < 0) {
+                    maxbest = {val: 1, pad: 0};
+                }
+            }
+
+            // in case it changed again...
+            mbest = (maxbest.val - minbest.val) /
+                (ax._length - getPad(minbest) - getPad(maxbest));
+
+        }
+
+        newRange = [
+            minbest.val - mbest * getPad(minbest),
+            maxbest.val + mbest * getPad(maxbest)
+        ];
+    }
+
+    // don't let axis have zero size, while still respecting tozero and nonnegative
+    if(newRange[0] === newRange[1]) {
+        if(ax.rangemode === 'tozero') {
+            if(newRange[0] < 0) {
+                newRange = [newRange[0], 0];
+            }
+            else if(newRange[0] > 0) {
+                newRange = [0, newRange[0]];
+            }
+            else {
+                newRange = [0, 1];
+            }
+        }
+        else {
+            newRange = [newRange[0] - 1, newRange[0] + 1];
+            if(ax.rangemode === 'nonnegative') {
+                newRange[0] = Math.max(0, newRange[0]);
+            }
+        }
+    }
+
+    // maintain reversal
+    if(axReverse) newRange.reverse();
+
+    return Lib.simpleMap(newRange, ax.l2r || Number);
+}
+
+/*
+ * calculate the pixel padding for ax._min and ax._max entries with
+ * optional extrapad as 5% of the total axis length
+ */
+function makePadFn(ax) {
+    // 5% padding for points that specify extrapad: true
+    var extrappad = ax._length / 20;
+
+    // domain-constrained axes: base extrappad on the unconstrained
+    // domain so it's consistent as the domain changes
+    if((ax.constrain === 'domain') && ax._inputDomain) {
+        extrappad *= (ax._inputDomain[1] - ax._inputDomain[0]) /
+            (ax.domain[1] - ax.domain[0]);
+    }
+
+    return function getPad(pt) { return pt.pad + (pt.extrapad ? extrappad : 0); };
+}
+
+function doAutoRange(ax) {
+    if(!ax._length) ax.setScale();
+
+    // TODO do we really need this?
+    var hasDeps = (ax._min && ax._max && ax._min.length && ax._max.length);
+    var axIn;
+
+    if(ax.autorange && hasDeps) {
+        ax.range = getAutoRange(ax);
+
+        ax._r = ax.range.slice();
+        ax._rl = Lib.simpleMap(ax._r, ax.r2l);
+
+        // doAutoRange will get called on fullLayout,
+        // but we want to report its results back to layout
+
+        axIn = ax._input;
+        axIn.range = ax.range.slice();
+        axIn.autorange = ax.autorange;
+    }
+
+    if(ax._anchorAxis && ax._anchorAxis.rangeslider) {
+        var axeRangeOpts = ax._anchorAxis.rangeslider[ax._name];
+        if(axeRangeOpts) {
+            if(axeRangeOpts.rangemode === 'auto') {
+                if(hasDeps) {
+                    axeRangeOpts.range = getAutoRange(ax);
+                } else {
+                    axeRangeOpts.range = ax._rangeInitial ? ax._rangeInitial.slice() : ax.range.slice();
+                }
+            }
+        }
+        axIn = ax._anchorAxis._input;
+        axIn.rangeslider[ax._name] = Lib.extendFlat({}, axeRangeOpts);
+    }
+}
+
+function needsAutorange(ax) {
+    return ax.autorange || ax._rangesliderAutorange;
+}
+
+/*
+ * expand: if autoranging, include new data in the outer limits for this axis.
+ * Note that `expand` is called during `calc`, when we don't yet know the axis
+ * length; all the inputs should be based solely on the trace data, nothing
+ * about the axis layout.
+ *
+ * @param {object} ax: the axis being expanded. The result will be more entries
+ *      in ax._min and ax._max if necessary to include the new data
+ * @param {array} data: an array of numbers (ie already run through ax.d2c)
+ * @param {object} options: available keys are:
+ *      vpad: (number or number array) pad values (data value +-vpad)
+ *      ppad: (number or number array) pad pixels (pixel location +-ppad)
+ *      ppadplus, ppadminus, vpadplus, vpadminus:
+ *          separate padding for each side, overrides symmetric
+ *      padded: (boolean) add 5% padding to both ends
+ *          (unless one end is overridden by tozero)
+ *      tozero: (boolean) make sure to include zero if axis is linear,
+ *          and make it a tight bound if possible
+ */
+function expand(ax, data, options) {
+    if(!needsAutorange(ax) || !data) return;
+
+    if(!ax._min) ax._min = [];
+    if(!ax._max) ax._max = [];
+    if(!options) options = {};
+    if(!ax._m) ax.setScale();
+
+    var len = data.length;
+    var extrapad = options.padded || false;
+    var tozero = options.tozero && (ax.type === 'linear' || ax.type === '-');
+    var isLog = (ax.type === 'log');
+
+    var i, j, k, v, di, dmin, dmax, ppadiplus, ppadiminus, includeThis, vmin, vmax;
+
+    var hasArrayOption = false;
+
+    function makePadAccessor(item) {
+        if(Array.isArray(item)) {
+            hasArrayOption = true;
+            return function(i) { return Math.max(Number(item[i]||0), 0); };
+        }
+        else {
+            var v = Math.max(Number(item||0), 0);
+            return function() { return v; };
+        }
+    }
+
+    var ppadplus = makePadAccessor((ax._m > 0 ?
+        options.ppadplus : options.ppadminus) || options.ppad || 0);
+    var ppadminus = makePadAccessor((ax._m > 0 ?
+        options.ppadminus : options.ppadplus) || options.ppad || 0);
+    var vpadplus = makePadAccessor(options.vpadplus || options.vpad);
+    var vpadminus = makePadAccessor(options.vpadminus || options.vpad);
+
+    if(!hasArrayOption) {
+        // with no arrays other than `data` we don't need to consider
+        // every point, only the extreme data points
+        vmin = Infinity;
+        vmax = -Infinity;
+
+        if(isLog) {
+            for(i = 0; i < len; i++) {
+                v = data[i];
+                // data is not linearized yet so we still have to filter out negative logs
+                if(v < vmin && v > 0) vmin = v;
+                if(v > vmax && v < FP_SAFE) vmax = v;
+            }
+        }
+        else {
+            for(i = 0; i < len; i++) {
+                v = data[i];
+                if(v < vmin && v > -FP_SAFE) vmin = v;
+                if(v > vmax && v < FP_SAFE) vmax = v;
+            }
+        }
+
+        data = [vmin, vmax];
+        len = 2;
+    }
+
+    function addItem(i) {
+        di = data[i];
+        if(!isNumeric(di)) return;
+        ppadiplus = ppadplus(i);
+        ppadiminus = ppadminus(i);
+        vmin = di - vpadminus(i);
+        vmax = di + vpadplus(i);
+        // special case for log axes: if vpad makes this object span
+        // more than an order of mag, clip it to one order. This is so
+        // we don't have non-positive errors or absurdly large lower
+        // range due to rounding errors
+        if(isLog && vmin < vmax / 10) vmin = vmax / 10;
+
+        dmin = ax.c2l(vmin);
+        dmax = ax.c2l(vmax);
+
+        if(tozero) {
+            dmin = Math.min(0, dmin);
+            dmax = Math.max(0, dmax);
+        }
+
+        for(k = 0; k < 2; k++) {
+            var newVal = k ? dmax : dmin;
+            if(goodNumber(newVal)) {
+                var extremes = k ? ax._max : ax._min;
+                var newPad = k ? ppadiplus : ppadiminus;
+                var atLeastAsExtreme = k ? greaterOrEqual : lessOrEqual;
+
+                includeThis = true;
+                /*
+                 * Take items v from ax._min/_max and compare them to the presently active point:
+                 * - Since we don't yet know the relationship between pixels and values
+                 *   (that's what we're trying to figure out!) AND we don't yet know how
+                 *   many pixels `extrapad` represents (it's going to be 5% of the length,
+                 *   but we don't want to have to redo _min and _max just because length changed)
+                 *   two point must satisfy three criteria simultaneously for one to supersede the other:
+                 *   - at least as extreme a `val`
+                 *   - at least as big a `pad`
+                 *   - an unpadded point cannot supersede a padded point, but any other combination can
+                 *
+                 * - If the item supersedes the new point, set includethis false
+                 * - If the new pt supersedes the item, delete it from ax._min/_max
+                 */
+                for(j = 0; j < extremes.length && includeThis; j++) {
+                    v = extremes[j];
+                    if(atLeastAsExtreme(v.val, newVal) && v.pad >= newPad && (v.extrapad || !extrapad)) {
+                        includeThis = false;
+                        break;
+                    }
+                    else if(atLeastAsExtreme(newVal, v.val) && v.pad <= newPad && (extrapad || !v.extrapad)) {
+                        extremes.splice(j, 1);
+                        j--;
+                    }
+                }
+                if(includeThis) {
+                    var clipAtZero = (tozero && newVal === 0);
+                    extremes.push({
+                        val: newVal,
+                        pad: clipAtZero ? 0 : newPad,
+                        extrapad: clipAtZero ? false : extrapad
+                    });
+                }
+            }
+        }
+    }
+
+    // For efficiency covering monotonic or near-monotonic data,
+    // check a few points at both ends first and then sweep
+    // through the middle
+    var iMax = Math.min(6, len);
+    for(i = 0; i < iMax; i++) addItem(i);
+    for(i = len - 1; i >= iMax; i--) addItem(i);
+}
+
+// In order to stop overflow errors, don't consider points
+// too close to the limits of js floating point
+function goodNumber(v) {
+    return isNumeric(v) && Math.abs(v) < FP_SAFE;
+}
+
+function lessOrEqual(v0, v1) { return v0 <= v1; }
+function greaterOrEqual(v0, v1) { return v0 >= v1; }
+
+},{"../../constants/numerical":138,"../../lib":155,"fast-isnumeric":5}],197:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -47613,6 +49188,7 @@ module.exports = {
 
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
+var Plots = require('../../plots/plots');
 
 var Registry = require('../../registry');
 var Lib = require('../../lib');
@@ -47622,7 +49198,6 @@ var Color = require('../../components/color');
 var Drawing = require('../../components/drawing');
 
 var constants = require('../../constants/numerical');
-var FP_SAFE = constants.FP_SAFE;
 var ONEAVGYEAR = constants.ONEAVGYEAR;
 var ONEAVGMONTH = constants.ONEAVGMONTH;
 var ONEDAY = constants.ONEDAY;
@@ -47633,6 +49208,7 @@ var MINUS_SIGN = constants.MINUS_SIGN;
 var BADNUM = constants.BADNUM;
 
 var MID_SHIFT = require('../../constants/alignment').MID_SHIFT;
+var LINE_SPACING = require('../../constants/alignment').LINE_SPACING;
 
 var axes = module.exports = {};
 
@@ -47641,11 +49217,16 @@ var autoType = require('./axis_autotype');
 
 var axisIds = require('./axis_ids');
 axes.id2name = axisIds.id2name;
+axes.name2id = axisIds.name2id;
 axes.cleanId = axisIds.cleanId;
 axes.list = axisIds.list;
 axes.listIds = axisIds.listIds;
 axes.getFromId = axisIds.getFromId;
 axes.getFromTrace = axisIds.getFromTrace;
+
+var autorange = require('./autorange');
+axes.expand = autorange.expand;
+axes.getAutoRange = autorange.getAutoRange;
 
 /*
  * find the list of possible axes to reference with an xref or yref attribute
@@ -47819,157 +49400,6 @@ axes.minDtick = function(ax, newDiff, newFirst, allow) {
     }
 };
 
-// Find the autorange for this axis
-//
-// assumes ax._min and ax._max have already been set by calling axes.expand
-// using calcdata from all traces. These are arrays of:
-// {val: calcdata value, pad: extra pixels beyond this value}
-//
-// Returns an array of [min, max]. These are calcdata for log and category axes
-// and data for linear and date axes.
-//
-// TODO: we want to change log to data as well, but it's hard to do this
-// maintaining backward compatibility. category will always have to use calcdata
-// though, because otherwise values between categories (or outside all categories)
-// would be impossible.
-axes.getAutoRange = function(ax) {
-    var newRange = [];
-
-    var minmin = ax._min[0].val,
-        maxmax = ax._max[0].val,
-        i;
-
-    for(i = 1; i < ax._min.length; i++) {
-        if(minmin !== maxmax) break;
-        minmin = Math.min(minmin, ax._min[i].val);
-    }
-    for(i = 1; i < ax._max.length; i++) {
-        if(minmin !== maxmax) break;
-        maxmax = Math.max(maxmax, ax._max[i].val);
-    }
-
-    var j, minpt, maxpt, minbest, maxbest, dp, dv,
-        mbest = 0,
-        axReverse = false;
-
-    if(ax.range) {
-        var rng = Lib.simpleMap(ax.range, ax.r2l);
-        axReverse = rng[1] < rng[0];
-    }
-
-    // one-time setting to easily reverse the axis
-    // when plotting from code
-    if(ax.autorange === 'reversed') {
-        axReverse = true;
-        ax.autorange = true;
-    }
-
-    for(i = 0; i < ax._min.length; i++) {
-        minpt = ax._min[i];
-        for(j = 0; j < ax._max.length; j++) {
-            maxpt = ax._max[j];
-            dv = maxpt.val - minpt.val;
-            dp = ax._length - minpt.pad - maxpt.pad;
-            if(dv > 0 && dp > 0 && dv / dp > mbest) {
-                minbest = minpt;
-                maxbest = maxpt;
-                mbest = dv / dp;
-            }
-        }
-    }
-
-    if(minmin === maxmax) {
-        var lower = minmin - 1;
-        var upper = minmin + 1;
-        if(ax.rangemode === 'tozero') {
-            newRange = minmin < 0 ? [lower, 0] : [0, upper];
-        }
-        else if(ax.rangemode === 'nonnegative') {
-            newRange = [Math.max(0, lower), Math.max(0, upper)];
-        }
-        else {
-            newRange = [lower, upper];
-        }
-    }
-    else if(mbest) {
-        if(ax.type === 'linear' || ax.type === '-') {
-            if(ax.rangemode === 'tozero') {
-                if(minbest.val >= 0) {
-                    minbest = {val: 0, pad: 0};
-                }
-                if(maxbest.val <= 0) {
-                    maxbest = {val: 0, pad: 0};
-                }
-            }
-            else if(ax.rangemode === 'nonnegative') {
-                if(minbest.val - mbest * minbest.pad < 0) {
-                    minbest = {val: 0, pad: 0};
-                }
-                if(maxbest.val < 0) {
-                    maxbest = {val: 1, pad: 0};
-                }
-            }
-
-            // in case it changed again...
-            mbest = (maxbest.val - minbest.val) /
-                (ax._length - minbest.pad - maxbest.pad);
-
-        }
-
-        newRange = [
-            minbest.val - mbest * minbest.pad,
-            maxbest.val + mbest * maxbest.pad
-        ];
-    }
-
-    // don't let axis have zero size, while still respecting tozero and nonnegative
-    if(newRange[0] === newRange[1]) {
-        if(ax.rangemode === 'tozero') {
-            if(newRange[0] < 0) {
-                newRange = [newRange[0], 0];
-            }
-            else if(newRange[0] > 0) {
-                newRange = [0, newRange[0]];
-            }
-            else {
-                newRange = [0, 1];
-            }
-        }
-        else {
-            newRange = [newRange[0] - 1, newRange[0] + 1];
-            if(ax.rangemode === 'nonnegative') {
-                newRange[0] = Math.max(0, newRange[0]);
-            }
-        }
-    }
-
-    // maintain reversal
-    if(axReverse) newRange.reverse();
-
-    return Lib.simpleMap(newRange, ax.l2r || Number);
-};
-
-axes.doAutoRange = function(ax) {
-    if(!ax._length) ax.setScale();
-
-    // TODO do we really need this?
-    var hasDeps = (ax._min && ax._max && ax._min.length && ax._max.length);
-
-    if(ax.autorange && hasDeps) {
-        ax.range = axes.getAutoRange(ax);
-
-        ax._r = ax.range.slice();
-        ax._rl = Lib.simpleMap(ax._r, ax.r2l);
-
-        // doAutoRange will get called on fullLayout,
-        // but we want to report its results back to layout
-
-        var axIn = ax._input;
-        axIn.range = ax.range.slice();
-        axIn.autorange = ax.autorange;
-    }
-};
-
 // save a copy of the initial axis ranges in fullLayout
 // use them in mode bar and dblclick events
 axes.saveRangeInitial = function(gd, overwrite) {
@@ -48025,140 +49455,6 @@ axes.saveShowSpikeInitial = function(gd, overwrite) {
     return hasOneAxisChanged;
 };
 
-// axes.expand: if autoranging, include new data in the outer limits
-// for this axis
-// data is an array of numbers (ie already run through ax.d2c)
-// available options:
-//      vpad: (number or number array) pad values (data value +-vpad)
-//      ppad: (number or number array) pad pixels (pixel location +-ppad)
-//      ppadplus, ppadminus, vpadplus, vpadminus:
-//          separate padding for each side, overrides symmetric
-//      padded: (boolean) add 5% padding to both ends
-//          (unless one end is overridden by tozero)
-//      tozero: (boolean) make sure to include zero if axis is linear,
-//          and make it a tight bound if possible
-axes.expand = function(ax, data, options) {
-    var needsAutorange = (
-        ax.autorange ||
-        !!Lib.nestedProperty(ax, 'rangeslider.autorange').get()
-    );
-
-    if(!needsAutorange || !data) return;
-
-    if(!ax._min) ax._min = [];
-    if(!ax._max) ax._max = [];
-    if(!options) options = {};
-    if(!ax._m) ax.setScale();
-
-    var len = data.length,
-        extrappad = options.padded ? ax._length * 0.05 : 0,
-        tozero = options.tozero && (ax.type === 'linear' || ax.type === '-'),
-        i, j, v, di, dmin, dmax,
-        ppadiplus, ppadiminus, includeThis, vmin, vmax;
-
-    // domain-constrained axes: base extrappad on the unconstrained
-    // domain so it's consistent as the domain changes
-    if(extrappad && (ax.constrain === 'domain') && ax._inputDomain) {
-        extrappad *= (ax._inputDomain[1] - ax._inputDomain[0]) /
-            (ax.domain[1] - ax.domain[0]);
-    }
-
-    function getPad(item) {
-        if(Array.isArray(item)) {
-            return function(i) { return Math.max(Number(item[i]||0), 0); };
-        }
-        else {
-            var v = Math.max(Number(item||0), 0);
-            return function() { return v; };
-        }
-    }
-    var ppadplus = getPad((ax._m > 0 ?
-            options.ppadplus : options.ppadminus) || options.ppad || 0),
-        ppadminus = getPad((ax._m > 0 ?
-            options.ppadminus : options.ppadplus) || options.ppad || 0),
-        vpadplus = getPad(options.vpadplus || options.vpad),
-        vpadminus = getPad(options.vpadminus || options.vpad);
-
-    function addItem(i) {
-        di = data[i];
-        if(!isNumeric(di)) return;
-        ppadiplus = ppadplus(i) + extrappad;
-        ppadiminus = ppadminus(i) + extrappad;
-        vmin = di - vpadminus(i);
-        vmax = di + vpadplus(i);
-        // special case for log axes: if vpad makes this object span
-        // more than an order of mag, clip it to one order. This is so
-        // we don't have non-positive errors or absurdly large lower
-        // range due to rounding errors
-        if(ax.type === 'log' && vmin < vmax / 10) { vmin = vmax / 10; }
-
-        dmin = ax.c2l(vmin);
-        dmax = ax.c2l(vmax);
-
-        if(tozero) {
-            dmin = Math.min(0, dmin);
-            dmax = Math.max(0, dmax);
-        }
-
-        // In order to stop overflow errors, don't consider points
-        // too close to the limits of js floating point
-        function goodNumber(v) {
-            return isNumeric(v) && Math.abs(v) < FP_SAFE;
-        }
-
-        if(goodNumber(dmin)) {
-            includeThis = true;
-            // take items v from ax._min and compare them to the
-            // presently active point:
-            // - if the item supercedes the new point, set includethis false
-            // - if the new pt supercedes the item, delete it from ax._min
-            for(j = 0; j < ax._min.length && includeThis; j++) {
-                v = ax._min[j];
-                if(v.val <= dmin && v.pad >= ppadiminus) {
-                    includeThis = false;
-                }
-                else if(v.val >= dmin && v.pad <= ppadiminus) {
-                    ax._min.splice(j, 1);
-                    j--;
-                }
-            }
-            if(includeThis) {
-                ax._min.push({
-                    val: dmin,
-                    pad: (tozero && dmin === 0) ? 0 : ppadiminus
-                });
-            }
-        }
-
-        if(goodNumber(dmax)) {
-            includeThis = true;
-            for(j = 0; j < ax._max.length && includeThis; j++) {
-                v = ax._max[j];
-                if(v.val >= dmax && v.pad >= ppadiplus) {
-                    includeThis = false;
-                }
-                else if(v.val <= dmax && v.pad <= ppadiplus) {
-                    ax._max.splice(j, 1);
-                    j--;
-                }
-            }
-            if(includeThis) {
-                ax._max.push({
-                    val: dmax,
-                    pad: (tozero && dmax === 0) ? 0 : ppadiplus
-                });
-            }
-        }
-    }
-
-    // For efficiency covering monotonic or near-monotonic data,
-    // check a few points at both ends first and then sweep
-    // through the middle
-    for(i = 0; i < 6; i++) addItem(i);
-    for(i = len - 1; i > 5; i--) addItem(i);
-
-};
-
 axes.autoBin = function(data, ax, nbins, is2d, calendar) {
     var dataMin = Lib.aggNums(Math.min, null, data),
         dataMax = Lib.aggNums(Math.max, null, data);
@@ -48170,7 +49466,7 @@ axes.autoBin = function(data, ax, nbins, is2d, calendar) {
             start: dataMin - 0.5,
             end: dataMax + 0.5,
             size: 1,
-            _count: dataMax - dataMin + 1
+            _dataSpan: dataMax - dataMin,
         };
     }
 
@@ -48250,7 +49546,7 @@ axes.autoBin = function(data, ax, nbins, is2d, calendar) {
         start: ax.c2r(binStart, 0, calendar),
         end: ax.c2r(binEnd, 0, calendar),
         size: dummyAx.dtick,
-        _count: bincount
+        _dataSpan: dataMax - dataMin
     };
 };
 
@@ -48344,11 +49640,8 @@ function autoShiftMonthBins(binStart, data, dtick, dataMin, calendar) {
 // Ticks and grids
 // ----------------------------------------------------
 
-// calculate the ticks: text, values, positioning
-// if ticks are set to automatic, determine the right values (tick0,dtick)
-// in any case, set tickround to # of digits to round tick labels to,
-// or codes to this effect for log and date scales
-axes.calcTicks = function calcTicks(ax) {
+// ensure we have tick0, dtick, and tick rounding calculated
+axes.prepTicks = function(ax) {
     var rng = Lib.simpleMap(ax.range, ax.r2l);
 
     // calculate max number of (auto) ticks to display based on plot size
@@ -48389,6 +49682,15 @@ axes.calcTicks = function calcTicks(ax) {
 
     // now figure out rounding of tick values
     autoTickRound(ax);
+};
+
+// calculate the ticks: text, values, positioning
+// if ticks are set to automatic, determine the right values (tick0,dtick)
+// in any case, set tickround to # of digits to round tick labels to,
+// or codes to this effect for log and date scales
+axes.calcTicks = function calcTicks(ax) {
+    axes.prepTicks(ax);
+    var rng = Lib.simpleMap(ax.range, ax.r2l);
 
     // now that we've figured out the auto values for formatting
     // in case we're missing some ticktext, we can break out for array ticks
@@ -48397,22 +49699,27 @@ axes.calcTicks = function calcTicks(ax) {
     // find the first tick
     ax._tmin = axes.tickFirst(ax);
 
+    // add a tiny bit so we get ticks which may have rounded out
+    var startTick = rng[0] * 1.0001 - rng[1] * 0.0001;
+    var endTick = rng[1] * 1.0001 - rng[0] * 0.0001;
     // check for reversed axis
     var axrev = (rng[1] < rng[0]);
 
+    // No visible ticks? Quit.
+    // I've only seen this on category axes with all categories off the edge.
+    if((ax._tmin < startTick) !== axrev) return [];
+
     // return the full set of tick vals
-    var vals = [],
-        // add a tiny bit so we get ticks which may have rounded out
-        endtick = rng[1] * 1.0001 - rng[0] * 0.0001;
+    var vals = [];
     if(ax.type === 'category') {
-        endtick = (axrev) ? Math.max(-0.5, endtick) :
-            Math.min(ax._categories.length - 0.5, endtick);
+        endTick = (axrev) ? Math.max(-0.5, endTick) :
+            Math.min(ax._categories.length - 0.5, endTick);
     }
 
     var xPrevious = null;
     var maxTicks = Math.max(1000, ax._length || 0);
     for(var x = ax._tmin;
-            (axrev) ? (x >= endtick) : (x <= endtick);
+            (axrev) ? (x >= endTick) : (x <= endTick);
             x = axes.tickIncrement(x, ax.dtick, axrev, ax.calendar)) {
         // prevent infinite loops - no more than one tick per pixel,
         // and make sure each value is different from the previous
@@ -48894,7 +50201,7 @@ function formatDate(ax, out, hover, extraPrecision) {
         else tr = {y: 'm', m: 'd', d: 'M', M: 'S', S: 4}[tr];
     }
 
-    var dateStr = Lib.formatDate(out.x, fmt, tr, ax._dateFormat, ax.calendar),
+    var dateStr = Lib.formatDate(out.x, fmt, tr, ax._dateFormat, ax.calendar, ax._extraFormat),
         headStr;
 
     var splitIndex = dateStr.indexOf('\n');
@@ -49124,7 +50431,7 @@ function numFormat(v, ax, fmtoverride, hover) {
     if(hover) {
         // make a dummy axis obj to get the auto rounding and exponent
         var ah = {
-            exponentformat: ax.exponentformat,
+            exponentformat: exponentFormat,
             dtick: ax.showexponent === 'none' ? ax.dtick :
                 (isNumeric(v) ? Math.abs(v) || 1 : 1),
             // if not showing any exponents, don't change the exponent
@@ -49419,17 +50726,6 @@ axes.doTicks = function(gd, axid, skipTitle) {
         }
     }
 
-    // make sure we only have allowed options for exponents
-    // (others can make confusing errors)
-    if(!ax.tickformat) {
-        if(['none', 'e', 'E', 'power', 'SI', 'B'].indexOf(ax.exponentformat) === -1) {
-            ax.exponentformat = 'e';
-        }
-        if(['all', 'first', 'last', 'none'].indexOf(ax.showexponent) === -1) {
-            ax.showexponent = 'all';
-        }
-    }
-
     // set scaling to pixels
     ax.setScale();
 
@@ -49643,16 +50939,43 @@ axes.doTicks = function(gd, axid, skipTitle) {
             });
         }
 
+        // How much to shift a multi-line label to center it vertically.
+        function getAnchorHeight(lineCount, lineHeight, angle) {
+            var h = (lineCount - 1) * lineHeight;
+            if(axLetter === 'x') {
+                if(angle < -60 || 60 < angle) {
+                    return -0.5 * h;
+                } else if(axside === 'top') {
+                    return -h;
+                }
+            } else {
+                angle *= axside === 'left' ? 1 : -1;
+                if(angle < -30) {
+                    return -h;
+                } else if(angle < 30) {
+                    return -0.5 * h;
+                }
+            }
+            return 0;
+        }
+
         function positionLabels(s, angle) {
             s.each(function(d) {
                 var anchor = labelanchor(angle, d);
                 var thisLabel = d3.select(this),
                     mathjaxGroup = thisLabel.select('.text-math-group'),
-                    transform = transfn(d) +
+                    transform = transfn.call(thisLabel.node(), d) +
                         ((isNumeric(angle) && +angle !== 0) ?
                         (' rotate(' + angle + ',' + labelx(d) + ',' +
                             (labely(d) - d.fontSize / 2) + ')') :
                         '');
+                var anchorHeight = getAnchorHeight(
+                    svgTextUtils.lineCount(thisLabel),
+                    LINE_SPACING * d.fontSize,
+                    isNumeric(angle) ? +angle : 0);
+                if(anchorHeight) {
+                    transform += ' translate(0, ' + anchorHeight + ')';
+                }
                 if(mathjaxGroup.empty()) {
                     thisLabel.select('text').attr({
                         transform: transform,
@@ -49822,10 +51145,40 @@ axes.doTicks = function(gd, axid, skipTitle) {
             }
         }
 
+        function doAutoMargins() {
+            if(!ax.automargin) { return; }
+            if(axLetter !== 'x' && axLetter !== 'y') { return; }
+
+            var s = ax.side[0];
+            var push = {x: 0, y: 0, r: 0, l: 0, t: 0, b: 0};
+
+            if(axLetter === 'x') {
+                push.y = (ax.anchor === 'free' ? ax.position :
+                        ax._anchorAxis.domain[s === 't' ? 1 : 0]);
+                push[s] += ax._boundingBox.height;
+            }
+            else {
+                push.x = (ax.anchor === 'free' ? ax.position :
+                        ax._anchorAxis.domain[s === 'r' ? 1 : 0]);
+                push[s] += ax._boundingBox.width;
+            }
+
+            if(ax.title !== fullLayout._dfltTitle[axLetter]) {
+                push[s] += ax.titlefont.size;
+            }
+
+            var pushKey = ax._name + '.automargin';
+            var prevPush = fullLayout._pushmargin[pushKey];
+            if(!prevPush || prevPush[s].size < push[s]) {
+                Plots.autoMargin(gd, pushKey, push);
+            }
+        }
+
         var done = Lib.syncOrAsync([
             allLabelsReady,
             fixLabelOverlaps,
-            calcBoundingBox
+            calcBoundingBox,
+            doAutoMargins
         ]);
         if(done && done.then) gd._promises.push(done);
         return done;
@@ -49837,20 +51190,23 @@ axes.doTicks = function(gd, axid, skipTitle) {
         // now this only applies to regular cartesian axes; colorbars and
         // others ALWAYS call doTicks with skipTitle=true so they can
         // configure their own titles.
-        var ax = axisIds.getFromId(gd, axid),
-            avoidSelection = d3.select(gd).selectAll('g.' + axid + 'tick'),
-            avoid = {
-                selection: avoidSelection,
-                side: ax.side
-            },
-            axLetter = axid.charAt(0),
-            gs = gd._fullLayout._size,
-            offsetBase = 1.5,
-            fontSize = ax.titlefont.size,
-            transform,
-            counterAxis,
-            x,
-            y;
+        var ax = axisIds.getFromId(gd, axid);
+
+        // rangeslider takes over a bottom title so drop it here
+        if(ax.rangeslider && ax.rangeslider.visible && ax._boundingBox && ax.side === 'bottom') return;
+
+        var avoidSelection = d3.select(gd).selectAll('g.' + axid + 'tick');
+        var avoid = {
+            selection: avoidSelection,
+            side: ax.side
+        };
+        var axLetter = axid.charAt(0);
+        var gs = gd._fullLayout._size;
+        var offsetBase = 1.5;
+        var fontSize = ax.titlefont.size;
+
+        var transform, counterAxis, x, y;
+
         if(avoidSelection.size()) {
             var translation = Drawing.getTranslate(avoidSelection.node().parentNode);
             avoid.offsetLeft = translation.x;
@@ -49866,6 +51222,7 @@ axes.doTicks = function(gd, axid, skipTitle) {
                 axisIds.getFromId(gd, ax.anchor);
 
             x = ax._offset + ax._length / 2;
+
             if(ax.side === 'top') {
                 y = -titleStandoff - fontSize * (ax.showticklabels ? 1 : 0);
             }
@@ -49874,11 +51231,6 @@ axes.doTicks = function(gd, axid, skipTitle) {
                     fontSize * (ax.showticklabels ? 1.5 : 0.5);
             }
             y += counterAxis._offset;
-
-            if(ax.rangeslider && ax.rangeslider.visible && ax._boundingBox) {
-                y += (fullLayout.height - fullLayout.margin.b - fullLayout.margin.t) *
-                    ax.rangeslider.thickness + ax._boundingBox.height;
-            }
 
             if(!avoid.side) avoid.side = 'bottom';
         }
@@ -50186,7 +51538,7 @@ function swapAxisAttrs(layout, key, xFullAxes, yFullAxes, dfltTitle) {
     }
 }
 
-},{"../../components/color":35,"../../components/drawing":60,"../../components/titles":126,"../../constants/alignment":133,"../../constants/numerical":135,"../../lib":152,"../../lib/svg_text_utils":173,"../../registry":234,"./axis_autotype":196,"./axis_ids":198,"./set_convert":214,"d3":3,"fast-isnumeric":5}],196:[function(require,module,exports){
+},{"../../components/color":36,"../../components/drawing":61,"../../components/titles":129,"../../constants/alignment":136,"../../constants/numerical":138,"../../lib":155,"../../lib/svg_text_utils":176,"../../plots/plots":230,"../../registry":237,"./autorange":196,"./axis_autotype":198,"./axis_ids":200,"./set_convert":216,"d3":3,"fast-isnumeric":5}],198:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50261,7 +51613,7 @@ function category(a) {
     return curvecats > curvenums * 2;
 }
 
-},{"../../constants/numerical":135,"../../lib":152,"fast-isnumeric":5}],197:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155,"fast-isnumeric":5}],199:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50313,6 +51665,12 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
 
     var autoRange = coerce('autorange', !containerOut.isValidRange(containerIn.range));
 
+    // both x and y axes may need autorange done just for the range slider's purposes
+    // the logic is complicated to figure this out later, particularly for y axes since
+    // the settings can be spread out in the x axes... so instead we'll collect them
+    // during supplyDefaults
+    containerOut._rangesliderAutorange = false;
+
     if(autoRange) coerce('rangemode');
 
     coerce('range');
@@ -50322,6 +51680,9 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
     containerOut._initialCategories = axType === 'category' ?
         orderedCategories(letter, containerOut.categoryorder, containerOut.categoryarray, options.data) :
         [];
+
+
+    if(axType !== 'category' && !options.noHover) coerce('hoverformat');
 
     if(!visible) return containerOut;
 
@@ -50349,10 +51710,12 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
 
     if(containerOut.showline || containerOut.ticks) coerce('mirror');
 
+    if(options.automargin) coerce('automargin');
+
     return containerOut;
 };
 
-},{"../../lib":152,"../../registry":234,"./category_order_defaults":199,"./layout_attributes":207,"./line_grid_defaults":209,"./ordered_categories":210,"./set_convert":214,"./tick_label_defaults":215,"./tick_mark_defaults":216,"./tick_value_defaults":217}],198:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237,"./category_order_defaults":201,"./layout_attributes":209,"./line_grid_defaults":211,"./ordered_categories":212,"./set_convert":216,"./tick_label_defaults":217,"./tick_mark_defaults":218,"./tick_value_defaults":219}],200:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50470,7 +51833,7 @@ exports.idSort = function(id1, id2) {
     return +(id1.substr(1) || 1) - +(id2.substr(1) || 1);
 };
 
-},{"../../registry":234,"./constants":200}],199:[function(require,module,exports){
+},{"../../registry":237,"./constants":202}],201:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50504,7 +51867,7 @@ module.exports = function handleCategoryOrderDefaults(containerIn, containerOut,
     }
 };
 
-},{}],200:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50514,7 +51877,7 @@ module.exports = function handleCategoryOrderDefaults(containerIn, containerOut,
 */
 
 'use strict';
-var counterRegex = require('../../lib').counterRegex;
+var counterRegex = require('../../lib/regex').counter;
 
 
 module.exports = {
@@ -50584,7 +51947,7 @@ module.exports = {
     }
 };
 
-},{"../../lib":152}],201:[function(require,module,exports){
+},{"../../lib/regex":170}],203:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50738,7 +52101,7 @@ function updateConstraintGroups(constraintGroups, thisGroup, thisID, scaleanchor
     thisGroup[scaleanchor] = 1;
 }
 
-},{"../../lib":152,"./axis_ids":198}],202:[function(require,module,exports){
+},{"../../lib":155,"./axis_ids":200}],204:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50752,6 +52115,7 @@ function updateConstraintGroups(constraintGroups, thisGroup, thisID, scaleanchor
 
 var id2name = require('./axis_ids').id2name;
 var scaleZoom = require('./scale_zoom');
+var makePadFn = require('./autorange').makePadFn;
 
 var ALMOST_EQUAL = require('../../constants/numerical').ALMOST_EQUAL;
 
@@ -50875,6 +52239,7 @@ exports.enforce = function enforceAxisConstraints(gd) {
                         // *are* expanding to the full domain
                         var outerMin = rangeCenter - halfRange * factor * 1.0001;
                         var outerMax = rangeCenter + halfRange * factor * 1.0001;
+                        var getPad = makePadFn(ax);
 
                         updateDomain(ax, factor);
                         ax.setScale();
@@ -50883,14 +52248,14 @@ exports.enforce = function enforceAxisConstraints(gd) {
                         var k;
 
                         for(k = 0; k < ax._min.length; k++) {
-                            newVal = ax._min[k].val - ax._min[k].pad / m;
+                            newVal = ax._min[k].val - getPad(ax._min[k]) / m;
                             if(newVal > outerMin && newVal < rangeMin) {
                                 rangeMin = newVal;
                             }
                         }
 
                         for(k = 0; k < ax._max.length; k++) {
-                            newVal = ax._max[k].val + ax._max[k].pad / m;
+                            newVal = ax._max[k].val + getPad(ax._max[k]) / m;
                             if(newVal < outerMax && newVal > rangeMax) {
                                 rangeMax = newVal;
                             }
@@ -50943,7 +52308,7 @@ function updateDomain(ax, factor) {
     ];
 }
 
-},{"../../constants/alignment":133,"../../constants/numerical":135,"./axis_ids":198,"./scale_zoom":212}],203:[function(require,module,exports){
+},{"../../constants/alignment":136,"../../constants/numerical":138,"./autorange":196,"./axis_ids":200,"./scale_zoom":214}],205:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -50957,8 +52322,8 @@ function updateDomain(ax, factor) {
 
 var d3 = require('d3');
 var tinycolor = require('tinycolor2');
+var supportsPassive = require('has-passive-events');
 
-var Plotly = require('../../plotly');
 var Registry = require('../../registry');
 var Lib = require('../../lib');
 var svgTextUtils = require('../../lib/svg_text_utils');
@@ -50980,7 +52345,6 @@ var constants = require('./constants');
 var MINDRAG = constants.MINDRAG;
 var MINZOOM = constants.MINZOOM;
 
-var supportsPassive = Lib.eventListenerOptionsSupported();
 
 // flag for showing "doubleclick to zoom out" only at the beginning
 var SHOWZOOMOUTTIP = true;
@@ -51159,7 +52523,7 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
                         .on('edit', function(text) {
                             var v = ax.d2r(text);
                             if(v !== undefined) {
-                                Plotly.relayout(gd, attrStr, v);
+                                Registry.call('relayout', gd, attrStr, v);
                             }
                         });
                 }
@@ -51304,9 +52668,15 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
             return;
         }
 
+        if(redrawTimer === null) {
+            clearSelect(zoomlayer);
+        }
+
         // If a transition is in progress, then disable any behavior:
         if(gd._transitioningWithDuration) {
-            return Lib.pauseEvent(e);
+            e.preventDefault();
+            e.stopPropagation();
+            return;
         }
 
         var pc = gd.querySelector('.plotly');
@@ -51380,7 +52750,8 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
             dragTail(zoomMode);
         }, REDRAWDELAY);
 
-        return Lib.pauseEvent(e);
+        e.preventDefault();
+        return;
     }
 
     // everything but the corners gets wheel zoom
@@ -51594,7 +52965,7 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
         }
 
         gd.emit('plotly_doubleclick', null);
-        Plotly.relayout(gd, attrs);
+        Registry.call('relayout', gd, attrs);
     }
 
     // dragTail - finish a drag event with a redraw
@@ -51608,7 +52979,7 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
         // accumulated MathJax promises - wait for them before we relayout.
         Lib.syncOrAsync([
             Plots.previousPromises,
-            function() { Plotly.relayout(gd, updates); }
+            function() { Registry.call('relayout', gd, updates); }
         ], gd);
     }
 
@@ -51732,6 +53103,9 @@ function makeDragBox(gd, plotinfo, x, y, w, h, ns, ew) {
                 .call(Drawing.setTextPointsScale, xScaleFactor2, yScaleFactor2);
             traceGroups
                 .call(Drawing.hideOutsideRangePoints, subplot);
+
+            subplot.plot.selectAll('.barlayer .trace')
+                .call(Drawing.hideOutsideRangePoints, subplot, '.bartext');
         }
     }
 
@@ -52032,7 +53406,7 @@ module.exports = {
     attachWheelEventHandler: attachWheelEventHandler
 };
 
-},{"../../components/color":35,"../../components/dragelement":57,"../../components/drawing":60,"../../components/fx":77,"../../constants/alignment":133,"../../lib":152,"../../lib/setcursor":171,"../../lib/svg_text_utils":173,"../../plotly":190,"../../registry":234,"../plots":227,"./axes":195,"./axis_ids":198,"./constants":200,"./scale_zoom":212,"./select":213,"d3":3,"tinycolor2":302}],204:[function(require,module,exports){
+},{"../../components/color":36,"../../components/dragelement":58,"../../components/drawing":61,"../../components/fx":78,"../../constants/alignment":136,"../../lib":155,"../../lib/setcursor":174,"../../lib/svg_text_utils":176,"../../registry":237,"../plots":230,"./axes":197,"./axis_ids":200,"./constants":202,"./scale_zoom":214,"./select":215,"d3":3,"has-passive-events":8,"tinycolor2":305}],206:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -52044,6 +53418,8 @@ module.exports = {
 
 'use strict';
 
+var d3 = require('d3');
+
 var Fx = require('../../components/fx');
 var dragElement = require('../../components/dragelement');
 
@@ -52053,7 +53429,13 @@ var makeDragBox = require('./dragbox').makeDragBox;
 module.exports = function initInteractions(gd) {
     var fullLayout = gd._fullLayout;
 
-    if((!fullLayout._has('cartesian') && !fullLayout._has('gl2d')) || gd._context.staticPlot) return;
+    if(gd._context.staticPlot) {
+        // this sweeps up more than just cartesian drag elements...
+        d3.select(gd).selectAll('.drag').remove();
+        return;
+    }
+
+    if(!fullLayout._has('cartesian') && !fullLayout._has('gl2d')) return;
 
     var subplots = Object.keys(fullLayout._plots || {}).sort(function(a, b) {
         // sort overlays last, then by x axis number, then y axis number
@@ -52181,7 +53563,7 @@ module.exports = function initInteractions(gd) {
     };
 };
 
-},{"../../components/dragelement":57,"../../components/fx":77,"./constants":200,"./dragbox":203}],205:[function(require,module,exports){
+},{"../../components/dragelement":58,"../../components/fx":78,"./constants":202,"./dragbox":205,"d3":3}],207:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -52256,7 +53638,7 @@ module.exports = function makeIncludeComponents(containerArrayName) {
     };
 };
 
-},{"../../lib":152,"../../registry":234}],206:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237}],208:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -52347,11 +53729,9 @@ exports.finalizeSubplots = function(layoutIn, layoutOut) {
     // so if there are NO subplots at all, make one from the first
     // x & y axes in the input layout
     if(!spAll.length) {
-        var keys = Object.keys(layoutIn);
         xi = '';
         yi = '';
-        for(i = 0; i < keys.length; i++) {
-            var ki = keys[i];
+        for(var ki in layoutIn) {
             if(constants.attrRegex.test(ki)) {
                 var axLetter = ki.charAt(0);
                 if(axLetter === 'x') {
@@ -52477,35 +53857,19 @@ exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout)
     var oldModules = oldFullLayout._modules || [],
         newModules = newFullLayout._modules || [];
 
-    var hadScatter, hasScatter, hadGl, hasGl, i, oldPlots, ids, subplotInfo;
+    var hadScatter, hasScatter, hadGl, hasGl, i, oldPlots, ids, subplotInfo, moduleName;
 
 
     for(i = 0; i < oldModules.length; i++) {
-        if(oldModules[i].name === 'scatter') {
-            hadScatter = true;
-        }
-        break;
+        moduleName = oldModules[i].name;
+        if(moduleName === 'scatter') hadScatter = true;
+        else if(moduleName === 'scattergl') hadGl = true;
     }
 
     for(i = 0; i < newModules.length; i++) {
-        if(newModules[i].name === 'scatter') {
-            hasScatter = true;
-            break;
-        }
-    }
-
-    for(i = 0; i < oldModules.length; i++) {
-        if(oldModules[i].name === 'scattergl') {
-            hadGl = true;
-        }
-        break;
-    }
-
-    for(i = 0; i < newModules.length; i++) {
-        if(newModules[i].name === 'scattergl') {
-            hasGl = true;
-            break;
-        }
+        moduleName = newModules[i].name;
+        if(moduleName === 'scatter') hasScatter = true;
+        else if(moduleName === 'scattergl') hasGl = true;
     }
 
     if(hadScatter && !hasScatter) {
@@ -52564,6 +53928,18 @@ exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout)
     if(hadCartesian && !hasCartesian) {
         purgeSubplotLayers(oldFullLayout._cartesianlayer.selectAll('.subplot'), oldFullLayout);
         oldFullLayout._defs.selectAll('.axesclip').remove();
+        delete oldFullLayout._axisConstraintGroups;
+    }
+    // otherwise look for subplots we need to remove
+    else if(oldSubplotList.cartesian) {
+        for(i = 0; i < oldSubplotList.cartesian.length; i++) {
+            var oldSubplotId = oldSubplotList.cartesian[i];
+            if(newSubplotList.cartesian.indexOf(oldSubplotId) === -1) {
+                var selector = '.' + oldSubplotId + ',.' + oldSubplotId + '-x,.' + oldSubplotId + '-y';
+                oldFullLayout._cartesianlayer.selectAll(selector).remove();
+                removeSubplotExtras(oldSubplotId, oldFullLayout);
+            }
+        }
     }
 };
 
@@ -52743,11 +54119,9 @@ function purgeSubplotLayers(layers, fullLayout) {
 
     layers.each(function(subplotId) {
         var plotgroup = d3.select(this);
-        var clipId = 'clip' + fullLayout._uid + subplotId + 'plot';
 
         plotgroup.remove();
-        fullLayout._draggers.selectAll('g.' + subplotId).remove();
-        fullLayout._defs.select('#' + clipId).remove();
+        removeSubplotExtras(subplotId, fullLayout);
 
         overlayIdsToRemove[subplotId] = true;
 
@@ -52772,6 +54146,11 @@ function purgeSubplotLayers(layers, fullLayout) {
             }
         }
     }
+}
+
+function removeSubplotExtras(subplotId, fullLayout) {
+    fullLayout._draggers.selectAll('g.' + subplotId).remove();
+    fullLayout._defs.select('#clip' + fullLayout._uid + subplotId + 'plot').remove();
 }
 
 function joinLayer(parent, nodeType, className, dataVal) {
@@ -52809,7 +54188,7 @@ exports.toSVG = function(gd) {
     canvases.each(canvasToImage);
 };
 
-},{"../../constants/xmlns_namespaces":137,"../../lib":152,"../get_data":223,"../plots":227,"./attributes":194,"./axis_ids":198,"./constants":200,"./layout_attributes":207,"./layout_defaults":208,"./transition_axes":218,"d3":3}],207:[function(require,module,exports){
+},{"../../constants/xmlns_namespaces":140,"../../lib":155,"../get_data":226,"../plots":230,"./attributes":195,"./axis_ids":200,"./constants":202,"./layout_attributes":209,"./layout_defaults":210,"./transition_axes":220,"d3":3}],209:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -52854,11 +54233,11 @@ module.exports = {
     title: {
         valType: 'string',
         role: 'info',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: 'Sets the title of this axis.'
     },
     titlefont: fontAttrs({
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Sets this axis\' title font.'
         ].join(' ')
@@ -52898,7 +54277,7 @@ module.exports = {
         values: ['normal', 'tozero', 'nonnegative'],
         dflt: 'normal',
         role: 'style',
-        editType: 'calc',
+        editType: 'plot',
         description: [
             'If *normal*, the range is computed in relation to the extrema',
             'of the input data.',
@@ -52912,10 +54291,10 @@ module.exports = {
         valType: 'info_array',
         role: 'info',
         items: [
-            {valType: 'any', editType: 'plot', impliedEdits: {'^autorange': false}},
-            {valType: 'any', editType: 'plot', impliedEdits: {'^autorange': false}}
+            {valType: 'any', editType: 'plot+margins', impliedEdits: {'^autorange': false}},
+            {valType: 'any', editType: 'plot+margins', impliedEdits: {'^autorange': false}}
         ],
-        editType: 'plot',
+        editType: 'plot+margins',
         impliedEdits: {'autorange': false},
         description: [
             'Sets the range of this axis.',
@@ -52949,7 +54328,7 @@ module.exports = {
             constants.idRegex.y.toString()
         ],
         role: 'info',
-        editType: 'calc',
+        editType: 'plot',
         description: [
             'If set to another axis id (e.g. `x2`, `y`), the range of this axis',
             'changes together with the range of the corresponding axis',
@@ -52971,7 +54350,7 @@ module.exports = {
         min: 0,
         dflt: 1,
         role: 'info',
-        editType: 'calc',
+        editType: 'plot',
         description: [
             'If this axis is linked to another by `scaleanchor`, this determines the pixel',
             'to unit scale ratio. For example, if this value is 10, then every unit on',
@@ -52985,7 +54364,7 @@ module.exports = {
         values: ['range', 'domain'],
         dflt: 'range',
         role: 'info',
-        editType: 'calc',
+        editType: 'plot',
         description: [
             'If this axis needs to be compressed (either due to its own `scaleanchor` and',
             '`scaleratio` or those of the other axis), determines how that happens:',
@@ -52997,7 +54376,7 @@ module.exports = {
         valType: 'enumerated',
         values: ['left', 'center', 'right', 'top', 'middle', 'bottom'],
         role: 'info',
-        editType: 'calc',
+        editType: 'plot',
         description: [
             'If this axis needs to be compressed (either due to its own `scaleanchor` and',
             '`scaleratio` or those of the other axis), determines which direction we push',
@@ -53010,7 +54389,7 @@ module.exports = {
         valType: 'enumerated',
         values: ['auto', 'linear', 'array'],
         role: 'info',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         impliedEdits: {tick0: undefined, dtick: undefined},
         description: [
             'Sets the tick mode for this axis.',
@@ -53028,7 +54407,7 @@ module.exports = {
         min: 0,
         dflt: 0,
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Specifies the maximum number of ticks for the particular axis.',
             'The actual number of ticks will be chosen automatically to be',
@@ -53039,7 +54418,7 @@ module.exports = {
     tick0: {
         valType: 'any',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         impliedEdits: {tickmode: 'linear'},
         description: [
             'Sets the placement of the first tick on this axis.',
@@ -53055,7 +54434,7 @@ module.exports = {
     dtick: {
         valType: 'any',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         impliedEdits: {tickmode: 'linear'},
         description: [
             'Sets the step in-between ticks on this axis. Use with `tick0`.',
@@ -53081,7 +54460,7 @@ module.exports = {
     },
     tickvals: {
         valType: 'data_array',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Sets the values at which ticks on this axis appear.',
             'Only has an effect if `tickmode` is set to *array*.',
@@ -53090,7 +54469,7 @@ module.exports = {
     },
     ticktext: {
         valType: 'data_array',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Sets the text displayed at the ticks position via `tickvals`.',
             'Only has an effect if `tickmode` is set to *array*.',
@@ -53101,7 +54480,7 @@ module.exports = {
         valType: 'enumerated',
         values: ['outside', 'inside', ''],
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Determines whether ticks are drawn or not.',
             'If **, this axis\' ticks are not drawn.',
@@ -53153,8 +54532,18 @@ module.exports = {
         valType: 'boolean',
         dflt: true,
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: 'Determines whether or not the tick labels are drawn.'
+    },
+    automargin: {
+        valType: 'boolean',
+        dflt: false,
+        role: 'style',
+        editType: 'ticks+margins',
+        description: [
+            'Determines whether long tick labels automatically grow the figure',
+            'margins.'
+        ].join(' ')
     },
     showspikes: {
         valType: 'boolean',
@@ -53208,14 +54597,14 @@ module.exports = {
         description: 'Determines whether spikelines are stuck to the cursor or to the closest datapoints.'
     },
     tickfont: fontAttrs({
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: 'Sets the tick font.'
     }),
     tickangle: {
         valType: 'angle',
         dflt: 'auto',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Sets the angle of the tick labels with respect to the horizontal.',
             'For example, a `tickangle` of -90 draws the tick labels',
@@ -53226,7 +54615,7 @@ module.exports = {
         valType: 'string',
         dflt: '',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: 'Sets a tick label prefix.'
     },
     showtickprefix: {
@@ -53234,7 +54623,7 @@ module.exports = {
         values: ['all', 'first', 'last', 'none'],
         dflt: 'all',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'If *all*, all tick labels are displayed with a prefix.',
             'If *first*, only the first tick is displayed with a prefix.',
@@ -53246,7 +54635,7 @@ module.exports = {
         valType: 'string',
         dflt: '',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: 'Sets a tick label suffix.'
     },
     showticksuffix: {
@@ -53254,7 +54643,7 @@ module.exports = {
         values: ['all', 'first', 'last', 'none'],
         dflt: 'all',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: 'Same as `showtickprefix` but for tick suffixes.'
     },
     showexponent: {
@@ -53262,7 +54651,7 @@ module.exports = {
         values: ['all', 'first', 'last', 'none'],
         dflt: 'all',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'If *all*, all exponents are shown besides their significands.',
             'If *first*, only the exponent of the first tick is shown.',
@@ -53275,7 +54664,7 @@ module.exports = {
         values: ['none', 'e', 'E', 'power', 'SI', 'B'],
         dflt: 'B',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Determines a formatting rule for the tick exponents.',
             'For example, consider the number 1,000,000,000.',
@@ -53291,7 +54680,7 @@ module.exports = {
         valType: 'boolean',
         dflt: false,
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'If "true", even 4-digit integers are separated'
         ].join(' ')
@@ -53300,7 +54689,7 @@ module.exports = {
         valType: 'string',
         dflt: '',
         role: 'style',
-        editType: 'ticks',
+        editType: 'ticks+margins',
         description: [
             'Sets the tick label formatting rule using d3 formatting mini-languages',
             'which are very similar to those in Python. For numbers, see:',
@@ -53319,10 +54708,10 @@ module.exports = {
             valType: 'info_array',
             role: 'info',
             items: [
-                {valType: 'any', editType: 'ticks'},
-                {valType: 'any', editType: 'ticks'}
+                {valType: 'any', editType: 'ticks+margins'},
+                {valType: 'any', editType: 'ticks+margins'}
             ],
-            editType: 'ticks',
+            editType: 'ticks+margins',
             description: [
                 'range [*min*, *max*], where *min*, *max* - dtick values',
                 'which describe some zoom level, it is possible to omit *min*',
@@ -53333,12 +54722,12 @@ module.exports = {
             valType: 'string',
             dflt: '',
             role: 'style',
-            editType: 'ticks',
+            editType: 'ticks+margins',
             description: [
                 'string - dtickformat for described zoom level, the same as *tickformat*'
             ].join(' ')
         },
-        editType: 'ticks'
+        editType: 'ticks+margins'
     },
     hoverformat: {
         valType: 'string',
@@ -53440,7 +54829,7 @@ module.exports = {
             constants.idRegex.y.toString()
         ],
         role: 'info',
-        editType: 'plot',
+        editType: 'plot+margins',
         description: [
             'If set to an opposite-letter axis id (e.g. `x2`, `y`), this axis is bound to',
             'the corresponding opposite-letter axis.',
@@ -53453,7 +54842,7 @@ module.exports = {
         valType: 'enumerated',
         values: ['top', 'bottom', 'left', 'right'],
         role: 'info',
-        editType: 'plot',
+        editType: 'plot+margins',
         description: [
             'Determines whether a x (y) axis is positioned',
             'at the *bottom* (*left*) or *top* (*right*)',
@@ -53471,7 +54860,7 @@ module.exports = {
             constants.idRegex.y.toString()
         ],
         role: 'info',
-        editType: 'calc',
+        editType: 'plot',
         description: [
             'If set a same-letter axis id, this axis is overlaid on top of',
             'the corresponding same-letter axis.',
@@ -53497,11 +54886,11 @@ module.exports = {
         valType: 'info_array',
         role: 'info',
         items: [
-            {valType: 'number', min: 0, max: 1, editType: 'calc'},
-            {valType: 'number', min: 0, max: 1, editType: 'calc'}
+            {valType: 'number', min: 0, max: 1, editType: 'plot+margins'},
+            {valType: 'number', min: 0, max: 1, editType: 'plot+margins'}
         ],
         dflt: [0, 1],
-        editType: 'calc',
+        editType: 'plot+margins',
         description: [
             'Sets the domain of this axis (in plot fraction).'
         ].join(' ')
@@ -53512,7 +54901,7 @@ module.exports = {
         max: 1,
         dflt: 0,
         role: 'style',
-        editType: 'plot',
+        editType: 'plot+margins',
         description: [
             'Sets the position of this axis in the plotting space',
             '(in normalized coordinates).',
@@ -53556,7 +54945,7 @@ module.exports = {
         autotick: {
             valType: 'boolean',
             role: 'info',
-            editType: 'ticks',
+            editType: 'ticks+margins',
             description: [
                 'Obsolete.',
                 'Set `tickmode` to *auto* for old `autotick` *true* behavior.',
@@ -53566,7 +54955,7 @@ module.exports = {
     }
 };
 
-},{"../../components/color/attributes":34,"../../components/drawing/attributes":59,"../../lib/extend":146,"../font_attributes":221,"./constants":200}],208:[function(require,module,exports){
+},{"../../components/color/attributes":35,"../../components/drawing/attributes":60,"../../lib/extend":149,"../font_attributes":224,"./constants":202}],210:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -53707,6 +55096,7 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut, fullData) {
             data: fullData,
             bgColor: bgColor,
             calendar: layoutOut.calendar,
+            automargin: true,
             cheateronly: axLetter === 'x' && xaCheater[axName] && !xaNonCheater[axName]
         };
 
@@ -53730,7 +55120,8 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut, fullData) {
         var positioningOptions = {
             letter: axLetter,
             counterAxes: counterAxes[axLetter],
-            overlayableAxes: overlayableAxes
+            overlayableAxes: overlayableAxes,
+            grid: layoutOut.grid
         };
 
         handlePositionDefaults(axLayoutIn, axLayoutOut, coerce, positioningOptions);
@@ -53798,7 +55189,7 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut, fullData) {
     }
 };
 
-},{"../../components/color":35,"../../lib":152,"../../registry":234,"../layout_attributes":225,"./axis_defaults":197,"./axis_ids":198,"./constraint_defaults":201,"./layout_attributes":207,"./position_defaults":211,"./type_defaults":219}],209:[function(require,module,exports){
+},{"../../components/color":36,"../../lib":155,"../../registry":237,"../layout_attributes":228,"./axis_defaults":199,"./axis_ids":200,"./constraint_defaults":203,"./layout_attributes":209,"./position_defaults":213,"./type_defaults":221}],211:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -53863,7 +55254,7 @@ module.exports = function handleLineGridDefaults(containerIn, containerOut, coer
     }
 };
 
-},{"../../components/color/attributes":34,"../../lib":152,"tinycolor2":302}],210:[function(require,module,exports){
+},{"../../components/color/attributes":35,"../../lib":155,"tinycolor2":305}],212:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -53942,7 +55333,7 @@ module.exports = function orderedCategories(axisLetter, categoryorder, categorya
     }
 };
 
-},{"d3":3}],211:[function(require,module,exports){
+},{"d3":3}],213:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -53960,26 +55351,43 @@ var Lib = require('../../lib');
 
 
 module.exports = function handlePositionDefaults(containerIn, containerOut, coerce, options) {
-    var counterAxes = options.counterAxes || [],
-        overlayableAxes = options.overlayableAxes || [],
-        letter = options.letter;
+    var counterAxes = options.counterAxes || [];
+    var overlayableAxes = options.overlayableAxes || [];
+    var letter = options.letter;
+    var grid = options.grid;
+
+    var dfltAnchor, dfltDomain, dfltSide, dfltPosition;
+
+    if(grid) {
+        dfltDomain = grid._domains[letter][grid._axisMap[containerOut._id]];
+        dfltAnchor = grid._anchors[containerOut._id];
+        if(dfltDomain) {
+            dfltSide = grid[letter + 'side'].split(' ')[0];
+            dfltPosition = grid.domain[letter][dfltSide === 'right' || dfltSide === 'top' ? 1 : 0];
+        }
+    }
+
+    // Even if there's a grid, this axis may not be in it - fall back on non-grid defaults
+    dfltDomain = dfltDomain || [0, 1];
+    dfltAnchor = dfltAnchor || (isNumeric(containerIn.position) ? 'free' : (counterAxes[0] || 'free'));
+    dfltSide = dfltSide || (letter === 'x' ? 'bottom' : 'left');
+    dfltPosition = dfltPosition || 0;
 
     var anchor = Lib.coerce(containerIn, containerOut, {
         anchor: {
             valType: 'enumerated',
             values: ['free'].concat(counterAxes),
-            dflt: isNumeric(containerIn.position) ? 'free' :
-                (counterAxes[0] || 'free')
+            dflt: dfltAnchor
         }
     }, 'anchor');
 
-    if(anchor === 'free') coerce('position');
+    if(anchor === 'free') coerce('position', dfltPosition);
 
     Lib.coerce(containerIn, containerOut, {
         side: {
             valType: 'enumerated',
             values: letter === 'x' ? ['bottom', 'top'] : ['left', 'right'],
-            dflt: letter === 'x' ? 'bottom' : 'left'
+            dflt: dfltSide
         }
     }, 'side');
 
@@ -53999,9 +55407,9 @@ module.exports = function handlePositionDefaults(containerIn, containerOut, coer
         // in ax.setscale()... but this means we still need (imperfect) logic
         // in the axes popover to hide domain for the overlaying axis.
         // perhaps I should make a private version _domain that all axes get???
-        var domain = coerce('domain');
-        if(domain[0] > domain[1] - 0.01) containerOut.domain = [0, 1];
-        Lib.noneOrAll(containerIn.domain, containerOut.domain, [0, 1]);
+        var domain = coerce('domain', dfltDomain);
+        if(domain[0] > domain[1] - 0.01) containerOut.domain = dfltDomain;
+        Lib.noneOrAll(containerIn.domain, containerOut.domain, dfltDomain);
     }
 
     coerce('layer');
@@ -54009,7 +55417,7 @@ module.exports = function handlePositionDefaults(containerIn, containerOut, coer
     return containerOut;
 };
 
-},{"../../lib":152,"fast-isnumeric":5}],212:[function(require,module,exports){
+},{"../../lib":155,"fast-isnumeric":5}],214:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -54037,7 +55445,7 @@ module.exports = function scaleZoom(ax, factor, centerFraction) {
     ];
 };
 
-},{"../../constants/alignment":133}],213:[function(require,module,exports){
+},{"../../constants/alignment":136}],215:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -54429,7 +55837,7 @@ function fillSelectionItem(selection, searchInfo) {
     return selection;
 }
 
-},{"../../components/color":35,"../../components/fx":77,"../../components/fx/helpers":74,"../../lib/polygon":164,"../../lib/throttle":174,"./axes":195,"./constants":200,"polybooljs":294}],214:[function(require,module,exports){
+},{"../../components/color":36,"../../components/fx":78,"../../components/fx/helpers":75,"../../lib/polygon":167,"../../lib/throttle":177,"./axes":197,"./constants":202,"polybooljs":297}],216:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -54830,30 +56238,42 @@ module.exports = function setConvert(ax, fullLayout) {
     // in case the expected data isn't there, make a list of
     // integers based on the opposite data
     ax.makeCalcdata = function(trace, axLetter) {
-        var arrayIn, arrayOut, i;
+        var arrayIn, arrayOut, i, len;
 
-        var cal = ax.type === 'date' && trace[axLetter + 'calendar'];
+        var axType = ax.type;
+        var cal = axType === 'date' && trace[axLetter + 'calendar'];
 
         if(axLetter in trace) {
             arrayIn = trace[axLetter];
-            arrayOut = new Array(arrayIn.length);
+            len = trace._length || arrayIn.length;
 
-            for(i = 0; i < arrayIn.length; i++) {
+            if(Lib.isTypedArray(arrayIn) && (axType === 'linear' || axType === 'log')) {
+                if(len === arrayIn.length) {
+                    return arrayIn;
+                } else if(arrayIn.subarray) {
+                    return arrayIn.subarray(0, len);
+                }
+            }
+
+            arrayOut = new Array(len);
+            for(i = 0; i < len; i++) {
                 arrayOut[i] = ax.d2c(arrayIn[i], 0, cal);
             }
         }
         else {
-            var v0 = ((axLetter + '0') in trace) ?
-                    ax.d2c(trace[axLetter + '0'], 0, cal) : 0,
-                dv = (trace['d' + axLetter]) ?
-                    Number(trace['d' + axLetter]) : 1;
+            var v0 = ((axLetter + '0') in trace) ? ax.d2c(trace[axLetter + '0'], 0, cal) : 0;
+            var dv = (trace['d' + axLetter]) ? Number(trace['d' + axLetter]) : 1;
 
             // the opposing data, for size if we have x and dx etc
             arrayIn = trace[{x: 'y', y: 'x'}[axLetter]];
-            arrayOut = new Array(arrayIn.length);
+            len = trace._length || arrayIn.length;
+            arrayOut = new Array(len);
 
-            for(i = 0; i < arrayIn.length; i++) arrayOut[i] = v0 + i * dv;
+            for(i = 0; i < len; i++) {
+                arrayOut[i] = v0 + i * dv;
+            }
         }
+
         return arrayOut;
     };
 
@@ -54875,11 +56295,26 @@ module.exports = function setConvert(ax, fullLayout) {
         );
     };
 
-    // for autoranging: arrays of objects:
-    //      {val: axis value, pad: pixel padding}
-    // on the low and high sides
-    ax._min = [];
-    ax._max = [];
+    ax.clearCalc = function() {
+        // for autoranging: arrays of objects:
+        // {
+        //     val: axis value,
+        //     pad: pixel padding,
+        //     extrapad: boolean, should this val get 5% additional padding
+        // }
+        ax._min = [];
+        ax._max = [];
+
+        // initialize the category list, if there is one, so we start over
+        // to be filled in later by ax.d2c
+        ax._categories = (ax._initialCategories || []).slice();
+
+        // Build the lookup map for initialized categories
+        ax._categoriesMap = {};
+        for(var j = 0; j < ax._categories.length; j++) {
+            ax._categoriesMap[ax._categories[j]] = j;
+        }
+    };
 
     // Propagate localization into the axis so that
     // methods in Axes can use it w/o having to pass fullLayout
@@ -54889,6 +56324,7 @@ module.exports = function setConvert(ax, fullLayout) {
     var locale = fullLayout._d3locale;
     if(ax.type === 'date') {
         ax._dateFormat = locale ? locale.timeFormat.utc : d3.time.format.utc;
+        ax._extraFormat = fullLayout._extraFormat;
     }
     // occasionally we need _numFormat to pass through
     // even though it won't be needed by this axis
@@ -54900,7 +56336,7 @@ module.exports = function setConvert(ax, fullLayout) {
     delete ax._forceTick0;
 };
 
-},{"../../constants/numerical":135,"../../lib":152,"./axis_ids":198,"./constants":200,"d3":3,"fast-isnumeric":5}],215:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155,"./axis_ids":200,"./constants":202,"d3":3,"fast-isnumeric":5}],217:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -54915,9 +56351,6 @@ module.exports = function setConvert(ax, fullLayout) {
 var Lib = require('../../lib');
 var layoutAttributes = require('./layout_attributes');
 
-/**
- * options: inherits font, outerTicks, noHover from axes.handleAxisDefaults
- */
 module.exports = function handleTickLabelDefaults(containerIn, containerOut, coerce, axType, options) {
     var showAttrDflt = getShowAttrDflt(containerIn);
 
@@ -54951,8 +56384,6 @@ module.exports = function handleTickLabelDefaults(containerIn, containerOut, coe
             }
         }
     }
-
-    if(axType !== 'category' && !options.noHover) coerce('hoverformat');
 };
 
 /*
@@ -55008,7 +56439,7 @@ function tickformatstopsDefaults(tickformatIn, tickformatOut) {
     }
 }
 
-},{"../../lib":152,"./layout_attributes":207}],216:[function(require,module,exports){
+},{"../../lib":155,"./layout_attributes":209}],218:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -55041,7 +56472,7 @@ module.exports = function handleTickDefaults(containerIn, containerOut, coerce, 
     }
 };
 
-},{"../../lib":152,"./layout_attributes":207}],217:[function(require,module,exports){
+},{"../../lib":155,"./layout_attributes":209}],219:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -55125,7 +56556,7 @@ module.exports = function handleTickValueDefaults(containerIn, containerOut, coe
     }
 };
 
-},{"../../constants/numerical":135,"../../lib":152,"fast-isnumeric":5}],218:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155,"fast-isnumeric":5}],220:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -55134,12 +56565,10 @@ module.exports = function handleTickValueDefaults(containerIn, containerOut, coe
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
 var d3 = require('d3');
 
-var Plotly = require('../../plotly');
 var Registry = require('../../registry');
 var Drawing = require('../../components/drawing');
 var Axes = require('./axes');
@@ -55402,7 +56831,7 @@ module.exports = function transitionAxes(gd, newLayout, transitionOpts, makeOnCo
         // Signal that this transition has completed:
         onComplete && onComplete();
 
-        return Plotly.relayout(gd, aobj).then(function() {
+        return Registry.call('relayout', gd, aobj).then(function() {
             for(var i = 0; i < affectedSubplots.length; i++) {
                 unsetSubplotTransform(affectedSubplots[i]);
             }
@@ -55419,7 +56848,7 @@ module.exports = function transitionAxes(gd, newLayout, transitionOpts, makeOnCo
             axi.range = axi._r.slice();
         }
 
-        return Plotly.relayout(gd, aobj).then(function() {
+        return Registry.call('relayout', gd, aobj).then(function() {
             for(var i = 0; i < affectedSubplots.length; i++) {
                 unsetSubplotTransform(affectedSubplots[i]);
             }
@@ -55459,7 +56888,7 @@ module.exports = function transitionAxes(gd, newLayout, transitionOpts, makeOnCo
     return Promise.resolve();
 };
 
-},{"../../components/drawing":60,"../../plotly":190,"../../registry":234,"./axes":195,"./constants":200,"d3":3}],219:[function(require,module,exports){
+},{"../../components/drawing":61,"../../registry":237,"./axes":197,"./constants":202,"d3":3}],221:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -55587,7 +57016,7 @@ function isBoxWithoutPositionCoords(trace, axLetter) {
     );
 }
 
-},{"../../registry":234,"./axis_autotype":196,"./axis_ids":198}],220:[function(require,module,exports){
+},{"../../registry":237,"./axis_autotype":198,"./axis_ids":200}],222:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -55596,10 +57025,9 @@ function isBoxWithoutPositionCoords(trace, axLetter) {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
-var Plotly = require('../plotly');
+var Registry = require('../registry');
 var Lib = require('../lib');
 
 /*
@@ -55854,17 +57282,15 @@ function bindingValueHasChanged(gd, binding, cache) {
 exports.executeAPICommand = function(gd, method, args) {
     if(method === 'skip') return Promise.resolve();
 
-    var apiMethod = Plotly[method];
-
+    var _method = Registry.apiMethodRegistry[method];
     var allArgs = [gd];
-
     if(!Array.isArray(args)) args = [];
 
     for(var i = 0; i < args.length; i++) {
         allArgs.push(args[i]);
     }
 
-    return apiMethod.apply(null, allArgs).catch(function(err) {
+    return _method.apply(null, allArgs).catch(function(err) {
         Lib.warn('API call to Plotly.' + method + ' rejected.', err);
         return Promise.reject(err);
     });
@@ -56014,7 +57440,141 @@ function crawl(attrs, callback, path, depth) {
     });
 }
 
-},{"../lib":152,"../plotly":190}],221:[function(require,module,exports){
+},{"../lib":155,"../registry":237}],223:[function(require,module,exports){
+/**
+* Copyright 2012-2018, Plotly, Inc.
+* All rights reserved.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+
+'use strict';
+
+var extendFlat = require('../lib/extend').extendFlat;
+
+/**
+ * Make a xy domain attribute group
+ *
+ * @param {object} opts
+ *   @param {string}
+ *     opts.name: name to be inserted in the default description
+ *   @param {boolean}
+ *     opts.trace: set to true for trace containers
+ *   @param {string}
+ *     opts.editType: editType for all pieces
+ *   @param {boolean}
+ *     opts.noGridCell: set to true to omit `row` and `column`
+ *
+ * @param {object} extra
+ *   @param {string}
+ *     extra.description: extra description. N.B we use
+ *     a separate extra container to make it compatible with
+ *     the compress_attributes transform.
+ *
+ * @return {object} attributes object containing {x,y} as specified
+ */
+exports.attributes = function(opts, extra) {
+    opts = opts || {};
+    extra = extra || {};
+
+    var base = {
+        valType: 'info_array',
+        role: 'info',
+        editType: opts.editType,
+        items: [
+            {valType: 'number', min: 0, max: 1, editType: opts.editType},
+            {valType: 'number', min: 0, max: 1, editType: opts.editType}
+        ],
+        dflt: [0, 1]
+    };
+
+    var namePart = opts.name ? opts.name + ' ' : '';
+    var contPart = opts.trace ? 'trace ' : 'subplot ';
+    var descPart = extra.description ? ' ' + extra.description : '';
+
+    var out = {
+        x: extendFlat({}, base, {
+            description: [
+                'Sets the horizontal domain of this ',
+                namePart,
+                contPart,
+                '(in plot fraction).',
+                descPart
+            ].join('')
+        }),
+        y: extendFlat({}, base, {
+            description: [
+                'Sets the vertical domain of this ',
+                namePart,
+                contPart,
+                '(in plot fraction).',
+                descPart
+            ].join('')
+        }),
+        editType: opts.editType
+    };
+
+    if(!opts.noGridCell) {
+        out.row = {
+            valType: 'integer',
+            min: 0,
+            dflt: 0,
+            role: 'info',
+            editType: opts.editType,
+            description: [
+                'If there is a layout grid, use the domain ',
+                'for this row in the grid for this ',
+                namePart,
+                contPart,
+                '.',
+                descPart
+            ].join('')
+        };
+        out.column = {
+            valType: 'integer',
+            min: 0,
+            dflt: 0,
+            role: 'info',
+            editType: opts.editType,
+            description: [
+                'If there is a layout grid, use the domain ',
+                'for this column in the grid for this ',
+                namePart,
+                contPart,
+                '.',
+                descPart
+            ].join('')
+        };
+    }
+
+    return out;
+};
+
+exports.defaults = function(containerOut, layout, coerce, dfltDomains) {
+    var dfltX = (dfltDomains && dfltDomains.x) || [0, 1];
+    var dfltY = (dfltDomains && dfltDomains.y) || [0, 1];
+
+    var grid = layout.grid;
+    if(grid) {
+        var column = coerce('domain.column');
+        if(column !== undefined) {
+            if(column < grid.columns) dfltX = grid._domains.x[column];
+            else delete containerOut.domain.column;
+        }
+
+        var row = coerce('domain.row');
+        if(row !== undefined) {
+            if(row < grid.rows) dfltY = grid._domains.y[row];
+            else delete containerOut.domain.row;
+        }
+    }
+
+    coerce('domain.x', dfltX);
+    coerce('domain.y', dfltY);
+};
+
+},{"../lib/extend":149}],224:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -56090,7 +57650,7 @@ module.exports = function(opts) {
     return attrs;
 };
 
-},{}],222:[function(require,module,exports){
+},{}],225:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -56152,7 +57712,7 @@ module.exports = {
     }
 };
 
-},{}],223:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -56246,7 +57806,7 @@ exports.getSubplotData = function getSubplotData(data, type, subplotId) {
     return subplotData;
 };
 
-},{"../registry":234,"./cartesian/constants":200}],224:[function(require,module,exports){
+},{"../registry":237,"./cartesian/constants":202}],227:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -56280,7 +57840,7 @@ function project(camera, v) {
 
 module.exports = project;
 
-},{}],225:[function(require,module,exports){
+},{}],228:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -56342,7 +57902,7 @@ module.exports = {
         role: 'info',
         min: 10,
         dflt: 700,
-        editType: 'none',
+        editType: 'plot',
         description: [
             'Sets the plot\'s width (in px).'
         ].join(' ')
@@ -56352,7 +57912,7 @@ module.exports = {
         role: 'info',
         min: 10,
         dflt: 450,
-        editType: 'none',
+        editType: 'plot',
         description: [
             'Sets the plot\'s height (in px).'
         ].join(' ')
@@ -56363,7 +57923,7 @@ module.exports = {
             role: 'info',
             min: 0,
             dflt: 80,
-            editType: 'calc',
+            editType: 'plot',
             description: 'Sets the left margin (in px).'
         },
         r: {
@@ -56371,7 +57931,7 @@ module.exports = {
             role: 'info',
             min: 0,
             dflt: 80,
-            editType: 'calc',
+            editType: 'plot',
             description: 'Sets the right margin (in px).'
         },
         t: {
@@ -56379,7 +57939,7 @@ module.exports = {
             role: 'info',
             min: 0,
             dflt: 100,
-            editType: 'calc',
+            editType: 'plot',
             description: 'Sets the top margin (in px).'
         },
         b: {
@@ -56387,7 +57947,7 @@ module.exports = {
             role: 'info',
             min: 0,
             dflt: 80,
-            editType: 'calc',
+            editType: 'plot',
             description: 'Sets the bottom margin (in px).'
         },
         pad: {
@@ -56395,7 +57955,7 @@ module.exports = {
             role: 'info',
             min: 0,
             dflt: 0,
-            editType: 'calc',
+            editType: 'plot',
             description: [
                 'Sets the amount of padding (in px)',
                 'between the plotting area and the axis lines'
@@ -56405,9 +57965,9 @@ module.exports = {
             valType: 'boolean',
             role: 'info',
             dflt: true,
-            editType: 'calc'
+            editType: 'plot'
         },
-        editType: 'calc'
+        editType: 'plot'
     },
     paper_bgcolor: {
         valType: 'color',
@@ -56465,9 +58025,23 @@ module.exports = {
         editType: 'calc',
         description: 'Sets the default trace colors.'
     },
+    datarevision: {
+        valType: 'any',
+        role: 'info',
+        editType: 'calc',
+        description: [
+            'If provided, a changed value tells `Plotly.react` that',
+            'one or more data arrays has changed. This way you can modify',
+            'arrays in-place rather than making a complete new copy for an',
+            'incremental change.',
+            'If NOT provided, `Plotly.react` assumes that data arrays are',
+            'being treated as immutable, thus any data array with a',
+            'different identity from its predecessor contains new data.'
+        ].join(' ')
+    }
 };
 
-},{"../components/color/attributes":34,"./font_attributes":221}],226:[function(require,module,exports){
+},{"../components/color/attributes":35,"./font_attributes":224}],229:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -56513,7 +58087,7 @@ module.exports = {
     editType: 'arraydraw'
 };
 
-},{}],227:[function(require,module,exports){
+},{}],230:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -56528,9 +58102,8 @@ module.exports = {
 var d3 = require('d3');
 var isNumeric = require('fast-isnumeric');
 
-var Plotly = require('../plotly');
-var PlotSchema = require('../plot_api/plot_schema');
 var Registry = require('../registry');
+var PlotSchema = require('../plot_api/plot_schema');
 var axisIDs = require('../plots/cartesian/axis_ids');
 var Lib = require('../lib');
 var _ = Lib._;
@@ -56556,8 +58129,6 @@ plots.layoutAttributes = require('./layout_attributes');
 plots.fontWeight = 'normal';
 
 var transformsRegistry = plots.transformsRegistry;
-
-var ErrorBars = require('../components/errorbars');
 
 var commandModule = require('./command');
 plots.executeAPICommand = commandModule.executeAPICommand;
@@ -56621,7 +58192,7 @@ plots.resize = function(gd) {
             // nor should it be included in the undo queue
             gd.autoplay = true;
 
-            Plotly.relayout(gd, { autosize: true }).then(function() {
+            Registry.call('relayout', gd, {autosize: true}).then(function() {
                 gd.changed = oldchanged;
                 resolve(gd);
             });
@@ -56766,6 +58337,16 @@ plots.sendDataToCloud = function(gd) {
     return false;
 };
 
+var d3FormatKeys = [
+    'days', 'shortDays', 'months', 'shortMonths', 'periods',
+    'dateTime', 'date', 'time',
+    'decimal', 'thousands', 'grouping', 'currency'
+];
+
+var extraFormatKeys = [
+    'year', 'month', 'dayMonth', 'dayMonthYear'
+];
+
 // Fill in default values:
 //
 // gd.data, gd.layout:
@@ -56787,13 +58368,21 @@ plots.sendDataToCloud = function(gd) {
 //   is a list of all the transform modules invoked.
 //
 plots.supplyDefaults = function(gd) {
-    var oldFullLayout = gd._fullLayout || {},
-        newFullLayout = gd._fullLayout = {},
-        newLayout = gd.layout || {};
+    var oldFullLayout = gd._fullLayout || {};
 
-    var oldFullData = gd._fullData || [],
-        newFullData = gd._fullData = [],
-        newData = gd.data || [];
+    if(oldFullLayout._skipDefaults) {
+        delete oldFullLayout._skipDefaults;
+        return;
+    }
+
+    var newFullLayout = gd._fullLayout = {};
+    var newLayout = gd.layout || {};
+
+    var oldFullData = gd._fullData || [];
+    var newFullData = gd._fullData = [];
+    var newData = gd.data || [];
+
+    var context = gd._context || {};
 
     var i;
 
@@ -56820,7 +58409,10 @@ plots.supplyDefaults = function(gd) {
     };
     newFullLayout._traceWord = _(gd, 'trace');
 
-    var formatObj = getD3FormatObj(gd);
+    var formatObj = getFormatObj(gd, d3FormatKeys);
+
+    // stash the token from context so mapbox subplots can use it as default
+    newFullLayout._mapboxAccessToken = context.mapboxAccessToken;
 
     // first fill in what we can of layout without looking at data
     // because fullData needs a few things from layout
@@ -56843,7 +58435,7 @@ plots.supplyDefaults = function(gd) {
 
         var missingWidthOrHeight = (!newLayout.width || !newLayout.height),
             autosize = newFullLayout.autosize,
-            autosizable = gd._context && gd._context.autosizable,
+            autosizable = context.autosizable,
             initialAutoSize = missingWidthOrHeight && (autosize || autosizable);
 
         if(initialAutoSize) plots.plotAutoSize(gd, newLayout, newFullLayout);
@@ -56857,6 +58449,7 @@ plots.supplyDefaults = function(gd) {
     }
 
     newFullLayout._d3locale = getFormatter(formatObj, newFullLayout.separators);
+    newFullLayout._extraFormat = getFormatObj(gd, extraFormatKeys);
 
     newFullLayout._initialAutoSizeIsDone = true;
 
@@ -56996,21 +58589,18 @@ function remapTransformedArrays(cd0, newTrace) {
     }
 }
 
-var formatKeys = [
-    'days', 'shortDays', 'months', 'shortMonths', 'periods',
-    'dateTime', 'date', 'time',
-    'decimal', 'thousands', 'grouping', 'currency'
-];
-
 /**
- * getD3FormatObj: use _context to get the d3.locale argument object.
+ * getFormatObj: use _context to get the format object from locale.
+ * Used to get d3.locale argument object and extraFormat argument object
+ *
+ * Regarding d3.locale argument :
  * decimal and thousands can be overridden later by layout.separators
  * grouping and currency are not presently used by our automatic number
  * formatting system but can be used by custom formats.
  *
  * @returns {object} d3.locale format object
  */
-function getD3FormatObj(gd) {
+function getFormatObj(gd, formatKeys) {
     var locale = gd._context.locale;
     if(!locale) locale === 'en-US';
 
@@ -57200,11 +58790,6 @@ plots.linkSubplots = function(newFullData, newFullLayout, oldFullData, oldFullLa
     var ids = newSubplotList.cartesian.concat(newSubplotList.gl2d || []);
 
     var i, j, id, ax;
-
-    // sort subplot lists
-    for(var subplotType in newSubplotList) {
-        newSubplotList[subplotType].sort(Lib.subplotSort);
-    }
 
     for(i = 0; i < ids.length; i++) {
         id = ids[i];
@@ -57607,7 +59192,7 @@ plots.supplyTraceDefaults = function(traceIn, colorIndex, layout, traceInIndex) 
         coerce('customdata');
         coerce('ids');
 
-        if(plots.traceIs(traceOut, 'showLegend')) {
+        if(Registry.traceIs(traceOut, 'showLegend')) {
             coerce('showlegend');
             coerce('legendgroup');
         }
@@ -57624,9 +59209,9 @@ plots.supplyTraceDefaults = function(traceIn, colorIndex, layout, traceInIndex) 
             Lib.coerceHoverinfo(traceIn, traceOut, layout);
         }
 
-        if(!plots.traceIs(traceOut, 'noOpacity')) coerce('opacity');
+        if(!Registry.traceIs(traceOut, 'noOpacity')) coerce('opacity');
 
-        if(plots.traceIs(traceOut, 'notLegendIsolatable')) {
+        if(Registry.traceIs(traceOut, 'notLegendIsolatable')) {
             // This clears out the legendonly state for traces like carpet that
             // cannot be isolated in the legend
             traceOut.visible = !!traceOut.visible;
@@ -57747,12 +59332,16 @@ plots.supplyLayoutGlobalDefaults = function(layoutIn, layoutOut, formatObj) {
 
     if(layoutIn.width && layoutIn.height) plots.sanitizeMargins(layoutOut);
 
+    Registry.getComponentMethod('grid', 'sizeDefaults')(layoutIn, layoutOut);
+
     coerce('paper_bgcolor');
 
     coerce('separators', formatObj.decimal + formatObj.thousands);
     coerce('hidesources');
 
     coerce('colorway');
+
+    coerce('datarevision');
 
     Registry.getComponentMethod(
         'calendars',
@@ -57882,7 +59471,13 @@ plots.supplyLayoutModuleDefaults = function(layoutIn, layoutOut, fullData, trans
 
     // ensure all cartesian axes have at least one subplot
     if(layoutOut._has('cartesian')) {
+        Registry.getComponentMethod('grid', 'contentDefaults')(layoutIn, layoutOut);
         Cartesian.finalizeSubplots(layoutIn, layoutOut);
+    }
+
+    // sort subplot lists
+    for(var subplotType in layoutOut._subplots) {
+        layoutOut._subplots[subplotType].sort(Lib.subplotSort);
     }
 
     // base plot module layout defaults
@@ -58165,7 +59760,7 @@ plots.doAutoMargin = function(gd) {
     // if things changed and we're not already redrawing, trigger a redraw
     if(!fullLayout._replotting && oldmargins !== '{}' &&
             oldmargins !== JSON.stringify(fullLayout._size)) {
-        return Plotly.plot(gd);
+        return Registry.call('plot', gd);
     }
 };
 
@@ -58287,7 +59882,7 @@ plots.graphJson = function(gd, dataonly, mode, output, useDefaults) {
 plots.modifyFrames = function(gd, operations) {
     var i, op, frame;
     var _frames = gd._transitionData._frames;
-    var _hash = gd._transitionData._frameHash;
+    var _frameHash = gd._transitionData._frameHash;
 
     for(i = 0; i < operations.length; i++) {
         op = operations[i];
@@ -58296,32 +59891,32 @@ plots.modifyFrames = function(gd, operations) {
             // No reason this couldn't exist, but is currently unused/untested:
             /* case 'rename':
                 frame = _frames[op.index];
-                delete _hash[frame.name];
-                _hash[op.name] = frame;
+                delete _frameHash[frame.name];
+                _frameHash[op.name] = frame;
                 frame.name = op.name;
                 break;*/
             case 'replace':
                 frame = op.value;
                 var oldName = (_frames[op.index] || {}).name;
                 var newName = frame.name;
-                _frames[op.index] = _hash[newName] = frame;
+                _frames[op.index] = _frameHash[newName] = frame;
 
                 if(newName !== oldName) {
                     // If name has changed in addition to replacement, then update
                     // the lookup table:
-                    delete _hash[oldName];
-                    _hash[newName] = frame;
+                    delete _frameHash[oldName];
+                    _frameHash[newName] = frame;
                 }
 
                 break;
             case 'insert':
                 frame = op.value;
-                _hash[frame.name] = frame;
+                _frameHash[frame.name] = frame;
                 _frames.splice(op.index, 0, frame);
                 break;
             case 'delete':
                 frame = _frames[op.index];
-                delete _hash[frame.name];
+                delete _frameHash[frame.name];
                 _frames.splice(op.index, 1);
                 break;
         }
@@ -58507,7 +60102,7 @@ plots.extendObjectWithContainers = function(dest, src, containerPaths) {
     return dest;
 };
 
-plots.dataArrayContainers = ['transforms'];
+plots.dataArrayContainers = ['transforms', 'dimensions'];
 plots.layoutArrayContainers = Registry.layoutArrayContainers;
 
 /*
@@ -58609,7 +60204,7 @@ plots.transition = function(gd, data, layout, traces, frameOpts, transitionOpts)
 
         plots.doCalcdata(gd);
 
-        ErrorBars.calc(gd);
+        Registry.getComponentMethod('errorbars', 'calc')(gd);
 
         return Promise.resolve();
     }
@@ -58657,7 +60252,7 @@ plots.transition = function(gd, data, layout, traces, frameOpts, transitionOpts)
 
             if(frameOpts.redraw) {
                 gd._transitionData._interruptCallbacks.push(function() {
-                    return Plotly.redraw(gd);
+                    return Registry.call('redraw', gd);
                 });
             }
 
@@ -58729,7 +60324,7 @@ plots.transition = function(gd, data, layout, traces, frameOpts, transitionOpts)
 
         return Promise.resolve().then(function() {
             if(frameOpts.redraw) {
-                return Plotly.redraw(gd);
+                return Registry.call('redraw', gd);
             }
         }).then(function() {
             // Set transitioning false again once the redraw has occurred. This is used, for example,
@@ -58760,14 +60355,6 @@ plots.transition = function(gd, data, layout, traces, frameOpts, transitionOpts)
         var module = contFull._module;
 
         if(!module) continue;
-
-        if(!module.animatable) {
-            var thisUpdate = {};
-
-            for(var ai in data[i]) {
-                thisUpdate[ai] = [data[i][ai]];
-            }
-        }
     }
 
     var seq = [plots.previousPromises, interruptPreviousTransitions, prepareTransitions, plots.rehover, executeTransitions];
@@ -58840,7 +60427,7 @@ plots.doCalcdata = function(gd, traces) {
         );
     }
 
-    initCategories(axList);
+    clearAxesCalc(axList);
 
     var hasCalcTransform = false;
 
@@ -58870,15 +60457,7 @@ plots.doCalcdata = function(gd, traces) {
     }
 
     // clear stuff that should recomputed in 'regular' loop
-    if(hasCalcTransform) {
-        for(i = 0; i < axList.length; i++) {
-            axList[i]._min = [];
-            axList[i]._max = [];
-            axList[i]._categories = [];
-            axList[i]._categoriesMap = {};
-        }
-        initCategories(axList);
-    }
+    if(hasCalcTransform) clearAxesCalc(axList);
 
     // 'regular' loop
     for(i = 0; i < fullData.length; i++) {
@@ -58925,17 +60504,9 @@ plots.doCalcdata = function(gd, traces) {
     Registry.getComponentMethod('fx', 'calc')(gd);
 };
 
-// initialize the category list, if there is one, so we start over
-// to be filled in later by ax.d2c
-function initCategories(axList) {
+function clearAxesCalc(axList) {
     for(var i = 0; i < axList.length; i++) {
-        axList[i]._categories = axList[i]._initialCategories.slice();
-
-        // Build the lookup map for initialized categories
-        axList[i]._categoriesMap = {};
-        for(var j = 0; j < axList[i]._categories.length; j++) {
-            axList[i]._categoriesMap[axList[i]._categories[j]] = j;
-        }
+        axList[i].clearCalc();
     }
 }
 
@@ -58988,7 +60559,7 @@ plots.generalUpdatePerTraceModule = function(gd, subplot, subplotCalcData, subpl
     subplot.traceHash = traceHash;
 };
 
-},{"../components/color":35,"../components/errorbars":66,"../constants/numerical":135,"../lib":152,"../plot_api/plot_schema":184,"../plotly":190,"../plots/cartesian/axis_ids":198,"../registry":234,"./animation_attributes":191,"./attributes":193,"./command":220,"./font_attributes":221,"./frame_attributes":222,"./layout_attributes":225,"d3":3,"fast-isnumeric":5}],228:[function(require,module,exports){
+},{"../components/color":36,"../constants/numerical":138,"../lib":155,"../plot_api/plot_schema":188,"../plots/cartesian/axis_ids":200,"../registry":237,"./animation_attributes":192,"./attributes":194,"./command":222,"./font_attributes":224,"./frame_attributes":225,"./layout_attributes":228,"d3":3,"fast-isnumeric":5}],231:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -59014,7 +60585,7 @@ module.exports = {
     }
 };
 
-},{"../../../traces/scatter/attributes":269}],229:[function(require,module,exports){
+},{"../../../traces/scatter/attributes":272}],232:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -59165,7 +60736,7 @@ module.exports = overrideAll({
     }
 }, 'plot', 'nested');
 
-},{"../../../lib/extend":146,"../../../plot_api/edit_types":179,"../../cartesian/layout_attributes":207}],230:[function(require,module,exports){
+},{"../../../lib/extend":149,"../../../plot_api/edit_types":182,"../../cartesian/layout_attributes":209}],233:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -59180,7 +60751,7 @@ var Polar = module.exports = require('./micropolar');
 
 Polar.manager = require('./micropolar_manager');
 
-},{"./micropolar":231,"./micropolar_manager":232}],231:[function(require,module,exports){
+},{"./micropolar":234,"./micropolar_manager":235}],234:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -60600,7 +62171,7 @@ var µ = module.exports = { version: '0.2.2' };
     return exports;
 };
 
-},{"../../../constants/alignment":133,"../../../lib":152,"d3":3}],232:[function(require,module,exports){
+},{"../../../constants/alignment":136,"../../../lib":155,"d3":3}],235:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -60686,7 +62257,7 @@ manager.fillLayout = function(_gd) {
     _gd._fullLayout = extendDeepAll(dflts, _gd.layout);
 };
 
-},{"../../../components/color":35,"../../../lib":152,"./micropolar":231,"./undo_manager":233,"d3":3}],233:[function(require,module,exports){
+},{"../../../components/color":36,"../../../lib":155,"./micropolar":234,"./undo_manager":236,"d3":3}],236:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -60752,7 +62323,7 @@ module.exports = function UndoManager() {
     };
 };
 
-},{}],234:[function(require,module,exports){
+},{}],237:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -60761,18 +62332,19 @@ module.exports = function UndoManager() {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
 var Loggers = require('./lib/loggers');
 var noop = require('./lib/noop');
 var pushUnique = require('./lib/push_unique');
+var isPlainObject = require('./lib/is_plain_object');
 var ExtendModule = require('./lib/extend');
-var extendFlat = ExtendModule.extendFlat;
-var extendDeepAll = ExtendModule.extendDeepAll;
 
 var basePlotAttributes = require('./plots/attributes');
 var baseLayoutAttributes = require('./plots/layout_attributes');
+
+var extendFlat = ExtendModule.extendFlat;
+var extendDeepAll = ExtendModule.extendDeepAll;
 
 exports.modules = {};
 exports.allCategories = {};
@@ -60784,175 +62356,83 @@ exports.layoutArrayContainers = [];
 exports.layoutArrayRegexes = [];
 exports.traceLayoutAttributes = {};
 exports.localeRegistry = {};
+exports.apiMethodRegistry = {};
 
 /**
- * register a module as the handler for a trace type
+ * Top-level register routine, exported as Plotly.register
  *
- * @param {object} _module the module that will handle plotting this trace type
- * @param {string} thisType
- * @param {array of strings} categoriesIn all the categories this type is in,
- *     tested by calls: traceIs(trace, oneCategory)
- * @param {object} meta meta information about the trace type
+ * @param {object array or array of objects} _modules :
+ *  module object or list of module object to register.
+ *
+ *  A valid `moduleType: 'trace'` module has fields:
+ *  - name {string} : the trace type
+ *  - categories {array} : categories associated with this trace type,
+ *                         tested with Register.traceIs()
+ *  - meta {object} : meta info (mostly for plot-schema)
+ *
+ *  A valid `moduleType: 'locale'` module has fields:
+ *  - name {string} : the locale name. Should be a 2-digit language string ('en', 'de')
+ *                    optionally with a country/region code ('en-GB', 'de-CH'). If a country
+ *                    code is used but the base language locale has not yet been supplied,
+ *                    we will use this locale for the base as well.
+ *  - dictionary {object} : the dictionary mapping input strings to localized strings
+ *                          generally the keys should be the literal input strings, but
+ *                          if default translations are provided you can use any string as a key.
+ *  - format {object} : a `d3.locale` format specifier for this locale
+ *                      any omitted keys we'll fall back on en-US.
+ *
+ *  A valid `moduleType: 'transform'` module has fields:
+ *  - name {string} : transform name
+ *  - transform {function} : default-level transform function
+ *  - calcTransform {function} : calc-level transform function
+ *  - attributes {object} : transform attributes declarations
+ *  - supplyDefaults {function} : attributes default-supply function
+ *
+ *  A valid `moduleType: 'component'` module has fields:
+ *  - name {string} : the component name, used it with Register.getComponentMethod()
+ *                    to employ component method.
+ *
+ *  A valid `moduleType: 'apiMethod'` module has fields:
+ *  - name {string} : the api method name.
+ *  - fn {function} : the api method called with Register.call();
+ *
  */
-exports.register = function(_module, thisType, categoriesIn, meta) {
-    if(exports.modules[thisType]) {
-        Loggers.log('Type ' + thisType + ' already registered');
-        return;
+exports.register = function register(_modules) {
+    if(!_modules) {
+        throw new Error('No argument passed to Plotly.register.');
+    } else if(_modules && !Array.isArray(_modules)) {
+        _modules = [_modules];
     }
 
-    var categoryObj = {};
-    for(var i = 0; i < categoriesIn.length; i++) {
-        categoryObj[categoriesIn[i]] = true;
-        exports.allCategories[categoriesIn[i]] = true;
-    }
+    for(var i = 0; i < _modules.length; i++) {
+        var newModule = _modules[i];
 
-    exports.modules[thisType] = {
-        _module: _module,
-        categories: categoryObj
-    };
-
-    if(meta && Object.keys(meta).length) {
-        exports.modules[thisType].meta = meta;
-    }
-
-    exports.allTypes.push(thisType);
-
-    for(var componentName in exports.componentsRegistry) {
-        mergeComponentAttrsToTrace(componentName, thisType);
-    }
-
-    /*
-     * Collect all trace layout attributes in one place for easier lookup later
-     * but don't merge them into the base schema as it would confuse the docs
-     * (at least after https://github.com/plotly/documentation/issues/202 gets done!)
-     */
-    if(_module.layoutAttributes) {
-        extendFlat(exports.traceLayoutAttributes, _module.layoutAttributes);
-    }
-};
-
-/**
- * register a subplot type
- *
- * @param {object} _module subplot module:
- *
- *      @param {string or array of strings} attr
- *          attribute name in traces and layout
- *      @param {string or array of strings} idRoot
- *          root of id (setting the possible value for attrName)
- *      @param {object} attributes
- *          attribute(s) for traces of this subplot type
- *
- * In trace objects `attr` is the object key taking a valid `id` as value
- * (the set of all valid ids is generated below and stored in idRegex).
- *
- * In the layout object, a or several valid `attr` name(s) can be keys linked
- * to a nested attribute objects
- * (the set of all valid attr names is generated below and stored in attrRegex).
- */
-exports.registerSubplot = function(_module) {
-    var plotType = _module.name;
-
-    if(exports.subplotsRegistry[plotType]) {
-        Loggers.log('Plot type ' + plotType + ' already registered.');
-        return;
-    }
-
-    // relayout array handling will look for component module methods with this
-    // name and won't find them because this is a subplot module... but that
-    // should be fine, it will just fall back on redrawing the plot.
-    findArrayRegexps(_module);
-
-    // not sure what's best for the 'cartesian' type at this point
-    exports.subplotsRegistry[plotType] = _module;
-
-    for(var componentName in exports.componentsRegistry) {
-        mergeComponentAttrsToSubplot(componentName, _module.name);
-    }
-};
-
-exports.registerComponent = function(_module) {
-    var name = _module.name;
-
-    exports.componentsRegistry[name] = _module;
-
-    if(_module.layoutAttributes) {
-        if(_module.layoutAttributes._isLinkedToArray) {
-            pushUnique(exports.layoutArrayContainers, name);
+        if(!newModule) {
+            throw new Error('Invalid module was attempted to be registered!');
         }
-        findArrayRegexps(_module);
-    }
 
-    for(var traceType in exports.modules) {
-        mergeComponentAttrsToTrace(name, traceType);
-    }
-
-    for(var subplotName in exports.subplotsRegistry) {
-        mergeComponentAttrsToSubplot(name, subplotName);
-    }
-
-    for(var transformType in exports.transformsRegistry) {
-        mergeComponentAttrsToTransform(name, transformType);
-    }
-
-    if(_module.schema && _module.schema.layout) {
-        extendDeepAll(baseLayoutAttributes, _module.schema.layout);
-    }
-};
-
-exports.registerTransform = function(_module) {
-    exports.transformsRegistry[_module.name] = _module;
-
-    for(var componentName in exports.componentsRegistry) {
-        mergeComponentAttrsToTransform(componentName, _module.name);
-    }
-};
-
-function findArrayRegexps(_module) {
-    if(_module.layoutAttributes) {
-        var arrayAttrRegexps = _module.layoutAttributes._arrayAttrRegexps;
-        if(arrayAttrRegexps) {
-            for(var i = 0; i < arrayAttrRegexps.length; i++) {
-                pushUnique(exports.layoutArrayRegexes, arrayAttrRegexps[i]);
-            }
+        switch(newModule.moduleType) {
+            case 'trace':
+                registerTraceModule(newModule);
+                break;
+            case 'transform':
+                registerTransformModule(newModule);
+                break;
+            case 'component':
+                registerComponentModule(newModule);
+                break;
+            case 'locale':
+                registerLocale(newModule);
+                break;
+            case 'apiMethod':
+                var name = newModule.name;
+                exports.apiMethodRegistry[name] = newModule.fn;
+                break;
+            default:
+                throw new Error('Invalid module was attempted to be registered!');
         }
     }
-}
-
-function mergeComponentAttrsToTrace(componentName, traceType) {
-    var componentSchema = exports.componentsRegistry[componentName].schema;
-    if(!componentSchema || !componentSchema.traces) return;
-
-    var traceAttrs = componentSchema.traces[traceType];
-    if(traceAttrs) {
-        extendDeepAll(exports.modules[traceType]._module.attributes, traceAttrs);
-    }
-}
-
-function mergeComponentAttrsToTransform(componentName, transformType) {
-    var componentSchema = exports.componentsRegistry[componentName].schema;
-    if(!componentSchema || !componentSchema.transforms) return;
-
-    var transformAttrs = componentSchema.transforms[transformType];
-    if(transformAttrs) {
-        extendDeepAll(exports.transformsRegistry[transformType].attributes, transformAttrs);
-    }
-}
-
-function mergeComponentAttrsToSubplot(componentName, subplotName) {
-    var componentSchema = exports.componentsRegistry[componentName].schema;
-    if(!componentSchema || !componentSchema.subplots) return;
-
-    var subplotModule = exports.subplotsRegistry[subplotName];
-    var subplotAttrs = subplotModule.layoutAttributes;
-    var subplotAttr = subplotModule.attr === 'subplot' ? subplotModule.name : subplotModule.attr;
-    if(Array.isArray(subplotAttr)) subplotAttr = subplotAttr[0];
-
-    var componentLayoutAttrs = componentSchema.subplots[subplotAttr];
-    if(subplotAttrs && componentLayoutAttrs) {
-        extendDeepAll(subplotAttrs, componentLayoutAttrs);
-    }
-}
+};
 
 /**
  * Get registered module using trace object or trace type
@@ -61035,7 +62515,6 @@ exports.hasTransform = function(data, type) {
         }
     }
     return false;
-
 };
 
 /**
@@ -61055,31 +62534,151 @@ exports.getComponentMethod = function(name, method) {
     return _module[method] || noop;
 };
 
-function getTraceType(traceType) {
-    if(typeof traceType === 'object') traceType = traceType.type;
-    return traceType;
+/**
+ * Call registered api method.
+ *
+ * @param {string} name : api method name
+ * @param {...array} args : arguments passed to api method
+ * @return {any} : returns api method output
+ */
+exports.call = function() {
+    var name = arguments[0];
+    var args = [].slice.call(arguments, 1);
+    return exports.apiMethodRegistry[name].apply(null, args);
+};
+
+function registerTraceModule(_module) {
+    var thisType = _module.name;
+    var categoriesIn = _module.categories;
+    var meta = _module.meta;
+
+    if(exports.modules[thisType]) {
+        Loggers.log('Type ' + thisType + ' already registered');
+        return;
+    }
+
+    if(!exports.subplotsRegistry[_module.basePlotModule.name]) {
+        registerSubplot(_module.basePlotModule);
+    }
+
+    var categoryObj = {};
+    for(var i = 0; i < categoriesIn.length; i++) {
+        categoryObj[categoriesIn[i]] = true;
+        exports.allCategories[categoriesIn[i]] = true;
+    }
+
+    exports.modules[thisType] = {
+        _module: _module,
+        categories: categoryObj
+    };
+
+    if(meta && Object.keys(meta).length) {
+        exports.modules[thisType].meta = meta;
+    }
+
+    exports.allTypes.push(thisType);
+
+    for(var componentName in exports.componentsRegistry) {
+        mergeComponentAttrsToTrace(componentName, thisType);
+    }
+
+    /*
+     * Collect all trace layout attributes in one place for easier lookup later
+     * but don't merge them into the base schema as it would confuse the docs
+     * (at least after https://github.com/plotly/documentation/issues/202 gets done!)
+     */
+    if(_module.layoutAttributes) {
+        extendFlat(exports.traceLayoutAttributes, _module.layoutAttributes);
+    }
 }
 
-/**
- * Register a new locale dictionary
- *
- * @param {object} module
- * @param {string} moduleType
- *  should be 'locale' so that Plotly.register will forward to this function
- * @param {string} module.name
- *  the locale name. Should be a 2-digit language string ('en', 'de')
- *  optionally with a country/region code ('en-GB', 'de-CH'). If a country
- *  code is used but the base language locale has not yet been supplied,
- *  we will use this locale for the base as well.
- * @param {object} module.dictionary
- *  the dictionary mapping input strings to localized strings
- *  generally the keys should be the literal input strings, but
- *  if default translations are provided you can use any string as a key.
- * @param {object} module.format
- *  a `d3.locale` format specifier for this locale
- *  any omitted keys we'll fall back on en-US
- */
-exports.registerLocale = function(_module) {
+function registerSubplot(_module) {
+    var plotType = _module.name;
+
+    if(exports.subplotsRegistry[plotType]) {
+        Loggers.log('Plot type ' + plotType + ' already registered.');
+        return;
+    }
+
+    // relayout array handling will look for component module methods with this
+    // name and won't find them because this is a subplot module... but that
+    // should be fine, it will just fall back on redrawing the plot.
+    findArrayRegexps(_module);
+
+    // not sure what's best for the 'cartesian' type at this point
+    exports.subplotsRegistry[plotType] = _module;
+
+    for(var componentName in exports.componentsRegistry) {
+        mergeComponentAttrsToSubplot(componentName, _module.name);
+    }
+}
+
+function registerComponentModule(_module) {
+    if(typeof _module.name !== 'string') {
+        throw new Error('Component module *name* must be a string.');
+    }
+
+    var name = _module.name;
+    exports.componentsRegistry[name] = _module;
+
+    if(_module.layoutAttributes) {
+        if(_module.layoutAttributes._isLinkedToArray) {
+            pushUnique(exports.layoutArrayContainers, name);
+        }
+        findArrayRegexps(_module);
+    }
+
+    for(var traceType in exports.modules) {
+        mergeComponentAttrsToTrace(name, traceType);
+    }
+
+    for(var subplotName in exports.subplotsRegistry) {
+        mergeComponentAttrsToSubplot(name, subplotName);
+    }
+
+    for(var transformType in exports.transformsRegistry) {
+        mergeComponentAttrsToTransform(name, transformType);
+    }
+
+    if(_module.schema && _module.schema.layout) {
+        extendDeepAll(baseLayoutAttributes, _module.schema.layout);
+    }
+}
+
+function registerTransformModule(_module) {
+    if(typeof _module.name !== 'string') {
+        throw new Error('Transform module *name* must be a string.');
+    }
+
+    var prefix = 'Transform module ' + _module.name;
+    var hasTransform = typeof _module.transform === 'function';
+    var hasCalcTransform = typeof _module.calcTransform === 'function';
+
+    if(!hasTransform && !hasCalcTransform) {
+        throw new Error(prefix + ' is missing a *transform* or *calcTransform* method.');
+    }
+    if(hasTransform && hasCalcTransform) {
+        Loggers.log([
+            prefix + ' has both a *transform* and *calcTransform* methods.',
+            'Please note that all *transform* methods are executed',
+            'before all *calcTransform* methods.'
+        ].join(' '));
+    }
+    if(!isPlainObject(_module.attributes)) {
+        Loggers.log(prefix + ' registered without an *attributes* object.');
+    }
+    if(typeof _module.supplyDefaults !== 'function') {
+        Loggers.log(prefix + ' registered without a *supplyDefaults* method.');
+    }
+
+    exports.transformsRegistry[_module.name] = _module;
+
+    for(var componentName in exports.componentsRegistry) {
+        mergeComponentAttrsToTransform(componentName, _module.name);
+    }
+}
+
+function registerLocale(_module) {
     var locale = _module.name;
     var baseLocale = locale.split('-')[0];
 
@@ -61113,9 +62712,60 @@ exports.registerLocale = function(_module) {
 
     if(hasDict) localeObj.dictionary = newDict;
     if(hasFormat) localeObj.format = newFormat;
-};
+}
 
-},{"./lib/extend":146,"./lib/loggers":157,"./lib/noop":161,"./lib/push_unique":165,"./plots/attributes":193,"./plots/layout_attributes":225}],235:[function(require,module,exports){
+function findArrayRegexps(_module) {
+    if(_module.layoutAttributes) {
+        var arrayAttrRegexps = _module.layoutAttributes._arrayAttrRegexps;
+        if(arrayAttrRegexps) {
+            for(var i = 0; i < arrayAttrRegexps.length; i++) {
+                pushUnique(exports.layoutArrayRegexes, arrayAttrRegexps[i]);
+            }
+        }
+    }
+}
+
+function mergeComponentAttrsToTrace(componentName, traceType) {
+    var componentSchema = exports.componentsRegistry[componentName].schema;
+    if(!componentSchema || !componentSchema.traces) return;
+
+    var traceAttrs = componentSchema.traces[traceType];
+    if(traceAttrs) {
+        extendDeepAll(exports.modules[traceType]._module.attributes, traceAttrs);
+    }
+}
+
+function mergeComponentAttrsToTransform(componentName, transformType) {
+    var componentSchema = exports.componentsRegistry[componentName].schema;
+    if(!componentSchema || !componentSchema.transforms) return;
+
+    var transformAttrs = componentSchema.transforms[transformType];
+    if(transformAttrs) {
+        extendDeepAll(exports.transformsRegistry[transformType].attributes, transformAttrs);
+    }
+}
+
+function mergeComponentAttrsToSubplot(componentName, subplotName) {
+    var componentSchema = exports.componentsRegistry[componentName].schema;
+    if(!componentSchema || !componentSchema.subplots) return;
+
+    var subplotModule = exports.subplotsRegistry[subplotName];
+    var subplotAttrs = subplotModule.layoutAttributes;
+    var subplotAttr = subplotModule.attr === 'subplot' ? subplotModule.name : subplotModule.attr;
+    if(Array.isArray(subplotAttr)) subplotAttr = subplotAttr[0];
+
+    var componentLayoutAttrs = componentSchema.subplots[subplotAttr];
+    if(subplotAttrs && componentLayoutAttrs) {
+        extendDeepAll(subplotAttrs, componentLayoutAttrs);
+    }
+}
+
+function getTraceType(traceType) {
+    if(typeof traceType === 'object') traceType = traceType.type;
+    return traceType;
+}
+
+},{"./lib/extend":149,"./lib/is_plain_object":157,"./lib/loggers":160,"./lib/noop":164,"./lib/push_unique":168,"./plots/attributes":194,"./plots/layout_attributes":228}],238:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61289,7 +62939,7 @@ module.exports = function clonePlot(graphObj, options) {
     return plotTile;
 };
 
-},{"../lib":152}],236:[function(require,module,exports){
+},{"../lib":155}],239:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61355,7 +63005,7 @@ function downloadImage(gd, opts) {
 
 module.exports = downloadImage;
 
-},{"../lib":152,"../plot_api/to_image":188,"./filesaver":237}],237:[function(require,module,exports){
+},{"../lib":155,"../plot_api/to_image":190,"./filesaver":240}],240:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61427,7 +63077,7 @@ var fileSaver = function(url, name) {
 
 module.exports = fileSaver;
 
-},{}],238:[function(require,module,exports){
+},{}],241:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61440,12 +63090,13 @@ module.exports = fileSaver;
 'use strict';
 
 exports.getDelay = function(fullLayout) {
-
-    // polar clears fullLayout._has for some reason
     if(!fullLayout._has) return 0;
 
-    // maybe we should add a 'gl' (and 'svg') layoutCategory ??
-    return (fullLayout._has('gl3d') || fullLayout._has('gl2d')) ? 500 : 0;
+    return (
+        fullLayout._has('gl3d') ||
+        fullLayout._has('gl2d') ||
+        fullLayout._has('mapbox')
+    ) ? 500 : 0;
 };
 
 exports.getRedrawFunc = function(gd) {
@@ -61463,7 +63114,7 @@ exports.getRedrawFunc = function(gd) {
     };
 };
 
-},{}],239:[function(require,module,exports){
+},{}],242:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61489,7 +63140,7 @@ var Snapshot = {
 
 module.exports = Snapshot;
 
-},{"./cloneplot":235,"./download":236,"./helpers":238,"./svgtoimg":240,"./toimage":241,"./tosvg":242}],240:[function(require,module,exports){
+},{"./cloneplot":238,"./download":239,"./helpers":241,"./svgtoimg":243,"./toimage":244,"./tosvg":245}],243:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61605,7 +63256,7 @@ function svgToImg(opts) {
 
 module.exports = svgToImg;
 
-},{"../lib":152,"events":305}],241:[function(require,module,exports){
+},{"../lib":155,"events":308}],244:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61618,14 +63269,13 @@ module.exports = svgToImg;
 
 var EventEmitter = require('events').EventEmitter;
 
-var Plotly = require('../plotly');
+var Registry = require('../registry');
 var Lib = require('../lib');
 
 var helpers = require('./helpers');
 var clonePlot = require('./cloneplot');
 var toSVG = require('./tosvg');
 var svgToImg = require('./svgtoimg');
-
 
 /**
  * @param {object} gd figure Object
@@ -61672,7 +63322,7 @@ function toImage(gd, opts) {
 
     var redrawFunc = helpers.getRedrawFunc(clonedGd);
 
-    Plotly.plot(clonedGd, clone.data, clone.layout, clone.config)
+    Registry.call('plot', clonedGd, clone.data, clone.layout, clone.config)
         .then(redrawFunc)
         .then(wait)
         .catch(function(err) {
@@ -61685,7 +63335,7 @@ function toImage(gd, opts) {
 
 module.exports = toImage;
 
-},{"../lib":152,"../plotly":190,"./cloneplot":235,"./helpers":238,"./svgtoimg":240,"./tosvg":242,"events":305}],242:[function(require,module,exports){
+},{"../lib":155,"../registry":237,"./cloneplot":238,"./helpers":241,"./svgtoimg":243,"./tosvg":245,"events":308}],245:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61862,7 +63512,7 @@ module.exports = function toSVG(gd, format, scale) {
     return s;
 };
 
-},{"../components/color":35,"../components/drawing":60,"../constants/xmlns_namespaces":137,"../lib":152,"d3":3}],243:[function(require,module,exports){
+},{"../components/color":36,"../components/drawing":61,"../constants/xmlns_namespaces":140,"../lib":155,"d3":3}],246:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61897,7 +63547,7 @@ module.exports = function arraysToCalcdata(cd, trace) {
     }
 };
 
-},{"../../lib":152}],244:[function(require,module,exports){
+},{"../../lib":155}],247:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -61910,7 +63560,6 @@ module.exports = function arraysToCalcdata(cd, trace) {
 
 var scatterAttrs = require('../scatter/attributes');
 var colorAttributes = require('../../components/colorscale/color_attributes');
-var errorBarAttrs = require('../../components/errorbars/attributes');
 var colorbarAttrs = require('../../components/colorbar/attributes');
 var fontAttrs = require('../../plots/font_attributes');
 
@@ -62004,6 +63653,15 @@ module.exports = {
         ].join(' ')
     },
 
+    cliponaxis: extendFlat({}, scatterAttrs.cliponaxis, {
+        description: [
+            'Determines whether the text nodes',
+            'are clipped about the subplot axes.',
+            'To show the text nodes above axis lines and tick labels,',
+            'make sure to set `xaxis.layer` and `yaxis.layer` to *below traces*.'
+        ].join(' ')
+    }),
+
     orientation: {
         valType: 'enumerated',
         role: 'info',
@@ -62081,9 +63739,6 @@ module.exports = {
     r: scatterAttrs.r,
     t: scatterAttrs.t,
 
-    error_y: errorBarAttrs,
-    error_x: errorBarAttrs,
-
     _deprecated: {
         bardir: {
             valType: 'enumerated',
@@ -62095,7 +63750,7 @@ module.exports = {
     }
 };
 
-},{"../../components/colorbar/attributes":36,"../../components/colorscale/color_attributes":43,"../../components/errorbars/attributes":62,"../../lib/extend":146,"../../plots/font_attributes":221,"../scatter/attributes":269}],245:[function(require,module,exports){
+},{"../../components/colorbar/attributes":37,"../../components/colorscale/color_attributes":44,"../../lib/extend":149,"../../plots/font_attributes":224,"../scatter/attributes":272}],248:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -62108,7 +63763,7 @@ module.exports = {
 'use strict';
 
 var Fx = require('../../components/fx');
-var ErrorBars = require('../../components/errorbars');
+var Registry = require('../../registry');
 var Color = require('../../components/color');
 var fillHoverText = require('../scatter/fill_hover_text');
 
@@ -62117,8 +63772,10 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     var trace = cd[0].trace;
     var t = cd[0].t;
     var isClosest = (hovermode === 'closest');
+    var maxHoverDistance = pointData.maxHoverDistance;
+    var maxSpikeDistance = pointData.maxSpikeDistance;
 
-    var posVal, sizeVal, posLetter, sizeLetter, dx, dy;
+    var posVal, sizeVal, posLetter, sizeLetter, dx, dy, pRangeCalc;
 
     function thisBarMinPos(di) { return di[posLetter] - di.w / 2; }
     function thisBarMaxPos(di) { return di[posLetter] + di.w / 2; }
@@ -62147,15 +63804,26 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
             return Math.max(thisBarMaxPos(di), di.p + t.bardelta / 2);
         };
 
+    function _positionFn(_minPos, _maxPos) {
+        // add a little to the pseudo-distance for wider bars, so that like scatter,
+        // if you are over two overlapping bars, the narrower one wins.
+        return Fx.inbox(_minPos - posVal, _maxPos - posVal,
+            maxHoverDistance + Math.min(1, Math.abs(_maxPos - _minPos) / pRangeCalc) - 1);
+    }
+
     function positionFn(di) {
-        return Fx.inbox(minPos(di) - posVal, maxPos(di) - posVal);
+        return _positionFn(minPos(di), maxPos(di));
+    }
+
+    function thisBarPositionFn(di) {
+        return _positionFn(thisBarMinPos(di), thisBarMaxPos(di));
     }
 
     function sizeFn(di) {
         // add a gradient so hovering near the end of a
         // bar makes it a little closer match
-        return Fx.inbox(di.b - sizeVal, di[sizeLetter] - sizeVal) +
-            (di[sizeLetter] - sizeVal) / (di[sizeLetter] - di.b);
+        return Fx.inbox(di.b - sizeVal, di[sizeLetter] - sizeVal,
+            maxHoverDistance + (di[sizeLetter] - sizeVal) / (di[sizeLetter] - di.b) - 1);
     }
 
     if(trace.orientation === 'h') {
@@ -62178,7 +63846,10 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     var pa = pointData[posLetter + 'a'];
     var sa = pointData[sizeLetter + 'a'];
 
-    var distfn = Fx.getDistanceFunction(hovermode, dx, dy);
+    pRangeCalc = Math.abs(pa.r2c(pa.range[1]) - pa.r2c(pa.range[0]));
+
+    function dxy(di) { return (dx(di) + dy(di)) / 2; }
+    var distfn = Fx.getDistanceFunction(hovermode, dx, dy, dxy);
     Fx.getClosest(cd, distfn, pointData);
 
     // skip the rest (for this trace) if we didn't find a close point
@@ -62210,17 +63881,24 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     pointData[sizeLetter + '0'] = pointData[sizeLetter + '1'] = sa.c2p(di[sizeLetter], true);
     pointData[sizeLetter + 'LabelVal'] = size;
 
-    pointData[posLetter + '0'] = pa.c2p(minPos(di), true);
-    pointData[posLetter + '1'] = pa.c2p(maxPos(di), true);
+    var extent = t.extents[t.extents.round(di.p)];
+    pointData[posLetter + '0'] = pa.c2p(isClosest ? minPos(di) : extent[0], true);
+    pointData[posLetter + '1'] = pa.c2p(isClosest ? maxPos(di) : extent[1], true);
     pointData[posLetter + 'LabelVal'] = di.p;
 
+    // spikelines always want "closest" distance regardless of hovermode
+    pointData.spikeDistance = (sizeFn(di) + thisBarPositionFn(di)) / 2 + maxSpikeDistance - maxHoverDistance;
+    // they also want to point to the data value, regardless of where the label goes
+    // in case of bars shifted within groups
+    pointData[posLetter + 'Spike'] = pa.c2p(di.p, true);
+
     fillHoverText(di, trace, pointData);
-    ErrorBars.hoverInfo(di, trace, pointData);
+    Registry.getComponentMethod('errorbars', 'hoverInfo')(di, trace, pointData);
 
     return [pointData];
 };
 
-},{"../../components/color":35,"../../components/errorbars":66,"../../components/fx":77,"../scatter/fill_hover_text":277}],246:[function(require,module,exports){
+},{"../../components/color":36,"../../components/fx":78,"../../registry":237,"../scatter/fill_hover_text":280}],249:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -62289,7 +63967,7 @@ module.exports = {
     }
 };
 
-},{}],247:[function(require,module,exports){
+},{}],250:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -62347,7 +64025,7 @@ module.exports = function(layoutIn, layoutOut, fullData) {
     coerce('bargroupgap');
 };
 
-},{"../../lib":152,"../../plots/cartesian/axes":195,"../../registry":234,"./layout_attributes":246}],248:[function(require,module,exports){
+},{"../../lib":155,"../../plots/cartesian/axes":197,"../../registry":237,"./layout_attributes":249}],251:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -62368,7 +64046,7 @@ var svgTextUtils = require('../../lib/svg_text_utils');
 
 var Color = require('../../components/color');
 var Drawing = require('../../components/drawing');
-var ErrorBars = require('../../components/errorbars');
+var Registry = require('../../registry');
 
 var attributes = require('./attributes'),
     attributeText = attributes.text,
@@ -62488,15 +64166,26 @@ module.exports = function plot(gd, plotinfo, cdbar) {
                     bar.append('path')
                         .style('vector-effect', 'non-scaling-stroke')
                         .attr('d',
-                            'M' + x0 + ',' + y0 + 'V' + y1 + 'H' + x1 + 'V' + y0 + 'Z');
+                            'M' + x0 + ',' + y0 + 'V' + y1 + 'H' + x1 + 'V' + y0 + 'Z')
+                        .call(Drawing.setClipUrl, plotinfo.layerClipId);
 
                     appendBarText(gd, bar, d, i, x0, x1, y0, y1);
+
+                    if(plotinfo.layerClipId) {
+                        Drawing.hideOutsideRangePoint(d[i], bar.select('text'), xa, ya, trace.xcalendar, trace.ycalendar);
+                    }
                 });
         });
 
     // error bars are on the top
-    bartraces.call(ErrorBars.plot, plotinfo);
+    Registry.getComponentMethod('errorbars', 'plot')(bartraces, plotinfo);
 
+    // lastly, clip points groups of `cliponaxis !== false` traces
+    // on `plotinfo._hasClipOnAxisFalse === true` subplots
+    bartraces.each(function(d) {
+        var hasClipOnAxisFalse = d[0].trace.cliponaxis === false;
+        Drawing.setClipUrl(d3.select(this), hasClipOnAxisFalse ? null : plotinfo.layerClipId);
+    });
 };
 
 function appendBarText(gd, bar, calcTrace, i, x0, x1, y0, y1) {
@@ -62877,7 +64566,7 @@ function coerceColor(attributeDefinition, value, defaultValue) {
         attributeDefinition.dflt;
 }
 
-},{"../../components/color":35,"../../components/drawing":60,"../../components/errorbars":66,"../../lib":152,"../../lib/svg_text_utils":173,"./attributes":244,"d3":3,"fast-isnumeric":5,"tinycolor2":302}],249:[function(require,module,exports){
+},{"../../components/color":36,"../../components/drawing":61,"../../lib":155,"../../lib/svg_text_utils":176,"../../registry":237,"./attributes":247,"d3":3,"fast-isnumeric":5,"tinycolor2":305}],252:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -62920,7 +64609,7 @@ module.exports = function selectPoints(searchInfo, polygon) {
     return selection;
 };
 
-},{}],250:[function(require,module,exports){
+},{}],253:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -62933,6 +64622,7 @@ module.exports = function selectPoints(searchInfo, polygon) {
 'use strict';
 
 var isNumeric = require('fast-isnumeric');
+var isArrayOrTypedArray = require('../../lib').isArrayOrTypedArray;
 var BADNUM = require('../../constants/numerical').BADNUM;
 
 var Registry = require('../../registry');
@@ -63028,6 +64718,8 @@ function setGroupPositions(gd, pa, sa, calcTraces) {
             setGroupPositionsInOverlayMode(gd, pa, sa, excluded);
         }
     }
+
+    collectExtents(calcTraces, pa);
 }
 
 
@@ -63234,7 +64926,7 @@ function applyAttributes(sieve) {
             initialPoffset = t.poffset,
             newPoffset;
 
-        if(Array.isArray(offset)) {
+        if(isArrayOrTypedArray(offset)) {
             // if offset is an array, then clone it into t.poffset.
             newPoffset = offset.slice(0, calcTrace.length);
 
@@ -63260,7 +64952,7 @@ function applyAttributes(sieve) {
         var width = fullTrace.width,
             initialBarwidth = t.barwidth;
 
-        if(Array.isArray(width)) {
+        if(isArrayOrTypedArray(width)) {
             // if width is an array, then clone it into t.barwidth.
             var newBarwidth = width.slice(0, calcTrace.length);
 
@@ -63520,7 +65212,58 @@ function getAxisLetter(ax) {
     return ax._id.charAt(0);
 }
 
-},{"../../constants/numerical":135,"../../plots/cartesian/axes":195,"../../registry":234,"./sieve.js":251,"fast-isnumeric":5}],251:[function(require,module,exports){
+// find the full position span of bars at each position
+// for use by hover, to ensure labels move in if bars are
+// narrower than the space they're in.
+// run once per trace group (subplot & direction) and
+// the same mapping is attached to all calcdata traces
+function collectExtents(calcTraces, pa) {
+    var posLetter = pa._id.charAt(0);
+    var extents = {};
+    var pMin = Infinity;
+    var pMax = -Infinity;
+
+    var i, j, cd;
+    for(i = 0; i < calcTraces.length; i++) {
+        cd = calcTraces[i];
+        for(j = 0; j < cd.length; j++) {
+            var p = cd[j].p;
+            if(isNumeric(p)) {
+                pMin = Math.min(pMin, p);
+                pMax = Math.max(pMax, p);
+            }
+        }
+    }
+
+    // this is just for positioning of hover labels, and nobody will care if
+    // the label is 1px too far out; so round positions to 1/10K in case
+    // position values don't exactly match from trace to trace
+    var roundFactor = 10000 / (pMax - pMin);
+    var round = extents.round = function(p) {
+        return String(Math.round(roundFactor * (p - pMin)));
+    };
+
+    for(i = 0; i < calcTraces.length; i++) {
+        cd = calcTraces[i];
+        cd[0].t.extents = extents;
+        for(j = 0; j < cd.length; j++) {
+            var di = cd[j];
+            var p0 = di[posLetter] - di.w / 2;
+            if(isNumeric(p0)) {
+                var p1 = di[posLetter] + di.w / 2;
+                var pVal = round(di.p);
+                if(extents[pVal]) {
+                    extents[pVal] = [Math.min(p0, extents[pVal][0]), Math.max(p1, extents[pVal][1])];
+                }
+                else {
+                    extents[pVal] = [p0, p1];
+                }
+            }
+        }
+    }
+}
+
+},{"../../constants/numerical":138,"../../lib":155,"../../plots/cartesian/axes":197,"../../registry":237,"./sieve.js":254,"fast-isnumeric":5}],254:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -63629,7 +65372,7 @@ Sieve.prototype.getLabel = function getLabel(position, value) {
     return prefix + label;
 };
 
-},{"../../constants/numerical":135,"../../lib":152}],252:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155}],255:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -63643,7 +65386,7 @@ Sieve.prototype.getLabel = function getLabel(position, value) {
 
 var d3 = require('d3');
 var Drawing = require('../../components/drawing');
-var ErrorBars = require('../../components/errorbars');
+var Registry = require('../../registry');
 
 module.exports = function style(gd, cd) {
     var s = cd ? cd[0].node3 : d3.select(gd).selectAll('g.trace.bars');
@@ -63696,10 +65439,10 @@ module.exports = function style(gd, cd) {
         Drawing.selectedTextStyle(txs, trace);
     });
 
-    ErrorBars.style(s);
+    Registry.getComponentMethod('errorbars', 'style')(s);
 };
 
-},{"../../components/drawing":60,"../../components/errorbars":66,"d3":3}],253:[function(require,module,exports){
+},{"../../components/drawing":61,"../../registry":237,"d3":3}],256:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -63738,7 +65481,7 @@ module.exports = function handleStyleDefaults(traceIn, traceOut, coerce, default
     coerce('unselected.marker.color');
 };
 
-},{"../../components/color":35,"../../components/colorscale/defaults":45,"../../components/colorscale/has_colorscale":49}],254:[function(require,module,exports){
+},{"../../components/color":36,"../../components/colorscale/defaults":46,"../../components/colorscale/has_colorscale":50}],257:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -63750,7 +65493,6 @@ module.exports = function handleStyleDefaults(traceIn, traceOut, coerce, default
 'use strict';
 
 var barAttrs = require('../bar/attributes');
-
 
 module.exports = {
     x: {
@@ -63935,9 +65677,6 @@ module.exports = {
     selected: barAttrs.selected,
     unselected: barAttrs.unselected,
 
-    error_y: barAttrs.error_y,
-    error_x: barAttrs.error_x,
-
     _deprecated: {
         bardir: barAttrs._deprecated.bardir
     }
@@ -63988,7 +65727,7 @@ function makeBinsAttr(axLetter) {
     };
 }
 
-},{"../bar/attributes":244}],255:[function(require,module,exports){
+},{"../bar/attributes":247}],258:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -64014,7 +65753,7 @@ module.exports = function doAvg(size, counts) {
     return total;
 };
 
-},{}],256:[function(require,module,exports){
+},{}],259:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -64040,14 +65779,15 @@ module.exports = function handleBinDefaults(traceIn, traceOut, coerce, binDirect
         coerce(binDirection + 'bins.start');
         coerce(binDirection + 'bins.end');
         coerce(binDirection + 'bins.size');
-        coerce('autobin' + binDirection);
-        coerce('nbins' + binDirection);
+
+        var autobin = coerce('autobin' + binDirection);
+        if(autobin !== false) coerce('nbins' + binDirection);
     });
 
     return traceOut;
 };
 
-},{}],257:[function(require,module,exports){
+},{}],260:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -64123,7 +65863,7 @@ module.exports = {
     }
 };
 
-},{"fast-isnumeric":5}],258:[function(require,module,exports){
+},{"fast-isnumeric":5}],261:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -64301,7 +66041,7 @@ function dateParts(v, pa, calendar) {
     return parts;
 }
 
-},{"../../constants/numerical":135,"../../plots/cartesian/axes":195}],259:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../plots/cartesian/axes":197}],262:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -64376,7 +66116,7 @@ module.exports = function calc(gd, trace) {
     var pr2c = function(v) { return pa.r2c(v, 0, calendar); };
     var rawCounterData;
 
-    if(Array.isArray(trace[counterData]) && func !== 'count') {
+    if(Lib.isArrayOrTypedArray(trace[counterData]) && func !== 'count') {
         rawCounterData = trace[counterData];
         isAvg = func === 'avg';
         binFunc = binFunctions[func];
@@ -64503,7 +66243,7 @@ module.exports = function calc(gd, trace) {
 
     arraysToCalcdata(cd, trace);
 
-    if(Array.isArray(trace.selectedpoints)) {
+    if(Lib.isArrayOrTypedArray(trace.selectedpoints)) {
         Lib.tagSelected(cd, trace, ptNumber2cdIndex);
     }
 
@@ -64557,7 +66297,7 @@ function calcAllAutoBins(gd, trace, pa, mainData, _overlayEdgeCase) {
 
                 // Edge case: single-valued histogram overlaying others
                 // Use them all together to calculate the bin size for the single-valued one
-                if(isOverlay && binSpec._count === 1 && pa.type !== 'category') {
+                if(isOverlay && binSpec._dataSpan === 0 && pa.type !== 'category') {
                     // Several single-valued histograms! Stop infinite recursion,
                     // just return an extra flag that tells handleSingleValueOverlays
                     // to sort out this trace too
@@ -64821,7 +66561,7 @@ function cdf(size, direction, currentBin) {
     }
 }
 
-},{"../../constants/numerical":135,"../../lib":152,"../../plots/cartesian/axes":195,"../bar/arrays_to_calcdata":243,"./average":255,"./bin_functions":257,"./bin_label_vals":258,"./clean_bins":260,"./norm_functions":265,"fast-isnumeric":5}],260:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155,"../../plots/cartesian/axes":197,"../bar/arrays_to_calcdata":246,"./average":258,"./bin_functions":260,"./bin_label_vals":261,"./clean_bins":263,"./norm_functions":268,"fast-isnumeric":5}],263:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -64889,16 +66629,19 @@ module.exports = function cleanBins(trace, ax, binDirection) {
     var autoBinAttr = 'autobin' + binDirection;
 
     if(typeof trace[autoBinAttr] !== 'boolean') {
-        trace[autoBinAttr] = !(
+        trace[autoBinAttr] = trace._fullInput[autoBinAttr] = trace._input[autoBinAttr] = !(
             (bins.start || bins.start === 0) &&
             (bins.end || bins.end === 0)
         );
     }
 
-    if(!trace[autoBinAttr]) delete trace['nbins' + binDirection];
+    if(!trace[autoBinAttr]) {
+        delete trace['nbins' + binDirection];
+        delete trace._fullInput['nbins' + binDirection];
+    }
 };
 
-},{"../../constants/numerical":135,"../../lib":152,"fast-isnumeric":5}],261:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155,"fast-isnumeric":5}],264:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -64916,7 +66659,6 @@ var Color = require('../../components/color');
 
 var handleBinDefaults = require('./bin_defaults');
 var handleStyleDefaults = require('../bar/style_defaults');
-var errorBarsSupplyDefaults = require('../../components/errorbars/defaults');
 var attributes = require('./attributes');
 
 module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout) {
@@ -64955,13 +66697,14 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     handleStyleDefaults(traceIn, traceOut, coerce, defaultColor, layout);
 
     // override defaultColor for error bars with defaultLine
+    var errorBarsSupplyDefaults = Registry.getComponentMethod('errorbars', 'supplyDefaults');
     errorBarsSupplyDefaults(traceIn, traceOut, Color.defaultLine, {axis: 'y'});
     errorBarsSupplyDefaults(traceIn, traceOut, Color.defaultLine, {axis: 'x', inherit: 'y'});
 
     Lib.coerceSelectionMarkerOpacity(traceOut, coerce);
 };
 
-},{"../../components/color":35,"../../components/errorbars/defaults":65,"../../lib":152,"../../registry":234,"../bar/style_defaults":253,"./attributes":254,"./bin_defaults":256}],262:[function(require,module,exports){
+},{"../../components/color":36,"../../lib":155,"../../registry":237,"../bar/style_defaults":256,"./attributes":257,"./bin_defaults":259}],265:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65007,7 +66750,7 @@ module.exports = function eventData(out, pt, trace, cd, pointNumber) {
     return out;
 };
 
-},{}],263:[function(require,module,exports){
+},{}],266:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65040,7 +66783,7 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     return pts;
 };
 
-},{"../../plots/cartesian/axes":195,"../bar/hover":245}],264:[function(require,module,exports){
+},{"../../plots/cartesian/axes":197,"../bar/hover":248}],267:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65097,7 +66840,7 @@ Histogram.meta = {
 
 module.exports = Histogram;
 
-},{"../../plots/cartesian":206,"../bar/layout_attributes":246,"../bar/layout_defaults":247,"../bar/plot":248,"../bar/select":249,"../bar/set_positions":250,"../bar/style":252,"../scatter/colorbar":273,"./attributes":254,"./calc":259,"./defaults":261,"./event_data":262,"./hover":263}],265:[function(require,module,exports){
+},{"../../plots/cartesian":208,"../bar/layout_attributes":249,"../bar/layout_defaults":250,"../bar/plot":251,"../bar/select":252,"../bar/set_positions":253,"../bar/style":255,"../scatter/colorbar":276,"./attributes":257,"./calc":262,"./defaults":264,"./event_data":265,"./hover":266}],268:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65132,7 +66875,7 @@ module.exports = {
     }
 };
 
-},{}],266:[function(require,module,exports){
+},{}],269:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65174,7 +66917,7 @@ exports.castOption = function castOption(item, indices) {
     else if(item) return item;
 };
 
-},{"../../lib":152}],267:[function(require,module,exports){
+},{"../../lib":155}],270:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65198,7 +66941,7 @@ module.exports = function styleOne(s, pt, trace) {
         .call(Color.stroke, lineColor);
 };
 
-},{"../../components/color":35,"./helpers":266}],268:[function(require,module,exports){
+},{"../../components/color":36,"./helpers":269}],271:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65250,7 +66993,7 @@ module.exports = function arraysToCalcdata(cd, trace) {
     }
 };
 
-},{"../../lib":152}],269:[function(require,module,exports){
+},{"../../lib":155}],272:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65262,7 +67005,6 @@ module.exports = function arraysToCalcdata(cd, trace) {
 'use strict';
 
 var colorAttributes = require('../../components/colorscale/color_attributes');
-var errorBarAttrs = require('../../components/errorbars/attributes');
 var colorbarAttrs = require('../../components/colorbar/attributes');
 var fontAttrs = require('../../plots/font_attributes');
 var dash = require('../../components/drawing/attributes').dash;
@@ -65743,13 +67485,10 @@ module.exports = {
             'Please switch to *scatterpolar* trace type.',
             'Sets the angular coordinates.'
         ].join('')
-    },
-
-    error_y: errorBarAttrs,
-    error_x: errorBarAttrs
+    }
 };
 
-},{"../../components/colorbar/attributes":36,"../../components/colorscale/color_attributes":43,"../../components/drawing":60,"../../components/drawing/attributes":59,"../../components/errorbars/attributes":62,"../../lib/extend":146,"../../plots/font_attributes":221,"./constants":275}],270:[function(require,module,exports){
+},{"../../components/colorbar/attributes":37,"../../components/colorscale/color_attributes":44,"../../components/drawing":61,"../../components/drawing/attributes":60,"../../lib/extend":149,"../../plots/font_attributes":224,"./constants":278}],273:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65758,10 +67497,10 @@ module.exports = {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
 var isNumeric = require('fast-isnumeric');
+var isArrayOrTypedArray = require('../../lib').isArrayOrTypedArray;
 
 var Axes = require('../../plots/cartesian/axes');
 var BADNUM = require('../../constants/numerical').BADNUM;
@@ -65776,22 +67515,45 @@ function calc(gd, trace) {
     var ya = Axes.getFromId(gd, trace.yaxis || 'y');
     var x = xa.makeCalcdata(trace, 'x');
     var y = ya.makeCalcdata(trace, 'y');
-    var serieslen = Math.min(x.length, y.length);
+    var serieslen = trace._length;
+    var cd = new Array(serieslen);
+
+    var ppad = calcMarkerSize(trace, serieslen);
+    calcAxisExpansion(gd, trace, xa, ya, x, y, ppad);
+
+    for(var i = 0; i < serieslen; i++) {
+        cd[i] = (isNumeric(x[i]) && isNumeric(y[i])) ?
+            {x: x[i], y: y[i]} :
+            {x: BADNUM, y: BADNUM};
+
+        if(trace.ids) {
+            cd[i].id = String(trace.ids[i]);
+        }
+    }
+
+    arraysToCalcdata(cd, trace);
+    calcColorscale(trace);
+    calcSelection(cd, trace);
+
+    gd.firstscatter = false;
+    return cd;
+}
+
+function calcAxisExpansion(gd, trace, xa, ya, x, y, ppad) {
+    var serieslen = trace._length;
 
     // cancel minimum tick spacings (only applies to bars and boxes)
     xa._minDtick = 0;
     ya._minDtick = 0;
-
-    if(x.length > serieslen) x.splice(serieslen, x.length - serieslen);
-    if(y.length > serieslen) y.splice(serieslen, y.length - serieslen);
 
     // check whether bounds should be tight, padded, extended to zero...
     // most cases both should be padded on both ends, so start with that.
     var xOptions = {padded: true};
     var yOptions = {padded: true};
 
-    var ppad = calcMarkerSize(trace, serieslen);
-    if(ppad) xOptions.ppad = yOptions.ppad = ppad;
+    if(ppad) {
+        xOptions.ppad = yOptions.ppad = ppad;
+    }
 
     // TODO: text size
 
@@ -65827,24 +67589,6 @@ function calc(gd, trace) {
 
     Axes.expand(xa, x, xOptions);
     Axes.expand(ya, y, yOptions);
-
-    // create the "calculated data" to plot
-    var cd = new Array(serieslen);
-    for(var i = 0; i < serieslen; i++) {
-        cd[i] = (isNumeric(x[i]) && isNumeric(y[i])) ?
-            {x: x[i], y: y[i]} : {x: BADNUM, y: BADNUM};
-
-        if(trace.ids) {
-            cd[i].id = String(trace.ids[i]);
-        }
-    }
-
-    arraysToCalcdata(cd, trace);
-    calcColorscale(trace);
-    calcSelection(cd, trace);
-
-    gd.firstscatter = false;
-    return cd;
 }
 
 function calcMarkerSize(trace, serieslen) {
@@ -65866,15 +67610,19 @@ function calcMarkerSize(trace, serieslen) {
         };
     }
 
-    if(Array.isArray(marker.size)) {
+    if(isArrayOrTypedArray(marker.size)) {
         // I tried auto-type but category and dates dont make much sense.
         var ax = {type: 'linear'};
         Axes.setConvert(ax);
 
         var s = ax.makeCalcdata(trace.marker, 'size');
-        if(s.length > serieslen) s.splice(serieslen, s.length - serieslen);
 
-        return s.map(markerTrans);
+        var sizeOut = new Array(serieslen);
+        for(var i = 0; i < serieslen; i++) {
+            sizeOut[i] = markerTrans(s[i]);
+        }
+        return sizeOut;
+
     } else {
         return markerTrans(marker.size);
     }
@@ -65882,10 +67630,11 @@ function calcMarkerSize(trace, serieslen) {
 
 module.exports = {
     calc: calc,
-    calcMarkerSize: calcMarkerSize
+    calcMarkerSize: calcMarkerSize,
+    calcAxisExpansion: calcAxisExpansion
 };
 
-},{"../../constants/numerical":135,"../../plots/cartesian/axes":195,"./arrays_to_calcdata":268,"./calc_selection":271,"./colorscale_calc":274,"./subtypes":291,"fast-isnumeric":5}],271:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155,"../../plots/cartesian/axes":197,"./arrays_to_calcdata":271,"./calc_selection":274,"./colorscale_calc":277,"./subtypes":294,"fast-isnumeric":5}],274:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65899,12 +67648,12 @@ module.exports = {
 var Lib = require('../../lib');
 
 module.exports = function calcSelection(cd, trace) {
-    if(Array.isArray(trace.selectedpoints)) {
+    if(Lib.isArrayOrTypedArray(trace.selectedpoints)) {
         Lib.tagSelected(cd, trace);
     }
 };
 
-},{"../../lib":152}],272:[function(require,module,exports){
+},{"../../lib":155}],275:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65943,7 +67692,7 @@ module.exports = function cleanData(fullData) {
     }
 };
 
-},{}],273:[function(require,module,exports){
+},{}],276:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -65999,7 +67748,7 @@ module.exports = function colorbar(gd, cd) {
         .options(marker.colorbar)();
 };
 
-},{"../../components/colorbar/draw":39,"../../components/colorscale":50,"../../lib":152,"../../plots/plots":227,"fast-isnumeric":5}],274:[function(require,module,exports){
+},{"../../components/colorbar/draw":40,"../../components/colorscale":51,"../../lib":155,"../../plots/plots":230,"fast-isnumeric":5}],277:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66032,7 +67781,7 @@ module.exports = function calcMarkerColorscale(trace) {
     }
 };
 
-},{"../../components/colorscale/calc":42,"../../components/colorscale/has_colorscale":49,"./subtypes":291}],275:[function(require,module,exports){
+},{"../../components/colorscale/calc":43,"../../components/colorscale/has_colorscale":50,"./subtypes":294}],278:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66059,7 +67808,7 @@ module.exports = {
     maxScreensAway: 20
 };
 
-},{}],276:[function(require,module,exports){
+},{}],279:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66068,10 +67817,10 @@ module.exports = {
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
 var Lib = require('../../lib');
+var Registry = require('../../registry');
 
 var attributes = require('./attributes');
 var constants = require('./constants');
@@ -66082,7 +67831,6 @@ var handleLineDefaults = require('./line_defaults');
 var handleLineShapeDefaults = require('./line_shape_defaults');
 var handleTextDefaults = require('./text_defaults');
 var handleFillColorDefaults = require('./fillcolor_defaults');
-var errorBarsSupplyDefaults = require('../../components/errorbars/defaults');
 
 module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout) {
     function coerce(attr, dflt) {
@@ -66135,13 +67883,14 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     }
     coerce('hoveron', dfltHoverOn.join('+') || 'points');
 
+    var errorBarsSupplyDefaults = Registry.getComponentMethod('errorbars', 'supplyDefaults');
     errorBarsSupplyDefaults(traceIn, traceOut, defaultColor, {axis: 'y'});
     errorBarsSupplyDefaults(traceIn, traceOut, defaultColor, {axis: 'x', inherit: 'y'});
 
     Lib.coerceSelectionMarkerOpacity(traceOut, coerce);
 };
 
-},{"../../components/errorbars/defaults":65,"../../lib":152,"./attributes":269,"./constants":275,"./fillcolor_defaults":278,"./line_defaults":282,"./line_shape_defaults":284,"./marker_defaults":287,"./subtypes":291,"./text_defaults":292,"./xy_defaults":293}],277:[function(require,module,exports){
+},{"../../lib":155,"../../registry":237,"./attributes":272,"./constants":278,"./fillcolor_defaults":281,"./line_defaults":285,"./line_shape_defaults":287,"./marker_defaults":290,"./subtypes":294,"./text_defaults":295,"./xy_defaults":296}],280:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66184,7 +67933,7 @@ function isValid(v) {
     return v || v === 0;
 }
 
-},{"../../lib":152}],278:[function(require,module,exports){
+},{"../../lib":155}],281:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66197,7 +67946,7 @@ function isValid(v) {
 'use strict';
 
 var Color = require('../../components/color');
-
+var isArrayOrTypedArray = require('../../lib').isArrayOrTypedArray;
 
 module.exports = function fillColorDefaults(traceIn, traceOut, defaultColor, coerce) {
     var inheritColorFromMarker = false;
@@ -66207,10 +67956,10 @@ module.exports = function fillColorDefaults(traceIn, traceOut, defaultColor, coe
         var markerColor = traceOut.marker.color,
             markerLineColor = (traceOut.marker.line || {}).color;
 
-        if(markerColor && !Array.isArray(markerColor)) {
+        if(markerColor && !isArrayOrTypedArray(markerColor)) {
             inheritColorFromMarker = markerColor;
         }
-        else if(markerLineColor && !Array.isArray(markerLineColor)) {
+        else if(markerLineColor && !isArrayOrTypedArray(markerLineColor)) {
             inheritColorFromMarker = markerLineColor;
         }
     }
@@ -66222,7 +67971,7 @@ module.exports = function fillColorDefaults(traceIn, traceOut, defaultColor, coe
     ));
 };
 
-},{"../../components/color":35}],279:[function(require,module,exports){
+},{"../../components/color":36,"../../lib":155}],282:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66275,7 +68024,7 @@ module.exports = function getTraceColor(trace, di) {
     }
 };
 
-},{"../../components/color":35,"./subtypes":291}],280:[function(require,module,exports){
+},{"../../components/color":36,"./subtypes":294}],283:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66288,12 +68037,10 @@ module.exports = function getTraceColor(trace, di) {
 
 var Lib = require('../../lib');
 var Fx = require('../../components/fx');
-var ErrorBars = require('../../components/errorbars');
+var Registry = require('../../registry');
 var getTraceColor = require('./get_trace_color');
 var Color = require('../../components/color');
 var fillHoverText = require('./fill_hover_text');
-
-var MAXDIST = Fx.constants.MAXDIST;
 
 module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     var cd = pointData.cd;
@@ -66310,32 +68057,32 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     // didn't find a point
     if(hoveron.indexOf('points') !== -1) {
         var dx = function(di) {
-                // dx and dy are used in compare modes - here we want to always
-                // prioritize the closest data point, at least as long as markers are
-                // the same size or nonexistent, but still try to prioritize small markers too.
-                var rad = Math.max(3, di.mrc || 0);
-                var kink = 1 - 1 / rad;
-                var dxRaw = Math.abs(xa.c2p(di.x) - xpx);
-                var d = (dxRaw < rad) ? (kink * dxRaw / rad) : (dxRaw - rad + kink);
-                return d;
-            },
-            dy = function(di) {
-                var rad = Math.max(3, di.mrc || 0);
-                var kink = 1 - 1 / rad;
-                var dyRaw = Math.abs(ya.c2p(di.y) - ypx);
-                return (dyRaw < rad) ? (kink * dyRaw / rad) : (dyRaw - rad + kink);
-            },
-            dxy = function(di) {
-                // scatter points: d.mrc is the calculated marker radius
-                // adjust the distance so if you're inside the marker it
-                // always will show up regardless of point size, but
-                // prioritize smaller points
-                var rad = Math.max(minRad, di.mrc || 0);
-                var dx = xa.c2p(di.x) - xpx;
-                var dy = ya.c2p(di.y) - ypx;
-                return Math.max(Math.sqrt(dx * dx + dy * dy) - rad, 1 - minRad / rad);
-            },
-            distfn = Fx.getDistanceFunction(hovermode, dx, dy, dxy);
+            // dx and dy are used in compare modes - here we want to always
+            // prioritize the closest data point, at least as long as markers are
+            // the same size or nonexistent, but still try to prioritize small markers too.
+            var rad = Math.max(3, di.mrc || 0);
+            var kink = 1 - 1 / rad;
+            var dxRaw = Math.abs(xa.c2p(di.x) - xpx);
+            var d = (dxRaw < rad) ? (kink * dxRaw / rad) : (dxRaw - rad + kink);
+            return d;
+        };
+        var dy = function(di) {
+            var rad = Math.max(3, di.mrc || 0);
+            var kink = 1 - 1 / rad;
+            var dyRaw = Math.abs(ya.c2p(di.y) - ypx);
+            return (dyRaw < rad) ? (kink * dyRaw / rad) : (dyRaw - rad + kink);
+        };
+        var dxy = function(di) {
+            // scatter points: d.mrc is the calculated marker radius
+            // adjust the distance so if you're inside the marker it
+            // always will show up regardless of point size, but
+            // prioritize smaller points
+            var rad = Math.max(minRad, di.mrc || 0);
+            var dx = xa.c2p(di.x) - xpx;
+            var dy = ya.c2p(di.y) - ypx;
+            return Math.max(Math.sqrt(dx * dx + dy * dy) - rad, 1 - minRad / rad);
+        };
+        var distfn = Fx.getDistanceFunction(hovermode, dx, dy, dxy);
 
         Fx.getClosest(cd, distfn, pointData);
 
@@ -66343,10 +68090,10 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
         if(pointData.index !== false) {
 
             // the closest data point
-            var di = cd[pointData.index],
-                xc = xa.c2p(di.x, true),
-                yc = ya.c2p(di.y, true),
-                rad = di.mrc || 1;
+            var di = cd[pointData.index];
+            var xc = xa.c2p(di.x, true);
+            var yc = ya.c2p(di.y, true);
+            var rad = di.mrc || 1;
 
             Lib.extendFlat(pointData, {
                 color: getTraceColor(trace, di),
@@ -66359,11 +68106,11 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
                 y1: yc + rad,
                 yLabelVal: di.y,
 
-                kink: Math.max(minRad, di.mrc || 0)
+                spikeDistance: dxy(di)
             });
 
             fillHoverText(di, trace, pointData);
-            ErrorBars.hoverInfo(di, trace, pointData);
+            Registry.getComponentMethod('errorbars', 'hoverInfo')(di, trace, pointData);
 
             return [pointData];
         }
@@ -66371,14 +68118,15 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
 
     // even if hoveron is 'fills', only use it if we have polygons too
     if(hoveron.indexOf('fills') !== -1 && trace._polygons) {
-        var polygons = trace._polygons,
-            polygonsIn = [],
-            inside = false,
-            xmin = Infinity,
-            xmax = -Infinity,
-            ymin = Infinity,
-            ymax = -Infinity,
-            i, j, polygon, pts, xCross, x0, x1, y0, y1;
+        var polygons = trace._polygons;
+        var polygonsIn = [];
+        var inside = false;
+        var xmin = Infinity;
+        var xmax = -Infinity;
+        var ymin = Infinity;
+        var ymax = -Infinity;
+
+        var i, j, polygon, pts, xCross, x0, x1, y0, y1;
 
         for(i = 0; i < polygons.length; i++) {
             polygon = polygons[i];
@@ -66436,7 +68184,8 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
 
             Lib.extendFlat(pointData, {
                 // never let a 2D override 1D type as closest point
-                distance: MAXDIST + 10,
+                // also: no spikeDistance, it's not allowed for fills
+                distance: pointData.maxHoverDistance,
                 x0: xmin,
                 x1: xmax,
                 y0: yAvg,
@@ -66456,7 +68205,7 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     }
 };
 
-},{"../../components/color":35,"../../components/errorbars":66,"../../components/fx":77,"../../lib":152,"./fill_hover_text":277,"./get_trace_color":279}],281:[function(require,module,exports){
+},{"../../components/color":36,"../../components/fx":78,"../../lib":155,"../../registry":237,"./fill_hover_text":280,"./get_trace_color":282}],284:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66506,7 +68255,7 @@ Scatter.meta = {
 
 module.exports = Scatter;
 
-},{"../../plots/cartesian":206,"./arrays_to_calcdata":268,"./attributes":269,"./calc":270,"./clean_data":272,"./colorbar":273,"./defaults":276,"./hover":280,"./plot":288,"./select":289,"./style":290,"./subtypes":291}],282:[function(require,module,exports){
+},{"../../plots/cartesian":208,"./arrays_to_calcdata":271,"./attributes":272,"./calc":273,"./clean_data":275,"./colorbar":276,"./defaults":279,"./hover":283,"./plot":291,"./select":292,"./style":293,"./subtypes":294}],285:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66515,12 +68264,11 @@ module.exports = Scatter;
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
 
+var isArrayOrTypedArray = require('../../lib').isArrayOrTypedArray;
 var hasColorscale = require('../../components/colorscale/has_colorscale');
 var colorscaleDefaults = require('../../components/colorscale/defaults');
-
 
 module.exports = function lineDefaults(traceIn, traceOut, defaultColor, layout, coerce, opts) {
     var markerColor = (traceIn.marker || {}).color;
@@ -66531,7 +68279,7 @@ module.exports = function lineDefaults(traceIn, traceOut, defaultColor, layout, 
         colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: 'line.', cLetter: 'c'});
     }
     else {
-        var lineColorDflt = (Array.isArray(markerColor) ? false : markerColor) || defaultColor;
+        var lineColorDflt = (isArrayOrTypedArray(markerColor) ? false : markerColor) || defaultColor;
         coerce('line.color', lineColorDflt);
     }
 
@@ -66539,7 +68287,7 @@ module.exports = function lineDefaults(traceIn, traceOut, defaultColor, layout, 
     if(!(opts || {}).noDash) coerce('line.dash');
 };
 
-},{"../../components/colorscale/defaults":45,"../../components/colorscale/has_colorscale":49}],283:[function(require,module,exports){
+},{"../../components/colorscale/defaults":46,"../../components/colorscale/has_colorscale":50,"../../lib":155}],286:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66951,7 +68699,7 @@ module.exports = function linePoints(d, opts) {
     return segments;
 };
 
-},{"../../constants/numerical":135,"../../lib":152,"./constants":275}],284:[function(require,module,exports){
+},{"../../constants/numerical":138,"../../lib":155,"./constants":278}],287:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -66970,7 +68718,7 @@ module.exports = function handleLineShapeDefaults(traceIn, traceOut, coerce) {
     if(shape === 'spline') coerce('line.smoothing');
 };
 
-},{}],285:[function(require,module,exports){
+},{}],288:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67010,7 +68758,7 @@ module.exports = function linkTraces(gd, plotinfo, cdscatter) {
     }
 };
 
-},{}],286:[function(require,module,exports){
+},{}],289:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67052,7 +68800,7 @@ module.exports = function makeBubbleSizeFn(trace) {
     };
 };
 
-},{"fast-isnumeric":5}],287:[function(require,module,exports){
+},{"fast-isnumeric":5}],290:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67135,7 +68883,7 @@ module.exports = function markerDefaults(traceIn, traceOut, defaultColor, layout
     }
 };
 
-},{"../../components/color":35,"../../components/colorscale/defaults":45,"../../components/colorscale/has_colorscale":49,"./subtypes":291}],288:[function(require,module,exports){
+},{"../../components/color":36,"../../components/colorscale/defaults":46,"../../components/colorscale/has_colorscale":50,"./subtypes":294}],291:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67149,9 +68897,9 @@ module.exports = function markerDefaults(traceIn, traceOut, defaultColor, layout
 
 var d3 = require('d3');
 
+var Registry = require('../../registry');
 var Lib = require('../../lib');
 var Drawing = require('../../components/drawing');
-var ErrorBars = require('../../components/errorbars');
 
 var subTypes = require('./subtypes');
 var linePoints = require('./line_points');
@@ -67302,9 +69050,8 @@ function plotOne(gd, idx, plotinfo, cdscatter, cdscatterAll, element, transition
         line = trace.line,
         tr = d3.select(element);
 
-    // (so error bars can find them along with bars)
     // error bars are at the bottom
-    tr.call(ErrorBars.plot, plotinfo, transitionOpts);
+    Registry.getComponentMethod('errorbars', 'plot')(tr, plotinfo, transitionOpts);
 
     if(trace.visible !== true) return;
 
@@ -67723,7 +69470,7 @@ function selectMarkers(gd, idx, plotinfo, cdscatter, cdscatterAll) {
     });
 }
 
-},{"../../components/drawing":60,"../../components/errorbars":66,"../../lib":152,"../../lib/polygon":164,"./line_points":283,"./link_traces":285,"./subtypes":291,"d3":3}],289:[function(require,module,exports){
+},{"../../components/drawing":61,"../../lib":155,"../../lib/polygon":167,"../../registry":237,"./line_points":286,"./link_traces":288,"./subtypes":294,"d3":3}],292:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67778,7 +69525,7 @@ module.exports = function selectPoints(searchInfo, polygon) {
     return selection;
 };
 
-},{"./subtypes":291}],290:[function(require,module,exports){
+},{"./subtypes":294}],293:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67792,7 +69539,7 @@ module.exports = function selectPoints(searchInfo, polygon) {
 
 var d3 = require('d3');
 var Drawing = require('../../components/drawing');
-var ErrorBars = require('../../components/errorbars');
+var Registry = require('../../registry');
 
 function style(gd, cd) {
     var s = cd ? cd[0].node3 : d3.select(gd).selectAll('g.trace.scatter');
@@ -67813,7 +69560,7 @@ function style(gd, cd) {
     s.selectAll('g.trace path.js-fill')
         .call(Drawing.fillGroupStyle);
 
-    s.call(ErrorBars.style);
+    Registry.getComponentMethod('errorbars', 'style')(s);
 }
 
 function stylePoints(sel, trace, gd) {
@@ -67831,7 +69578,7 @@ module.exports = {
     stylePoints: stylePoints
 };
 
-},{"../../components/drawing":60,"../../components/errorbars":66,"d3":3}],291:[function(require,module,exports){
+},{"../../components/drawing":61,"../../registry":237,"d3":3}],294:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67863,11 +69610,11 @@ module.exports = {
 
     isBubble: function(trace) {
         return Lib.isPlainObject(trace.marker) &&
-            Array.isArray(trace.marker.size);
+            Lib.isArrayOrTypedArray(trace.marker.size);
     }
 };
 
-},{"../../lib":152}],292:[function(require,module,exports){
+},{"../../lib":155}],295:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67897,7 +69644,7 @@ module.exports = function(traceIn, traceOut, layout, coerce, opts) {
     }
 };
 
-},{"../../lib":152}],293:[function(require,module,exports){
+},{"../../lib":155}],296:[function(require,module,exports){
 /**
 * Copyright 2012-2018, Plotly, Inc.
 * All rights reserved.
@@ -67923,13 +69670,6 @@ module.exports = function handleXYDefaults(traceIn, traceOut, layout, coerce) {
     if(x) {
         if(y) {
             len = Math.min(x.length, y.length);
-            // TODO: not sure we should do this here... but I think
-            // the way it works in calc is wrong, because it'll delete data
-            // which could be a problem eg in streaming / editing if x and y
-            // come in at different times
-            // so we need to revisit calc before taking this out
-            if(len < x.length) traceOut.x = x.slice(0, len);
-            if(len < y.length) traceOut.y = y.slice(0, len);
         }
         else {
             len = x.length;
@@ -67944,10 +69684,13 @@ module.exports = function handleXYDefaults(traceIn, traceOut, layout, coerce) {
         coerce('x0');
         coerce('dx');
     }
+
+    traceOut._length = len;
+
     return len;
 };
 
-},{"../../registry":234}],294:[function(require,module,exports){
+},{"../../registry":237}],297:[function(require,module,exports){
 /*
  * @copyright 2016 Sean Connelly (@voidqk), http://syntheti.cc
  * @license MIT
@@ -68075,7 +69818,7 @@ if (typeof window === 'object')
 
 module.exports = PolyBool;
 
-},{"./lib/build-log":295,"./lib/epsilon":296,"./lib/geojson":297,"./lib/intersecter":298,"./lib/segment-chainer":300,"./lib/segment-selector":301}],295:[function(require,module,exports){
+},{"./lib/build-log":298,"./lib/epsilon":299,"./lib/geojson":300,"./lib/intersecter":301,"./lib/segment-chainer":303,"./lib/segment-selector":304}],298:[function(require,module,exports){
 // (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
 // MIT License
 // Project Home: https://github.com/voidqk/polybooljs
@@ -68190,7 +69933,7 @@ function BuildLog(){
 
 module.exports = BuildLog;
 
-},{}],296:[function(require,module,exports){
+},{}],299:[function(require,module,exports){
 // (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
 // MIT License
 // Project Home: https://github.com/voidqk/polybooljs
@@ -68362,7 +70105,7 @@ function Epsilon(eps){
 
 module.exports = Epsilon;
 
-},{}],297:[function(require,module,exports){
+},{}],300:[function(require,module,exports){
 // (c) Copyright 2017, Sean Connelly (@voidqk), http://syntheti.cc
 // MIT License
 // Project Home: https://github.com/voidqk/polybooljs
@@ -68552,7 +70295,7 @@ var GeoJSON = {
 
 module.exports = GeoJSON;
 
-},{}],298:[function(require,module,exports){
+},{}],301:[function(require,module,exports){
 // (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
 // MIT License
 // Project Home: https://github.com/voidqk/polybooljs
@@ -69059,7 +70802,7 @@ function Intersecter(selfIntersection, eps, buildLog){
 
 module.exports = Intersecter;
 
-},{"./linked-list":299}],299:[function(require,module,exports){
+},{"./linked-list":302}],302:[function(require,module,exports){
 // (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
 // MIT License
 // Project Home: https://github.com/voidqk/polybooljs
@@ -69142,7 +70885,7 @@ var LinkedList = {
 
 module.exports = LinkedList;
 
-},{}],300:[function(require,module,exports){
+},{}],303:[function(require,module,exports){
 // (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
 // MIT License
 // Project Home: https://github.com/voidqk/polybooljs
@@ -69396,7 +71139,7 @@ function SegmentChainer(segments, eps, buildLog){
 
 module.exports = SegmentChainer;
 
-},{}],301:[function(require,module,exports){
+},{}],304:[function(require,module,exports){
 // (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
 // MIT License
 // Project Home: https://github.com/voidqk/polybooljs
@@ -69564,7 +71307,7 @@ var SegmentSelector = {
 
 module.exports = SegmentSelector;
 
-},{}],302:[function(require,module,exports){
+},{}],305:[function(require,module,exports){
 // TinyColor v1.4.1
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -70761,7 +72504,7 @@ else {
 
 })(Math);
 
-},{}],303:[function(require,module,exports){
+},{}],306:[function(require,module,exports){
 
 var ndarray = require('ndarray');
 var nifti = require('nifti-js');
@@ -71655,7 +73398,7 @@ var TractView = {
 
 module.exports = TractView;
 
-},{"async":2,"ndarray":12,"nifti-js":13,"plotly.js/lib/core":16,"plotly.js/lib/histogram":17}],304:[function(require,module,exports){
+},{"async":2,"ndarray":13,"nifti-js":14,"plotly.js/lib/core":17,"plotly.js/lib/histogram":18}],307:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -72149,7 +73892,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":309}],305:[function(require,module,exports){
+},{"util/":312}],308:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -72453,7 +74196,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],306:[function(require,module,exports){
+},{}],309:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -72639,7 +74382,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],307:[function(require,module,exports){
+},{}],310:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -72664,14 +74407,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],308:[function(require,module,exports){
+},{}],311:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],309:[function(require,module,exports){
+},{}],312:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -73261,4 +75004,4 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":308,"_process":306,"inherits":307}]},{},[1]);
+},{"./support/isBuffer":311,"_process":309,"inherits":310}]},{},[1]);
