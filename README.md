@@ -1,6 +1,8 @@
 # ui-tractview
 HTML5 Tract Viewer - Used to visualize output from AFQ
 
+[Demo](https://brainlife.io/ui/tractview/demo.html) 
+
 ![Preview Image](https://raw.githubusercontent.com/stevengeeky/ui-tractview/master/images/preview.png)
 
 ## Install
