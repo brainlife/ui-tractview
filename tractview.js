@@ -1,11 +1,4 @@
 
-var ndarray = require('ndarray');
-var nifti = require('nifti-js');
-var async = require('async');
-
-var Plotly = require('plotly.js/lib/core');
-Plotly.register([require('plotly.js/lib/histogram')]);
-
 var TractView = {
 
     /**
@@ -898,5 +891,3 @@ var TractView = {
     }
 
 };
-
-module.exports = TractView;
