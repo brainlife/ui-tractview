@@ -20,12 +20,6 @@ Or via npm (might be old)
 npm install ui-tractview
 ```
 
-Get browserify so that you can use `require` locally:
-
-```bash
-npm install -g browserify
-```
-
 Include script dependencies in your index.html file:
 
 ```html
@@ -39,8 +33,8 @@ Include script dependencies in your index.html file:
 <script type="text/javascript" src="node_modules/ui-tractview/node_modules/pako/dist/pako_inflate.min.js"></script>
 
 <!-- Main Scripts -->
-<!-- bundle.js will be generated from a later step -->
-<script type="text/javascript" src="bundle.js"></script>
+<script type="text/javascript" src="node_modules/ui-tractview/tractview.js"></script>
+<script type="text/javascript" src="main.js"></script>
 
 <!-- Dep Styles -->
 <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
@@ -79,7 +73,7 @@ The `config` value used above has the following layout:
         "url": "file/path/to/tract1.json" }/*, ...*/],
     "niftis": [{
         "name": "faStd",
-        "url": "file/path/to/faStd.nii.gz" }/*, ...*/]
+        "url": "url/path/to/faStd.nii.gz" }/*, ...*/]
 }
 ```
 
@@ -98,7 +92,7 @@ The list of tracts contains a set of objects which each specify what the name of
 }
 ```
 
-If you are generating an output from AFQ in Matlab, you can use savejson and a script similar to the following in order to create a list of output json files:
+If you are generating an output from AFQ in Matlab, you can use `savejson` and a script similar to the following in order to create a list of output json files:
 
 ```matlab
 [fg_classified,~,classification] = AFQ_SegmentFiberGroups(config.dt6, fg, [], [], false);
@@ -113,10 +107,4 @@ for it = 1:length(tracts)
 end
 ```
 
-After you have set up your main javascript file, simply run
-
-```bash
-browserify main.js > bundle.js
-```
-
-And all of your code will be assembled into a single file (in this case `bundle.js`) which can be run standalone on a local machine.
+Once you have main.js and your configuration set up, you're ready to go!
