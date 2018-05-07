@@ -45,7 +45,6 @@
             $(function() {
                 var jwt = localStorage.getItem('jwt');
                 var config = window.config || window.parent.config;
-                var stevenHost = localStorage.getItem("stevenHost");
                 
                 if(localStorage.getItem('debug_config')) {
                     config = JSON.parse(localStorage.getItem("debug_config"));
