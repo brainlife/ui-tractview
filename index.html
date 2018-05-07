@@ -3,7 +3,7 @@
     <head>
         <title>Tractview</title>
         <meta http-equiv="content-type" content="text/html; charset=UTF8">
-                
+        
         <link href="//fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
         <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
 
@@ -19,6 +19,7 @@
             overflow:hidden;
         }
         </style>
+        
     </head>
     
     <body>
@@ -34,7 +35,47 @@
         <script type="text/javascript" src="node_modules/pako/dist/pako_inflate.min.js"></script>
         
         <!-- Main Scripts -->
-        <script type="text/javascript" src="bundle.js"></script>
+        <script type="text/javascript" src="dist.bundled.js"></script>
+        <script type="text/javascript" src="tractview.js"></script>
         <script type="text/javascript" src="lib/stats.js"></script>
+        
+        <script>
+            'use strict';
+
+            $(function() {
+                var jwt = localStorage.getItem('jwt');
+                var config = window.config || window.parent.config;
+                
+                if(localStorage.getItem('debug_config')) {
+                    config = JSON.parse(localStorage.getItem("debug_config"));
+                    config.debug = true;
+                }
+                
+                if(!config) alert("no config object found");
+                console.log("using config");
+                console.dir(config);
+
+                //set token for each tracts/layers
+                config.tracts.forEach(tract=>{
+                    if(~tract.url.indexOf("?")) tract.url += "&";
+                    else tract.url += "?";
+                    tract.url += "at="+jwt;
+                });
+                if(config.layers) config.layers.forEach(layer=>{
+                    if(~layer.url.indexOf("?")) layer.url += "&";
+                    else layer.url += "?";
+                    layer.url += "at="+jwt;
+                });
+                
+                TractView.init({
+                    selector: '#tractview',
+                    preview_scene_path: 'models/brain.json',
+                    tracts: config.tracts,
+                    niftis: config.layers,
+                    extend: config.extend,
+                    debug: config.debug,
+                });
+            });
+        </script>
      </body>
 </html>
