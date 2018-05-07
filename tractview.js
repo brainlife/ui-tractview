@@ -400,7 +400,7 @@ var TractView = {
         }
 
         function load_tract(tract, index, cb) {
-            console.log("loading tract", tract.url);
+            // console.log("loading tract", tract.url);
             fetch(tract.url).then(res=>{
                 return res.json();
             }).then(json=>{
@@ -669,10 +669,7 @@ var TractView = {
         
         function processDeflatedNiftiBuffer(buffer) {
             var raw = pako.inflate(buffer);
-            console.log(raw);
             var N = nifti.parse(raw);
-            console.log(nifti.parseHeader(raw));
-            console.log(N);
 
             color_map_head = nifti.parseHeader(raw);
             color_map = ndarray(N.data, N.sizes.slice().reverse());
