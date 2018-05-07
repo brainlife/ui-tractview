@@ -561,23 +561,31 @@ var TractView = {
 
                     //find voxel value
                     var v = color_map.get(z, y, x);
+                    if (isNaN(v)) {
+                        // if the color is invalid, then just gray out that part of the tract
+                        cols.push(.5);
+                        cols.push(.5);
+                        cols.push(.5);
+                        cols.push(1.0);
+                    }
+                    else {
+                        var normalized_v = (v - dataMin_value) / (dataMax_value - dataMin_value);
+                        
+                        //clip..
+                        if(normalized_v < 0.1) normalized_v = 0.1;
+                        if(normalized_v > 1) normalized_v = 1;
 
-                    var normalized_v = (v - dataMin_value) / (dataMax_value - dataMin_value);
-                    
-                    //clip..
-                    if(normalized_v < 0.1) normalized_v = 0.1;
-                    if(normalized_v > 1) normalized_v = 1;
-
-                    //compute histogram
-                    var hv = Math.round(normalized_v*256);
-                    var glob_hv = Math.round(normalized_v*100);
-                    hist[hv] = (hist[hv] || 0) + 1;
-                    global_hist[glob_hv] = (global_hist[glob_hv] || 0) + 1;
-                    
-                    cols.push(geometry.tract.color.r*normalized_v);
-                    cols.push(geometry.tract.color.g*normalized_v);
-                    cols.push(geometry.tract.color.b*normalized_v);
-                    cols.push(1.0);
+                        //compute histogram
+                        var hv = Math.round(normalized_v*256);
+                        var glob_hv = Math.round(normalized_v*100);
+                        hist[hv] = (hist[hv] || 0) + 1;
+                        global_hist[glob_hv] = (global_hist[glob_hv] || 0) + 1;
+                        
+                        cols.push(geometry.tract.color.r*normalized_v);
+                        cols.push(geometry.tract.color.g*normalized_v);
+                        cols.push(geometry.tract.color.b*normalized_v);
+                        cols.push(1.0);
+                    }
                 }
                 geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 4));
                 
@@ -661,22 +669,27 @@ var TractView = {
         
         function processDeflatedNiftiBuffer(buffer) {
             var raw = pako.inflate(buffer);
+            console.log(raw);
             var N = nifti.parse(raw);
+            console.log(nifti.parseHeader(raw));
+            console.log(N);
 
             color_map_head = nifti.parseHeader(raw);
             color_map = ndarray(N.data, N.sizes.slice().reverse());
 
             color_map.sum = 0;
             N.data.forEach(v=>{
-                color_map.sum+=v;
+                if (!isNaN(v)) color_map.sum+=v;
             });
             color_map.mean = color_map.sum / N.data.length;
 
             //compute sdev
             color_map.dsum = 0;
             N.data.forEach(v=>{
-                var d = v - color_map.mean;
-                color_map.dsum += d*d;
+                if (!isNaN(v)) {
+                    var d = v - color_map.mean;
+                    color_map.dsum += d*d;
+                }
             });
             color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
 

@@ -4,6 +4,8 @@ $(function() {
     var TractView = require('./tractview.js');
     var jwt = localStorage.getItem('jwt');
     var config = window.config || window.parent.config;
+    var stevenHost = localStorage.getItem("stevenHost");
+    
     if(localStorage.getItem('debug_config')) {
         config = JSON.parse(localStorage.getItem("debug_config"));
         config.debug = true;
@@ -11,15 +13,15 @@ $(function() {
     
     //TODO for steven .. please use debug_config
     //code to get steven's instance to work without remote loading
-    if (localStorage.getItem("steven_debug")) {
+    if (stevenHost) {
         config.tracts.forEach(tract => {
-            tract.url = encodeURI(`http://otherhost/temp/wmc_59b2c17a76fddd0027308fb8/1_tracts/${tract.filename}`);
+            tract.url = encodeURI(`${stevenHost}/files/wmc/tracts/${tract.filename}`);
         });
         if (config.layers) config.layers.forEach(layer => {
-            layer.url = encodeURI(`http://otherhost/temp/dtiinit_5a26f2c34e57c077cf5e3472/1_./dti/bin/${layer.filename}`);
+            layer.url = encodeURI(`${stevenHost}/files/dtiinit/${layer.filename}`);
         });
         if (config.extend) config.extend.forEach(extension => {
-            extension.url = encodeURI(`http://localhost:8080/temp/life_599ec73d8aca550029071e2f/${extension.filename}`);
+            extension.url = encodeURI(`${stevenHost}/files/life_599ec73d8aca550029071e2f/${extension.filename}`);
         });
     } else {
         if(!config) alert("no config object found");
