@@ -536,8 +536,12 @@ Vue.component('tractview', {
             overflow-y:auto;
             white-space:nowrap;
             font-family:Roboto;
-            font-size:12px;
+            font-size:13px;
             background:rgba(0, 0, 0, .7);
+            line-height: 130%;
+        }
+        .tract_toggles {
+            margin-right: 10px;
         }
     
         .hide_show {
@@ -551,6 +555,7 @@ Vue.component('tractview', {
             overflow:hidden;
             cursor:default;
             transition:background 1s, color 1s;
+            padding: 5px;
         }
         .hide_show:hover {
             background:black;
@@ -751,6 +756,9 @@ Vue.component('tractview', {
                     <td class='label'><input type='checkbox' v-model='all_left' /></td>
                     <td class='label'><input type='checkbox' v-model='all_right' /></td>
                   </tr>
+                  <tr class="row">
+                    <td colspan="3" style="padding-top: 5px; margin-bottom: 5px; border-bottom: 1px solid gray;"></td>
+                  </tr>
                   <tr v-for="(LR, basename) in sortedMeshes" class='row' @mouseenter="tractFocus(LR, basename)" @mouseleave="tractUnfocus(LR, basename)">
                     <td class='label'><label>{{basename}}</label></td>
                     <td v-if="LR.left" class='label'><input type='checkbox' :name='LR.left.name' v-model='LR.left.visible' /></td>
@@ -759,12 +767,12 @@ Vue.component('tractview', {
                 </table>
                 
                 <div v-if='controls' style='color:#ccc; margin-top:5px;'>
-                  <input type="checkbox" name="enableRotation" v-model="controls.autoRotate" /> <label for="enableRotation">Automatic Rotation {{controls.autoRotate?'Enabled':'Disabled'}}</label>
+                  <input type="checkbox" name="enableRotation" v-model="controls.autoRotate" /> Rotate
                 </div>
                 
                 <!-- Nifti Choosing -->
                 <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
-                    <div style="display:inline-block;"><label style="color:#ccc; width: 120px;">Background Gamma</label> <input type="number" min=".0001" value="1" step=".1" id="gamma_input" class="gamma_input" v-model="gamma" ref="gamma"></input></div><br />
+                    <div style="display:inline-block;"><label style="color:#ccc; width: 120px;">BG Gamma</label> <input type="number" min=".0001" value="1" step=".1" id="gamma_input" class="gamma_input" v-model="gamma" ref="gamma"></input></div><br />
                     <div style="display:inline-block;" v-if="niftis.length > 0"><label style="color:#ccc; width: 120px;">Overlay</label> <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged">
                       <option :value="-1">(No Overlay)</option>
                       <option v-for="(n, i) in niftis" :value="i">{{n.filename}}</option>
