@@ -55,7 +55,7 @@ The `config` prop used above has the following layout:
     "name": "Left IFOF",
     "color": [0.1465684211,0.7597421053,0.6797052632],
     "url": "file/path/to/tract1.json" }/*, ...*/],
-  "niftis": [{
+  "layers": [{
     "name": "faStd",
     "url": "url/path/to/faStd.nii.gz" }/*, ...*/]
 }
