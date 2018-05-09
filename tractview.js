@@ -1,4 +1,5 @@
 
+let firsttract = true;
 var TractView = {
 
     /**
@@ -684,7 +685,7 @@ var TractView = {
             color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
 
             //set min/max
-            dataMin_value = color_map.mean - color_map.sdev;
+            dataMin_value = color_map.mean - color_map.sdev*5;
             dataMax_value = color_map.mean + color_map.sdev*5;
 
             // console.log("color map");
