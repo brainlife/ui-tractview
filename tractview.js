@@ -58,20 +58,6 @@ Vue.component('tractview', {
     this.tinyBrainCam = new THREE.PerspectiveCamera(45, tinybrainbox.width / tinybrainbox.height, 1, 5000);
     
     this.camera.position.z = 200;
-    let info_json = getHashValue('info');
-    if (info_json) {
-      let info = JSON.parse(info_json);
-      if (info.rotation) {
-        this.camera.rotation.x = +info.rotation.x;
-        this.camera.rotation.y = +info.rotation.y;
-        this.camera.rotation.z = +info.rotation.z;
-      }
-      if (info.position) {
-        this.camera.position.x = +info.position.x;
-        this.camera.position.y = +info.position.y;
-        this.camera.position.z = +info.position.z;
-      }
-    };
 
     window.addEventListener("resize", this.resized);
 
@@ -125,11 +111,35 @@ Vue.component('tractview', {
 
     // use OrbitControls and make camera light follow camera position
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-    if (!info_json) this.controls.autoRotate = true;
+    
+    let info_json = getHashValue('info');
+    if (info_json) {
+      let info = JSON.parse(info_json);
+      if (info.rotation) {
+        this.camera.rotation.x = +info.rotation.x;
+        this.camera.rotation.y = +info.rotation.y;
+        this.camera.rotation.z = +info.rotation.z;
+      }
+      if (info.position) {
+        this.camera.position.x = +info.position.x;
+        this.camera.position.y = +info.position.y;
+        this.camera.position.z = +info.position.z;
+      }
+      if (info.origin) {
+        this.controls.target.x = +info.origin.x;
+        this.controls.target.y = +info.origin.y;
+        this.controls.target.z = +info.origin.z;
+      }
+      if (info.pan) {
+        this.controls.setPubPanOffset(+info.pan.x, +info.pan.y, +info.pan.z);
+      }
+    } else this.controls.autoRotate = true;
     
     this.controls.addEventListener('change', function (e) {
       // rotation changes
       let pan = vm.controls.getPanOffset();
+      
+      // save camera information in url
       window.location = "#info=" +
         encodeURIComponent(JSON.stringify({
           rotation: {
@@ -138,12 +148,23 @@ Vue.component('tractview', {
             z: vm.camera.rotation.z
           },
           position: {
-            x: vm.camera.position.x - pan.x,
-            y: vm.camera.position.y - pan.y,
-            z: vm.camera.position.z - pan.z
+            x: vm.camera.position.x,
+            y: vm.camera.position.y,
+            z: vm.camera.position.z
+          },
+          origin: {
+            x: vm.controls.target.x,
+            y: vm.controls.target.y,
+            z: vm.controls.target.z
+          },
+          pan: {
+            x: pan.x,
+            y: pan.y,
+            z: pan.z
           }
         }));
     });
+    
     this.controls.addEventListener('start', function () {
       // use interacting with control
       // gamma_input_el.trigger({ type: 'blur' })
