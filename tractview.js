@@ -9,6 +9,8 @@ Vue.component('tractview', {
   
   data () {
     return {
+      load_percentage: 1,
+      
       all_left: true,
       all_right: true,
       visible: true,
@@ -29,14 +31,19 @@ Vue.component('tractview', {
       camera: null,
       controls: null,
       
-      niftis: []
+      tinyBrainScene: null,
+      tinyBrainCam: null,
+      brainRenderer: null,
+      
+      niftis: [],
+      selectedNifti: 0
     };
   },
   
   mounted() {
     var vm = this;
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    let brainRenderer = new THREE.WebGLRenderer({
+    this.brainRenderer = new THREE.WebGLRenderer({
       alpha: true,
       antialias: true
     });
@@ -48,34 +55,47 @@ Vue.component('tractview', {
     let tinybrainbox = this.$refs.tinybrain.getBoundingClientRect();
     
     this.camera = new THREE.PerspectiveCamera(45, viewbox.width / viewbox.height, 1, 5000);
-    let brainCam = new THREE.PerspectiveCamera(45, tinybrainbox.width / tinybrainbox.height, 1, 5000);
+    this.tinyBrainCam = new THREE.PerspectiveCamera(45, tinybrainbox.width / tinybrainbox.height, 1, 5000);
     
     this.camera.position.z = 200;
+    let info_json = getHashValue('info');
+    if (info_json) {
+      let info = JSON.parse(info_json);
+      if (info.rotation) {
+        this.camera.rotation.x = +info.rotation.x;
+        this.camera.rotation.y = +info.rotation.y;
+        this.camera.rotation.z = +info.rotation.z;
+      }
+      if (info.position) {
+        this.camera.position.x = +info.position.x;
+        this.camera.position.y = +info.position.y;
+        this.camera.position.z = +info.position.z;
+      }
+    };
 
     window.addEventListener("resize", this.resized);
 
     // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
     let loader = new THREE.ObjectLoader();
-    let tinyBrainScene, brainlight;
 
     loader.load('models/brain.json', _scene => {
-      tinyBrainScene = _scene;
-      let brainMesh = tinyBrainScene.children[1],
-        unnecessaryDirectionalLight = tinyBrainScene.children[2];
+      this.tinyBrainScene = _scene;
+      let brainMesh = this.tinyBrainScene.children[1],
+        unnecessaryDirectionalLight = this.tinyBrainScene.children[2];
       // align the tiny brain with the model displaying fascicles
 
       brainMesh.rotation.z += Math.PI / 2;
       brainMesh.material = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
 
-      tinyBrainScene.remove(unnecessaryDirectionalLight);
+      this.tinyBrainScene.remove(unnecessaryDirectionalLight);
 
       let amblight = new THREE.AmbientLight(0x101010);
-      tinyBrainScene.add(amblight);
+      this.tinyBrainScene.add(amblight);
 
-      brainlight = new THREE.PointLight(0xffffff, 1);
-      brainlight.radius = 20;
-      brainlight.position.copy(brainCam.position);
-      tinyBrainScene.add(brainlight);
+      this.brainlight = new THREE.PointLight(0xffffff, 1);
+      this.brainlight.radius = 20;
+      this.brainlight.position.copy(this.tinyBrainCam.position);
+      this.tinyBrainScene.add(this.brainlight);
     });
 
     // start loading the tract
@@ -86,6 +106,7 @@ Vue.component('tractview', {
         vm.load_tract(tract, idx++, (err, mesh) => {
           if (err) return next_tract(err);
           this.add_mesh_to_scene(mesh);
+          this.load_percentage = idx / this.config.tracts.length;
           // this.config.num_fibers += res.coords.length;
           tract.mesh = mesh;
           next_tract();
@@ -98,15 +119,30 @@ Vue.component('tractview', {
     this.renderer.setSize(viewbox.width, viewbox.height);
     this.$refs.view.appendChild(this.renderer.domElement);
 
-    brainRenderer.autoClear = false;
-    brainRenderer.setSize(tinybrainbox.width, tinybrainbox.height);
-    this.$refs.tinybrain.appendChild(brainRenderer.domElement);
+    this.brainRenderer.autoClear = false;
+    this.brainRenderer.setSize(tinybrainbox.width, tinybrainbox.height);
+    this.$refs.tinybrain.appendChild(this.brainRenderer.domElement);
 
     // use OrbitControls and make camera light follow camera position
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.autoRotate = true;
+    if (!info_json) this.controls.autoRotate = true;
+    
     this.controls.addEventListener('change', function (e) {
       // rotation changes
+      let pan = vm.controls.getPanOffset();
+      window.location = "#info=" +
+        encodeURIComponent(JSON.stringify({
+          rotation: {
+            x: vm.camera.rotation.x,
+            y: vm.camera.rotation.y,
+            z: vm.camera.rotation.z
+          },
+          position: {
+            x: vm.camera.position.x - pan.x,
+            y: vm.camera.position.y - pan.y,
+            z: vm.camera.position.z - pan.z
+          }
+        }));
     });
     this.controls.addEventListener('start', function () {
       // use interacting with control
@@ -119,61 +155,65 @@ Vue.component('tractview', {
     this.updateAllShaders()
     this.appendStyle();
     
-    function animate_conview () {
-      vm.controls.enableKeys = document.activeElement != vm.$refs.gamma;
-      vm.controls.update();
-
-      vm.renderer.clear();
-      vm.renderer.clearDepth();
-      vm.renderer.render(vm.scene, vm.camera);
-
-      // handle display of the tiny brain preview
-      if (tinyBrainScene) {
-        // normalize the main camera's position so that the tiny brain camera is always the same distance away from <0, 0, 0>
-        let pan = vm.controls.getPanOffset();
-        let pos3 = new THREE.Vector3(
-          vm.camera.position.x - pan.x,
-          vm.camera.position.y - pan.y,
-          vm.camera.position.z - pan.z
-        ).normalize();
-        brainCam.position.set(pos3.x * 10, pos3.y * 10, pos3.z * 10);
-        brainCam.rotation.copy(vm.camera.rotation);
-
-        brainlight.position.copy(brainCam.position);
-
-        brainRenderer.clear();
-        brainRenderer.render(tinyBrainScene, brainCam);
-      }
-
-      requestAnimationFrame(animate_conview);
-    }
-
-    animate_conview();
+    this.animate_conview();
   },
 
   methods: {
+    animate_conview: function() {
+      this.controls.enableKeys = document.activeElement != this.$refs.gamma;
+      this.controls.update();
+
+      this.renderer.clear();
+      this.renderer.clearDepth();
+      this.renderer.render(this.scene, this.camera);
+
+      // handle display of the tiny brain preview
+      if (this.tinyBrainScene) {
+        // normalize the main camera's position so that the tiny brain camera is always the same distance away from <0, 0, 0>
+        let pan = this.controls.getPanOffset();
+        let pos3 = new THREE.Vector3(
+          this.camera.position.x - pan.x,
+          this.camera.position.y - pan.y,
+          this.camera.position.z - pan.z
+        ).normalize();
+        this.tinyBrainCam.position.set(pos3.x * 10, pos3.y * 10, pos3.z * 10);
+        this.tinyBrainCam.rotation.copy(this.camera.rotation);
+
+        this.brainlight.position.copy(this.tinyBrainCam.position);
+
+        this.brainRenderer.clear();
+        this.brainRenderer.render(this.tinyBrainScene, this.tinyBrainCam);
+      }
+
+      requestAnimationFrame(this.animate_conview);
+    },
+    
     toggle_hide_show: function () {
       this.visible = !this.visible;
     },
     
     tractFocus: function(LR, basename) {
-      this.focused[basename] = true;
-      
-      if (LR.left) {
-        LR.left.material_previous = LR.left.material;
-        LR.left.material = white_material;
-      }
-      if (LR.right) {
-        LR.right.material_previous = LR.right.material;
-        LR.right.material = white_material;
+      if (this.load_percentage == 1) {
+        this.focused[basename] = true;
+        
+        if (LR.left) {
+          LR.left.material_previous = LR.left.material;
+          LR.left.material = white_material;
+        }
+        if (LR.right) {
+          LR.right.material_previous = LR.right.material;
+          LR.right.material = white_material;
+        }
       }
     },
     
     tractUnfocus: function(LR, basename) {
-      this.focused[basename] = false;
-      
-      if (LR.left && LR.left.material_previous) LR.left.material = LR.left.material_previous;
-      if (LR.right && LR.right.material_previous) LR.right.material = LR.right.material_previous;
+      if (this.load_percentage == 1) {
+        this.focused[basename] = false;
+        
+        if (LR.left && LR.left.material_previous) LR.left.material = LR.left.material_previous;
+        if (LR.right && LR.right.material_previous) LR.right.material = LR.right.material_previous;
+      }
     },
     
     resized: function () {
@@ -437,20 +477,21 @@ Vue.component('tractview', {
     let reader = new FileReader();
     reader.addEventListener('load', function(buffer) {
         vm.niftis.push({ user_uploaded: true, filename: file.name, buffer: reader.result });
-        // vm.$refs.upload_input.value = vm.niftis.length - 1;
+        vm.selectedNifti = vm.niftis.length - 1;
+        vm.niftiSelectChanged();
     });
     reader.readAsArrayBuffer(file);
   },
   
-  niftiSelectChanged: function(e) {
-    if (e.target.value == -1) {
+  niftiSelectChanged: function() {
+    if (this.selectedNifti == -1) {
       this.color_map = undefined;
       
       this.recalculateMaterials();
       this.destroyPlot();
       this.showAll();
     } else {
-      let nifti = this.niftis[e.target.value];
+      let nifti = this.niftis[this.selectedNifti];
       if (nifti.user_uploaded) this.processDeflatedNiftiBuffer(nifti.buffer);
       else {
         fetch(nifti.url)
@@ -661,6 +702,27 @@ Vue.component('tractview', {
         tr.row.active label {
             color:#fff;
         }
+        
+        .bllogo {
+          position: absolute;
+          padding-left: 8px;
+          padding-top: 8px;
+          font-size: 20px;
+          font-family: "Open Sans";
+          font-weight: bold;
+          opacity:.2;
+          color:white;
+          text-decoration:none;
+        }
+        
+        .loading {
+          position: absolute;
+          bottom:15px;
+          left: 100px;
+          font-size: 16px;
+          opacity:.2;
+          color:white;
+        }
     </style>`;
     }
   },
@@ -723,8 +785,11 @@ Vue.component('tractview', {
 
   template: `
   <div class="container" style="display:inline-block;">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <div id="conview" class="conview" ref="view" style="position:absolute; width: 100%; height:100%;"></div>
-    <div id="tinybrain" class="tinybrain" ref="tinybrain"></div>
+    <div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>
+    <div v-if="load_percentage < 1" id="loading" class="loading">Loading... ({{Math.round(load_percentage*100)}}%)</div>
+    <a id="bllogo" class="bllogo" href="https://brainlife.io">Brain Life</a>
     <div style="display:inline-block;">
       <div id="controls" class="controls">
         <div style="display:flex;">
@@ -765,7 +830,7 @@ Vue.component('tractview', {
                 <!-- Nifti Choosing -->
                 <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
                     <div style="display:inline-block;"><label style="color:#ccc; width: 120px;">Background Gamma</label> <input type="number" min=".0001" value="1" step=".1" id="gamma_input" class="gamma_input" v-model="gamma" ref="gamma"></input></div><br />
-                    <div style="display:inline-block;" v-if="niftis.length > 0"><label style="color:#ccc; width: 120px;">Overlay</label> <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged">
+                    <div style="display:inline-block;" v-if="niftis.length > 0"><label style="color:#ccc; width: 120px;">Overlay</label> <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
                       <option :value="-1">(No Overlay)</option>
                       <option v-for="(n, i) in niftis" :value="i">{{n.filename}}</option>
                     </select></div><br />
@@ -789,6 +854,11 @@ Vue.component('tractview', {
 let white_material = new THREE.LineBasicMaterial({
   color: new THREE.Color(1, 1, 1)
 });
+
+function getHashValue(key) {
+  var matches = location.hash.match(new RegExp(key+'=([^&]*)'));
+  return matches ? decodeURIComponent(matches[1]) : null;
+}
 
 // returns whether or not the tractName is considered to be a left tract
 function isLeftTract(tractName) {
