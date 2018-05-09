@@ -1,5 +1,6 @@
 # ui-tractview
-HTML5 Tract Viewer - Used to visualize output from AFQ
+
+HTML5 Tract Viewer - Used to visualize output from white matter tractography
 
 [Demo](https://brainlife.io/ui/tractview/demo.html) 
 
@@ -14,23 +15,19 @@ git clone https://github.com/brain-life/ui-tractview.git
 cd ui-tractview && npm install
 ```
 
-Or via npm (might be old)
-
-```bash
-npm install ui-tractview
-```
-
 Include script dependencies in your index.html file:
 
 ```html
 <!-- Dep Scripts -->
-<script type="text/javascript" src="node_modules/ui-tractview/node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="node_modules/ui-tractview/node_modules/three/build/three.min.js"></script>
 <script type="text/javascript" src="node_modules/ui-tractview/node_modules/three/examples/js/loaders/VTKLoader.js"></script>
 <script type="text/javascript" src="node_modules/ui-tractview/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="node_modules/ui-tractview/node_modules/panning-orbit-controls/dist/panning-orbit-controls.js"></script>
-
 <script type="text/javascript" src="node_modules/ui-tractview/node_modules/pako/dist/pako_inflate.min.js"></script>
+<script type="text/javascript" src="node_modules/ui-tractview/node_modules/vue/dist/vue.min.js"></script>
+
+<!-- element to bind to the tract viewer -->
+<div id="tractview">
 
 <!-- Main Scripts -->
 <script type="text/javascript" src="node_modules/ui-tractview/tractview.js"></script>
@@ -40,40 +37,27 @@ Include script dependencies in your index.html file:
 <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
 ```
 
-Make an element to hook the tractviewer onto:
-
-```html
-<div id="tractview" style="height: 100%;"></div>
-```
-
-Make a main javascript file which we will denote as `main.js` for this demonstration. Then require `tractview` inside it:
+Initialize your main script after your target element to use with the tractviewer. The tractviewer is simply a Vue component that you can initialize in a few lines of JavaScript:
 
 ```javascript
-$(function() {
-    var tractview = require('./node_modules/ui-tractview/tractview.js');
-
-    var config = {/* read below */};
-
-    tractview.init({
-        selector: '#tractview',
-        preview_scene_path: 'node_modules/ui-tractview/models/brain.json',
-        tracts: config.tracts,  // read below
-        niftis: config.niftis   // read below
-    });
+new Vue({
+  el: '#tractview',
+  components: ['tractview'],
+  template: `<tractview :config='config'></tractview>`
 });
 ```
 
-The `config` value used above has the following layout:
+The `config` prop used above has the following layout:
 
 ```javascript
 {
-    "tracts": [{
-        "name": "Left IFOF",
-        "color": [0.1465684211,0.7597421053,0.6797052632],
-        "url": "file/path/to/tract1.json" }/*, ...*/],
-    "niftis": [{
-        "name": "faStd",
-        "url": "url/path/to/faStd.nii.gz" }/*, ...*/]
+  "tracts": [{
+    "name": "Left IFOF",
+    "color": [0.1465684211,0.7597421053,0.6797052632],
+    "url": "file/path/to/tract1.json" }/*, ...*/],
+  "layers": [{
+    "name": "faStd",
+    "url": "url/path/to/faStd.nii.gz" }/*, ...*/]
 }
 ```
 
@@ -81,14 +65,14 @@ The list of tracts contains a set of objects which each specify what the name of
 
 ```javascript
 {
-    "coords": [[
-            // x coords
-            [-21.69491386, -21.64446831, -21.4675293/*, ...*/],
-            // y coords
-            [43.13895035, 42.14380264, 41.15979385/*, ...*/],
-            // z coords
-            [1.224040627, 1.165375113, 1.165637732/*, ...*/]
-        ]/*, ...*/]
+  "coords": [[
+      // x coords
+      [-21.69491386, -21.64446831, -21.4675293/*, ...*/],
+      // y coords
+      [43.13895035, 42.14380264, 41.15979385/*, ...*/],
+      // z coords
+      [1.224040627, 1.165375113, 1.165637732/*, ...*/]
+    ]/*, ...*/]
 }
 ```
 
@@ -99,6 +83,7 @@ If you are generating an output from AFQ in Matlab, you can use `savejson` and a
 tracts = fg2Array(fg_classified);
 mkdir('tracts');
 cm = parula(length(tracts));
+
 for it = 1:length(tracts)
   tract.name   = tracts(it).name;
   tract.color  = cm(it,:);
