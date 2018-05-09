@@ -729,42 +729,6 @@ Vue.component('tractview', {
             color:#fff;
         }
         
-<<<<<<< HEAD
-        function processDeflatedNiftiBuffer(buffer) {
-            var raw = pako.inflate(buffer);
-            var N = nifti.parse(raw);
-
-            color_map_head = nifti.parseHeader(raw);
-            color_map = ndarray(N.data, N.sizes.slice().reverse());
-
-            color_map.sum = 0;
-            N.data.forEach(v=>{
-                if (!isNaN(v)) color_map.sum+=v;
-            });
-            color_map.mean = color_map.sum / N.data.length;
-
-            //compute sdev
-            color_map.dsum = 0;
-            N.data.forEach(v=>{
-                if (!isNaN(v)) {
-                    var d = v - color_map.mean;
-                    color_map.dsum += d*d;
-                }
-            });
-            color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
-
-            //set min/max
-            dataMin_value = color_map.mean - color_map.sdev*5;
-            dataMax_value = color_map.mean + color_map.sdev*5;
-
-            // console.log("color map");
-            // console.dir(color_map);
-            
-            recalculateMaterials();
-            makePlot();
-            
-            reselectAll();
-=======
         .bllogo {
           position: absolute;
           padding-left: 8px;
@@ -775,7 +739,6 @@ Vue.component('tractview', {
           opacity:.2;
           color:white;
           text-decoration:none;
->>>>>>> 1ff60ad3eb766cfeff768089e88266ebe1b05437
         }
         
         .loading {
