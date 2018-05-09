@@ -577,8 +577,12 @@ Vue.component('tractview', {
             overflow-y:auto;
             white-space:nowrap;
             font-family:Roboto;
-            font-size:12px;
+            font-size:13px;
             background:rgba(0, 0, 0, .7);
+            line-height: 130%;
+        }
+        .tract_toggles {
+            margin-right: 10px;
         }
     
         .hide_show {
@@ -592,6 +596,7 @@ Vue.component('tractview', {
             overflow:hidden;
             cursor:default;
             transition:background 1s, color 1s;
+            padding: 5px;
         }
         .hide_show:hover {
             background:black;
@@ -720,6 +725,7 @@ Vue.component('tractview', {
           bottom:15px;
           left: 100px;
           font-size: 16px;
+          font-family: "Open Sans";
           opacity:.2;
           color:white;
         }
@@ -816,6 +822,9 @@ Vue.component('tractview', {
                     <td class='label'><input type='checkbox' v-model='all_left' /></td>
                     <td class='label'><input type='checkbox' v-model='all_right' /></td>
                   </tr>
+                  <tr class="row">
+                    <td colspan="3" style="padding-top: 5px; margin-bottom: 5px; border-bottom: 1px solid gray;"></td>
+                  </tr>
                   <tr v-for="(LR, basename) in sortedMeshes" class='row' @mouseenter="tractFocus(LR, basename)" @mouseleave="tractUnfocus(LR, basename)">
                     <td class='label'><label>{{basename}}</label></td>
                     <td v-if="LR.left" class='label'><input type='checkbox' :name='LR.left.name' v-model='LR.left.visible' /></td>
@@ -824,7 +833,7 @@ Vue.component('tractview', {
                 </table>
                 
                 <div v-if='controls' style='color:#ccc; margin-top:5px;'>
-                  <input type="checkbox" name="enableRotation" v-model="controls.autoRotate" /> <label for="enableRotation">Automatic Rotation {{controls.autoRotate?'Enabled':'Disabled'}}</label>
+                  <input type="checkbox" name="enableRotation" v-model="controls.autoRotate" /> Rotate
                 </div>
                 
                 <!-- Nifti Choosing -->
