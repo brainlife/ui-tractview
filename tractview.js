@@ -103,6 +103,7 @@ Vue.component('tractview', {
 
     this.renderer.autoClear = false;
     this.renderer.setSize(viewbox.width, viewbox.height);
+    this.renderer.setClearColor(new THREE.Color(.5,.5,.5));
     this.$refs.view.appendChild(this.renderer.domElement);
 
     this.brainRenderer.autoClear = false;
@@ -112,26 +113,23 @@ Vue.component('tractview', {
     // use OrbitControls and make camera light follow camera position
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     
-    let info_json = getHashValue('info');
-    if (info_json) {
-      let info = JSON.parse(info_json);
-      if (info.rotation) {
-        this.camera.rotation.x = +info.rotation.x;
-        this.camera.rotation.y = +info.rotation.y;
-        this.camera.rotation.z = +info.rotation.z;
+    let info_string = getHashValue('where');
+    if (info_string) {
+      let info = info_string.split('/');
+      let pos = (info[0] || '').split(';');
+      let orig = (info[1] || '').split(';');
+      
+      if (pos) {
+        this.camera.position.x = +pos[0];
+        this.camera.position.y = +pos[1];
+        this.camera.position.z = +pos[2];
       }
-      if (info.position) {
-        this.camera.position.x = +info.position.x;
-        this.camera.position.y = +info.position.y;
-        this.camera.position.z = +info.position.z;
-      }
-      if (info.origin) {
-        this.controls.target.x = +info.origin.x;
-        this.controls.target.y = +info.origin.y;
-        this.controls.target.z = +info.origin.z;
-      }
-      if (info.pan) {
-        this.controls.setPubPanOffset(+info.pan.x, +info.pan.y, +info.pan.z);
+      if (orig) {
+        this.controls.target.x = +orig[0];
+        this.controls.target.y = +orig[1];
+        this.controls.target.z = +orig[2];
+        
+        this.controls.setPubPanOffset(+orig[0], +orig[1], +orig[2]);
       }
     } else this.controls.autoRotate = true;
     
@@ -140,29 +138,14 @@ Vue.component('tractview', {
       let pan = vm.controls.getPanOffset();
       
       // save camera information in url
-      window.location = "#info=" +
-        encodeURIComponent(JSON.stringify({
-          rotation: {
-            x: vm.camera.rotation.x,
-            y: vm.camera.rotation.y,
-            z: vm.camera.rotation.z
-          },
-          position: {
-            x: vm.camera.position.x,
-            y: vm.camera.position.y,
-            z: vm.camera.position.z
-          },
-          origin: {
-            x: vm.controls.target.x,
-            y: vm.controls.target.y,
-            z: vm.controls.target.z
-          },
-          pan: {
-            x: pan.x,
-            y: pan.y,
-            z: pan.z
-          }
-        }));
+      window.location = "#where=" +
+        ([[vm.round(vm.camera.position.x),
+                              vm.round(vm.camera.position.y),
+                              vm.round(vm.camera.position.z)],
+                            [vm.round(vm.controls.target.x),
+                              vm.round(vm.controls.target.y),
+                              vm.round(vm.controls.target.z)]]
+                                .map(x => x.join(';')).join('/'));
     });
     
     this.controls.addEventListener('start', function () {
@@ -173,7 +156,7 @@ Vue.component('tractview', {
 
     // gamma_input_el.on('change', gamma_changed)
     // gamma_input_el.on('keyup', gamma_changed)
-    this.updateAllShaders()
+    // this.updateAllShaders()
     this.appendStyle();
     
     this.animate_conview();
@@ -181,7 +164,7 @@ Vue.component('tractview', {
 
   methods: {
     animate_conview: function() {
-      this.controls.enableKeys = document.activeElement != this.$refs.gamma;
+      this.controls.enableKeys = !this.inputFocused();
       this.controls.update();
 
       this.renderer.clear();
@@ -207,6 +190,10 @@ Vue.component('tractview', {
       }
 
       requestAnimationFrame(this.animate_conview);
+    },
+    
+    round: function(v) {
+      return Math.round(v * 1e3) / 1e3;
     },
     
     toggle_hide_show: function () {
@@ -322,10 +309,22 @@ Vue.component('tractview', {
           var hist = [];
           for (var i = 0; i < geometry.vertices.length; i += 3) {
               //convert webgl to voxel coordinates
-              var x = Math.round((geometry.vertices[i] - this.color_map_head.spaceOrigin[0]) / this.color_map_head.thicknesses[0]);
-              var y = Math.round((geometry.vertices[i+1] - this.color_map_head.spaceOrigin[1]) / this.color_map_head.thicknesses[1]);
-              var z = Math.round((geometry.vertices[i+2] - this.color_map_head.spaceOrigin[2]) / this.color_map_head.thicknesses[2]);
-    
+              var vx, vy, vz;
+              if (i == geometry.vertices.length - 3) {
+                vx = geometry.vertices[i];
+                vy = geometry.vertices[i+1];
+                vz = geometry.vertices[i+2];
+              }
+              else {
+                vx = (geometry.vertices[i] + geometry.vertices[i+3])/2;
+                vy = (geometry.vertices[i+1] + geometry.vertices[i+4])/2;
+                vz = (geometry.vertices[i+2] + geometry.vertices[i+5])/2;
+              }
+              
+              var x = Math.round((vx - this.color_map_head.spaceOrigin[0]) / this.color_map_head.thicknesses[0]);
+              var y = Math.round((vy - this.color_map_head.spaceOrigin[1]) / this.color_map_head.thicknesses[1]);
+              var z = Math.round((vz - this.color_map_head.spaceOrigin[2]) / this.color_map_head.thicknesses[2]);
+              
               //find voxel value
               var v = this.color_map.get(z, y, x);
               if (isNaN(v)) {
@@ -337,27 +336,31 @@ Vue.component('tractview', {
               }
               else {
                   var normalized_v = (v - this.dataMin) / (this.dataMax - this.dataMin);
+                  var overlay_v = (v - this.sdev_m5) / (this.sdev_5 - this.sdev_m5);
                   
                   //clip..
-                  if(normalized_v < 0.1) normalized_v = 0.1;
-                  if(normalized_v > 1) normalized_v = 1;
+                  // if(normalized_v < 0.1) normalized_v = 0.1;
+                  // if(normalized_v > 1) normalized_v = 1;
+                  
+                  if(overlay_v < 0.1) overlay_v = 0.1;
+                  if(overlay_v > 1) overlay_v = 1;
     
                   //compute histogram
                   var hv = Math.round(normalized_v*256);
-                  var glob_hv = Math.round(normalized_v*100);
+                  var glob_hv = Math.round(normalized_v * 100);
                   hist[hv] = (hist[hv] || 0) + 1;
                   this.hist[glob_hv] = (this.hist[glob_hv] || 0) + 1;
                   
                   if (geometry.tract.color instanceof Array) {
-                    cols.push(geometry.tract.color[0] * normalized_v);
-                    cols.push(geometry.tract.color[1] * normalized_v);
-                    cols.push(geometry.tract.color[2] * normalized_v);
+                    cols.push(geometry.tract.color[0] * overlay_v);
+                    cols.push(geometry.tract.color[1] * overlay_v);
+                    cols.push(geometry.tract.color[2] * overlay_v);
                     cols.push(1.0);
                   }
                   else {
-                    cols.push(geometry.tract.color.r * normalized_v);
-                    cols.push(geometry.tract.color.g * normalized_v);
-                    cols.push(geometry.tract.color.b * normalized_v);
+                    cols.push(geometry.tract.color.r * overlay_v);
+                    cols.push(geometry.tract.color.g * overlay_v);
+                    cols.push(geometry.tract.color.b * overlay_v);
                     cols.push(1.0);
                   }
               }
@@ -430,7 +433,7 @@ Vue.component('tractview', {
       this.scene.add(mesh);
     },
     
-    updateAllShaders: function() {
+    /*updateAllShaders: function() {
       this.meshes.forEach(mesh => {
           if (mesh.material.uniforms) {
               // console.log(mesh.material.uniforms);
@@ -443,7 +446,7 @@ Vue.component('tractview', {
       // update background depending on gamma
       var transform96 = Math.pow(96 / 255, 1 / this.gamma);
       this.renderer.setClearColor(new THREE.Color(transform96,transform96,transform96));
-    },
+    },*/
     
     recalculateMaterials: function() {
       this.hist = [];
@@ -461,25 +464,25 @@ Vue.component('tractview', {
     makePlot: function() {
       this.destroyPlot();
       
-      var zero_to_one = [];
+      var min_to_max = [];
       for (var x = 0; x <= 100; x++) {
-          zero_to_one.push(x / 100);
+          min_to_max.push(this.dataMin + (this.dataMax - this.dataMin) / 100 * x);
           this.hist[x] = this.hist[x] || 0;
       }
       
       this.$refs.hist.style.display = "inline-block";
       Plotly.plot(this.$refs.hist, [{
-          x: zero_to_one,
+          x: min_to_max,
           y: this.hist,
       }], {
-          xaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Image Intensity" },
-          yaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Number of Voxels" },
+          xaxis: { gridcolor: '#444', tickfont: { color: '#aaa', size: 9 }, title: "Image Intensity" },
+          yaxis: { gridcolor: '#444', tickfont: { color: '#aaa', size: 9 }, title: "Number of Voxels", titlefont: { size: 12 } },
           
           margin: {
               t: 5,
               b: 32,
-              l: 52,
-              r: 30
+              l: 40,
+              r: 10
           },
           font: { color: '#ccc' },
           titlefont: { color: '#ccc' },
@@ -535,11 +538,21 @@ Vue.component('tractview', {
       this.color_map = ndarray(N.data, N.sizes.slice().reverse());
       
       this.color_map.sum = 0;
+      this.dataMin = null;
+      this.dataMax = null;
+      
       N.data.forEach(v=>{
-        if (!isNaN(v)) this.color_map.sum+=v;
+        if (!isNaN(v)) {
+          if (this.dataMin == null) this.dataMin = v;
+          else this.dataMin = v < this.dataMin ? v : this.dataMin;
+          if (this.dataMax == null) this.dataMax = v;
+          else this.dataMax = v > this.dataMax ? v : this.dataMax;
+          
+          this.color_map.sum+=v;
+        }
       });
       this.color_map.mean = this.color_map.sum / N.data.length;
-
+      
       //compute sdev
       this.color_map.dsum = 0;
       N.data.forEach(v=>{
@@ -551,8 +564,8 @@ Vue.component('tractview', {
       this.color_map.sdev = Math.sqrt(this.color_map.dsum/N.data.length);
 
       //set min/max
-      this.dataMin = this.color_map.mean - this.color_map.sdev*5;
-      this.dataMax = this.color_map.mean + this.color_map.sdev*5;
+      this.sdev_m5 = this.color_map.mean - this.color_map.sdev*5;
+      this.sdev_5 = this.color_map.mean + this.color_map.sdev*5;
       
       // console.log("color map");
       // console.dir(color_map);
@@ -560,6 +573,14 @@ Vue.component('tractview', {
       this.recalculateMaterials();
       this.makePlot();
       this.showAll();
+    },
+    
+    inputFocused: function() {
+      let result = false;
+      Object.keys(this.$refs)
+      .forEach(k => result = result || (document.activeElement == this.$refs[k]) );
+      
+      return result;
     },
     
     appendStyle: function() {
@@ -581,8 +602,6 @@ Vue.component('tractview', {
             pointer-events:none;
             left:0;
             bottom:0;
-            width:100px;
-            height:100px;
         }
     
         .controls {
@@ -593,7 +612,7 @@ Vue.component('tractview', {
             width:auto;
             height:auto;
             max-height:100%;
-            padding-left: 1px;
+            padding-left: 8px;
             overflow-x:hidden;
             overflow-y:auto;
             white-space:nowrap;
@@ -670,12 +689,12 @@ Vue.component('tractview', {
         }
         
         .gamma_input {
-            width: 55px;
+            max-width: 45px;
         }
         
         .plots {
             display:none;
-            width:300px;
+            width:200px;
             height:200px;
         }
         
@@ -750,6 +769,29 @@ Vue.component('tractview', {
           opacity:.2;
           color:white;
         }
+        
+        .xyz_input {
+          max-width:44px;
+        }
+        
+        .hide_show_container {
+          display:relative;
+          min-height:17px;
+        }
+        
+        .hide_show_button {
+          font-size:15px;
+          font:"Open Sans";
+          position:absolute;
+          right:15px;
+          color:white;
+          opacity:.6;
+          cursor:pointer;
+          display:inline-block;
+        }
+        .hide_show_button:hover {
+          opacity:1;
+        }
     </style>`;
     }
   },
@@ -800,14 +842,14 @@ Vue.component('tractview', {
       });
     },
     
-    gamma: function() {
+    /*gamma: function() {
       let vm = this;
       let tmp = setTimeout(function() {
         if (debounce == tmp)
             vm.updateAllShaders();
       }, 500);
       debounce = tmp;
-    },
+    },*/
   },
 
   template: `
@@ -820,18 +862,8 @@ Vue.component('tractview', {
     <div style="display:inline-block;">
       <div id="controls" class="controls">
         <div style="display:flex;">
-            <!-- Hide/Show Panel -->
-            <div id="hide_show" class="hide_show" @click="toggle_hide_show">
-                <div class="table">
-                    <div class="cell">
-                        <div class="rotated" v-if="visible">Hide Controls</div>
-                        <div class="rotated" v-if="!visible">Show Controls</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Fascicle Toggling -->
             <div v-if="sortedMeshes" :class="{ 'container_toggles': true, 'hidden': !visible }" id="container_toggles">
+                <div class='hide_show_container'></div>
                 <table class="tract_toggles" id="tract_toggles">
                   <tr>
                     <td class='label' style='color:#bbb; font-weight:bold; text-align:center;'><label>Tract Name</label></td>
@@ -859,7 +891,6 @@ Vue.component('tractview', {
                 
                 <!-- Nifti Choosing -->
                 <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
-                    <div style="display:inline-block;"><label style="color:#ccc; width: 120px;">Background Gamma</label> <input type="number" min=".0001" value="1" step=".1" id="gamma_input" class="gamma_input" v-model="gamma" ref="gamma"></input></div><br />
                     <div style="display:inline-block;" v-if="niftis.length > 0"><label style="color:#ccc; width: 120px;">Overlay</label> <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
                       <option :value="-1">(No Overlay)</option>
                       <option v-for="(n, i) in niftis" :value="i">{{n.filename}}</option>
@@ -876,6 +907,7 @@ Vue.component('tractview', {
       </div>
       <div ref="style" scoped></div>
     </div>
+    <div v-if="sortedMeshes" class='hide_show_button' @click="toggle_hide_show">&#9776;</div>
     
   </div>
     `
