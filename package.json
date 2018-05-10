@@ -27,8 +27,8 @@
     "nifti-js": "^1.0.1",
     "pako": "^1.0.6",
     "panning-orbit-controls": "^1.0.1",
-    "plotly.js": "^1.35.2",
-    "three": "^0.91.0",
+    "plotly.js": "^1.37.1",
+    "three": "^0.92.0",
     "vue": "^2.5.16"
   }
 }
