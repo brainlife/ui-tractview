@@ -41,11 +41,22 @@
   <script type="text/javascript" src="tractview.js"></script>
   
   <script>
+    let config = window.parent.config;
+    if(config) {
+        let jwt = localStorage.getItem("jwt");
+        config.tracts.forEach(tract=>{
+            tract.url += "&at="+jwt;
+        });
+        console.dir(config);
+    } else {
+        config = JSON.parse(localStorage.getItem("debug_config"));
+    }
+    window.myconfig = config;
     new Vue({
         el: '#tractview',
         components: ['tractview'],
         template: `
-            <tractview :config='JSON.parse(localStorage.getItem("debug_config"))'></tractview>
+            <tractview :config='window.myconfig'></tractview>
         `
     });
 
