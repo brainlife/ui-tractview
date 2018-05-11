@@ -41,7 +41,7 @@
   <script type="text/javascript" src="tractview.js"></script>
   
   <script>
-    let config = window.parent.config;
+    let config = window.parent.config || window.config;
     if(config) {
         let jwt = localStorage.getItem("jwt");
         config.tracts.forEach(tract=>{
