@@ -652,6 +652,7 @@
 
                 .upload_div {
                 color:#999;
+                margin-bottom:10px;
                 }
 
                 input[type="checkbox"] {
