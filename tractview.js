@@ -587,7 +587,10 @@
                 background:rgba(0, 0, 0, .4);
                 line-height: 130%;
 				color: #fff;
-				padding: 8px;
+                padding: 8px;
+                overflow-x:hidden;
+                overflow-y:auto;
+                max-height:90%;
 				transition: opacity 0.3s;
                 }
 				.controls.controls-hidden {
