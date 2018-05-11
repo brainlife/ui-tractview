@@ -231,7 +231,7 @@
                     //convert each bundle to threads_pos array
                     var threads_pos = [];
                     bundle.forEach(function(fascicle) {
-                        if (fascicle[0] instanceof Array) fascicle = fascicle[0]; //for backward compatibility
+                        if (Array.isArray(fascicle[0])) fascicle = fascicle[0]; //for backward compatibility
                         var xs = fascicle[0];
                         var ys = fascicle[1];
                         var zs = fascicle[2];
@@ -331,7 +331,7 @@
                             hist[hv] = (hist[hv] || 0) + 1;
                             this.hist[glob_hv] = (this.hist[glob_hv] || 0) + 1;
 
-                            if (geometry.tract.color instanceof Array) {
+                            if (Array.isArray(geometry.tract.color)) {
                                 cols.push(geometry.tract.color[0] * overlay_v);
                                 cols.push(geometry.tract.color[1] * overlay_v);
                                 cols.push(geometry.tract.color[2] * overlay_v);
@@ -370,7 +370,7 @@
                 }
 
                 var material;
-                if (geometry.tract.color instanceof Array) {
+                if (Array.isArray(geometry.tract.color)) {
                     material = new THREE.LineBasicMaterial({
                         color: new THREE.Color(geometry.tract.color[0], geometry.tract.color[1], geometry.tract.color[2]),
                         transparent: true,
@@ -590,7 +590,7 @@
                 padding: 8px;
                 overflow-x:hidden;
                 overflow-y:auto;
-                max-height:90%;
+                max-height:100%;
 				transition: opacity 0.3s;
                 }
 				.controls.controls-hidden {
@@ -652,6 +652,7 @@
 
                 .upload_div {
                 color:#999;
+                margin-bottom:10px;
                 }
 
                 input[type="checkbox"] {
