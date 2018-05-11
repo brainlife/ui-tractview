@@ -799,8 +799,8 @@
 				  </tr>
 				  <tr v-for="(LR, basename) in sortedMeshes" class='row' @mouseenter="tractFocus(LR, basename)" @mouseleave="tractUnfocus(LR, basename)">
 					 <td class='label'><label>{{basename}}</label></td>
-					 <td v-if="LR.left" class='label'><input type='checkbox' :name='LR.left.name' v-model='LR.left.visible' /></td>
-					 <td v-if="LR.right" class='label'><input type='checkbox' :name='LR.right.name' v-model='LR.right.visible' /></td>
+					 <td class='label'><input v-if="LR.left" type='checkbox' :name='LR.left.name' v-model='LR.left.visible' /></td>
+					 <td class='label'><input v-if="LR.right" type='checkbox' :name='LR.right.name' v-model='LR.right.visible' /></td>
 				  </tr>
 			   </table>
 			   <!-- Nifti Choosing -->
