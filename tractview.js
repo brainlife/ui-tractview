@@ -34,7 +34,7 @@
                 brainRenderer: null,
 
                 niftis: [],
-                selectedNifti: 0
+                selectedNifti: null,
             };
         },
 
@@ -152,7 +152,7 @@
                     if (condensed_filename.indexOf('/') != -1) condensed_filename = condensed_filename.substring(condensed_filename.lastIndexOf('/')+1);
                     this.niftis.push({ user_uploaded: false, url: layer.url, user_uploaded: false, filename: condensed_filename });
                 });
-                this.selectedNifti = 0;
+                this.selectedNifti = null;
             }
         },
 
@@ -477,7 +477,7 @@
             },
 
             niftiSelectChanged: function() {
-                if (this.selectedNifti == -1) {
+                if (this.selectedNifti === null) {
                     this.color_map = undefined;
 
                     this.recalculateMaterials();
@@ -489,7 +489,7 @@
                     else {
                         fetch(nifti.url)
                             .then(res => res.arrayBuffer())
-                            .then(processDeflatedNiftiBuffer)
+                            .then(this.processDeflatedNiftiBuffer)
                             .catch(err => console.error);
                     }
                 }
@@ -808,7 +808,7 @@
 				  <div style="display:inline-block;" v-if="niftis.length > 0">
 					 <label style="color:#ccc; width: 120px;">Overlay</label> 
 					 <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
-						<option :value="-1">(No Overlay)</option>
+						<option :value="null">(No Overlay)</option>
 						<option v-for="(n, i) in niftis" :value="i">{{n.filename}}</option>
 					 </select>
 				  </div>
