@@ -590,7 +590,7 @@
                 padding: 8px;
                 overflow-x:hidden;
                 overflow-y:auto;
-                max-height:90%;
+                max-height:100%;
 				transition: opacity 0.3s;
                 }
 				.controls.controls-hidden {
