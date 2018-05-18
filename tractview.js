@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    let debounce;
+    let debounce, debounceUrl;
 
     Vue.component('tractview', {
         props: [ "config" ],
@@ -124,13 +124,19 @@
             } else this.controls.autoRotate = true;
 
             this.controls.addEventListener('change', e=>{
-                // rotation changes
-                let pan = this.controls.getPanOffset();
+                let vm = this;
+                let timeout = setTimeout(function() {
+                    if (timeout == debounceUrl) {
+                        // rotation changes
+                        let pan = vm.controls.getPanOffset();
 
-                // save camera information in url
-                let pos_params = [ this.round(this.camera.position.x), this.round(this.camera.position.y), this.round(this.camera.position.z)].join(";");
-                let target_params = [ this.round(this.controls.target.x), this.round(this.controls.target.y), this.round(this.controls.target.z)].join(";");
-                window.location = "#where=" + pos_params + "/" + target_params;
+                        // save camera information in url
+                        let pos_params = [ vm.round(vm.camera.position.x), vm.round(vm.camera.position.y), vm.round(vm.camera.position.z)].join(";");
+                        let target_params = [ vm.round(vm.controls.target.x), vm.round(vm.controls.target.y), vm.round(vm.controls.target.z)].join(";");
+                        window.location = "#where=" + pos_params + "/" + target_params;
+                    }
+                }, 700);
+                debounceUrl = timeout;
             });
 
             this.controls.addEventListener('start', ()=>{
