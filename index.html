@@ -45,13 +45,9 @@
 		let config = window.parent.config || window.config;
 		let jwt = localStorage.getItem('jwt');
 		
-		if (!config) {
-			displayError('Error: No config object found in local storage to load tracts from.');
-		}
-		else if (!jwt) {
+		if (!jwt) {
 			displayError('Error: No user authorization token (JWT) found in local storage for authentication.');
-		}
-		else {
+		} else {
 			if(config) {
 					let jwt = localStorage.getItem("jwt");
 					config.tracts.forEach(tract=>{
@@ -61,6 +57,9 @@
 			} else {
 					config = JSON.parse(localStorage.getItem("debug_config"));
 			}
+            if (!config) {
+                displayError('Error: No config object found in local storage to load tracts from.');
+            }
 			window.myconfig = config;
 			
 			if (Detector.webgl) {
