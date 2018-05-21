@@ -29,6 +29,7 @@
     "panning-orbit-controls": "^1.0.1",
     "plotly.js": "^1.37.1",
     "three": "^0.92.0",
-    "vue": "^2.5.16"
+    "vue": "^2.5.16",
+    "webworker-threads": "^0.7.13"
   }
 }
