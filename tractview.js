@@ -139,7 +139,8 @@
                         this.round(this.controls.target.y), 
                         this.round(this.controls.target.z)
                     ].join(";");
-                    window.location.hash = "where=" + pos_params + "/" + target_params;
+                    let where = "where=" + pos_params + "/" + target_params;
+                    window.parent.location.hash = where;
                 }, 100);
             });
 
@@ -834,7 +835,7 @@
     });
 
     function getHashValue(key) {
-        var matches = location.hash.match(new RegExp(key+'=([^&]*)'));
+        var matches = window.parent.location.hash.match(new RegExp(key+'=([^&]*)'));
         return matches ? decodeURIComponent(matches[1]) : null;
     }
 
