@@ -103,26 +103,12 @@
             // use OrbitControls and make camera light follow camera position
             this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
-            let info_string = getHashValue('where');
-            if (info_string) {
-                let info = info_string.split('/');
-                let pos = (info[0] || '').split(';');
-                let orig = (info[1] || '').split(';');
-
-                if (pos) {
-                    this.camera.position.x = +pos[0];
-                    this.camera.position.y = +pos[1];
-                    this.camera.position.z = +pos[2];
-                }
-                if (orig) {
-                    this.controls.target.x = +orig[0];
-                    this.controls.target.y = +orig[1];
-                    this.controls.target.z = +orig[2];
-
-                    this.controls.setPubPanOffset(+orig[0], +orig[1], +orig[2]);
-                }
-            } else this.controls.autoRotate = true;
-
+	    this.handle_hash();
+            window.parent.addEventListener("hashchange", e=>{
+		console.log("hash changed");
+		this.handle_hash();
+                this.animate_conview();
+	    });
             this.controls.addEventListener('change', e=>{
                 let pan = this.controls.getPanOffset();
 
@@ -168,6 +154,29 @@
         },
 
         methods: {
+	    handle_hash() {
+	    let info_string = getHashValue('where');
+	    console.log(info_string);
+	    if (info_string) {
+		let info = info_string.split('/');
+		let pos = (info[0] || '').split(';');
+		let orig = (info[1] || '').split(';');
+
+		if (pos) {
+		    this.camera.position.x = +pos[0];
+		    this.camera.position.y = +pos[1];
+		    this.camera.position.z = +pos[2];
+		}
+		if (orig) {
+		    this.controls.target.x = +orig[0];
+		    this.controls.target.y = +orig[1];
+		    this.controls.target.z = +orig[2];
+
+		    this.controls.setPubPanOffset(+orig[0], +orig[1], +orig[2]);
+		}
+	    } else this.controls.autoRotate = true;
+	    },
+
             animate_conview: function() {
                 this.controls.enableKeys = !this.inputFocused();
                 this.controls.update();
