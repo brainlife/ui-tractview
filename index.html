@@ -45,35 +45,30 @@
 		let config = window.parent.config || window.config;
 		let jwt = localStorage.getItem('jwt');
 		
-		if (!jwt) {
-			displayError('Error: No user authorization token (JWT) found in local storage for authentication.');
-		} else {
-			if(config) {
-					let jwt = localStorage.getItem("jwt");
-					config.tracts.forEach(tract=>{
-							tract.url += "&at="+jwt;
-					});
-					console.dir(config);
-			} else {
-					config = JSON.parse(localStorage.getItem("debug_config"));
-			}
-            if (!config) {
-                displayError('Error: No config object found in local storage to load tracts from.');
-            }
-			window.myconfig = config;
-			
-			if (Detector.webgl) {
-				new Vue({
-						el: '#tractview',
-						components: ['tractview'],
-						template: `
-								<tractview :config='window.myconfig'></tractview>
-						`
-				});
-			}
-			else {
-				displayError('Error: Your browser does not support WebGL, so the TractViewer is unable to be initiated.');
-			}
+        if(config) {
+                let jwt = localStorage.getItem("jwt");
+                if(jwt) config.tracts.forEach(tract=>{
+                    tract.url += "&at="+jwt;
+                });
+        } else {
+                config = JSON.parse(localStorage.getItem("debug_config"));
+        }
+        if (!config) {
+            displayError('Error: No config object found in local storage to load tracts from.');
+        }
+        console.dir(config);
+        window.myconfig = config;
+        
+        if (Detector.webgl) {
+            new Vue({
+                    el: '#tractview',
+                    components: ['tractview'],
+                    template: `
+                            <tractview :config='window.myconfig'></tractview>
+                    `
+            });
+        } else {
+            displayError('Error: Your browser does not support WebGL, so the TractViewer is unable to be initiated.');
 		}
 		
 		function displayError(message) {
