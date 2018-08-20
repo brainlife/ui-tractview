@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    let debounce, debounceUrl;
+    let debounce_hashupdate;
 
     Vue.component('tractview', {
         props: [ "config" ],
@@ -124,19 +124,23 @@
             } else this.controls.autoRotate = true;
 
             this.controls.addEventListener('change', e=>{
-                let vm = this;
-                let timeout = setTimeout(function() {
-                    if (timeout == debounceUrl) {
-                        // rotation changes
-                        let pan = vm.controls.getPanOffset();
+                let pan = this.controls.getPanOffset();
 
-                        // save camera information in url
-                        let pos_params = [ vm.round(vm.camera.position.x), vm.round(vm.camera.position.y), vm.round(vm.camera.position.z)].join(";");
-                        let target_params = [ vm.round(vm.controls.target.x), vm.round(vm.controls.target.y), vm.round(vm.controls.target.z)].join(";");
-                        window.location = "#where=" + pos_params + "/" + target_params;
-                    }
-                }, 700);
-                debounceUrl = timeout;
+                //update URL hash
+                clearTimeout(debounce_hashupdate);
+                debounce_hashupdate = setTimeout(()=>{
+                    let pos_params = [ 
+                        this.round(this.camera.position.x), 
+                        this.round(this.camera.position.y), 
+                        this.round(this.camera.position.z)
+                    ].join(";");
+                    let target_params = [ 
+                        this.round(this.controls.target.x), 
+                        this.round(this.controls.target.y), 
+                        this.round(this.controls.target.z)
+                    ].join(";");
+                    window.location.hash = "where=" + pos_params + "/" + target_params;
+                }, 100);
             });
 
             this.controls.addEventListener('start', ()=>{
@@ -768,15 +772,6 @@
                     if (isRightTract(m.name)) m.visible = this.all_right;
                 });
             },
-
-            /*gamma: function() {
-              let vm = this;
-              let tmp = setTimeout(function() {
-              if (debounce == tmp)
-              vm.updateAllShaders();
-              }, 500);
-              debounce = tmp;
-              },*/
         },
 
         template: `
