@@ -18,14 +18,14 @@ HTML5 Tract Viewer - Used to visualize output from white matter tractography.
 [![NSF-BCS-1636893](https://img.shields.io/badge/NSF_BCS-1636893-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1636893)
 
 ### References 
+
 TBA
 
-### Dependencies
+## Dependencies
 
-This App only requires [singularity](https://www.sylabs.io/singularity/) to run. If you don't have singularity, you will need to install following dependencies.  
+* npm
+* git
 
-  - UPDATE: https://github.com/address
-  
 ## Installation
 
 Install for general purpose use (visualize a set of tracts with optional 3-dimensional nifti masks)
