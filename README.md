@@ -4,7 +4,7 @@ HTML5 Tract Viewer - Used to visualize output from white matter tractography.
 
 [Demo](https://brainlife.io/ui/tractview/demo.html) 
 
-![Preview Image](https://raw.githubusercontent.com/stevengeeky/ui-tractview/master/images/preview.png)
+![Preview Image](https://raw.githubusercontent.com/brain-life/brainlife.github.io/master/images/ui-logos/tractview.png)
 
 ### Authors
 - Soichi Hayashi (hayashis@iu.edu)
