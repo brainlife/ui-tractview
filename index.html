@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div id="tractview">
+    <div id="tractview" v-cloak>
         <div class="error" v-if="error">{{error}}</div>
         <tractview :config="config" v-else></tractview>
     </div>
