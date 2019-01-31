@@ -82,7 +82,6 @@ Vue.component('tractview', {
                 if (err) return next_tract(err);
                 this.add_mesh_to_scene(mesh);
                 this.load_percentage = idx / this.config.tracts.length;
-                // this.config.num_fibers += res.coords.length;
                 tract.mesh = mesh;
                 next_tract();
             });
@@ -244,7 +243,7 @@ Vue.component('tractview', {
                 //convert each bundle to threads_pos array
                 var threads_pos = [];
                 bundle.forEach(function(fascicle) {
-                    if (Array.isArray(fascicle[0])) fascicle = fascicle[0]; //for backward compatibility
+                    if (fascicle.length == 1) fascicle = fascicle[0]; //for backward compatibility
                     var xs = fascicle[0];
                     var ys = fascicle[1];
                     var zs = fascicle[2];

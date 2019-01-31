@@ -30,5 +30,8 @@
     "three": "^0.92.0",
     "vue": "^2.5.16",
     "webworker-threads": "^0.7.17"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.1"
   }
 }
