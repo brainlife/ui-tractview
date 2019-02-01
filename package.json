@@ -3,7 +3,8 @@
   "version": "1.0.3",
   "description": "brainlife tractviewer",
   "scripts": {
-    "dev": "lite-server"
+    "dev": "lite-server",
+    "deploy-prod": "ssh root@brainlife.io 'cd /root/docker/nginx/static/ui-tractview && git pull'"
   },
   "repository": {
     "type": "git",
