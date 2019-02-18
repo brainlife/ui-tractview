@@ -1,15 +1,18 @@
 let debounce_hashupdate;
 
+let tract_loader = new Worker("load_tract.js")
+
 Vue.component('tractview', {
     props: [ "config" ],
 
     data () {
         return {
             load_percentage: 1,
+            loading: null,
 
-            all_left: true,
-            all_right: true,
-            visible: true,
+            all_left: false,
+            all_right: false,
+            control_visible: true,
 
             meshes: [],
 
@@ -23,9 +26,13 @@ Vue.component('tractview', {
             focused: {},
 
             scene: null,
+            back_scene: null,
+
             renderer: null,
             camera: null,
             controls: null,
+
+            camera_light: null,
 
             tinyBrainScene: null,
             tinyBrainCam: null,
@@ -33,64 +40,132 @@ Vue.component('tractview', {
 
             niftis: [],
             selectedNifti: null,
+
+            tracts: null, //tracts organized into left/right
+            surfaces: null, //surfaces organized into left/right
+
+            gui: new dat.GUI(),
+            stats: new Stats(),
+            show_stats: true,
         };
     },
 
     mounted() {
+        this.organize_tracts();
+        this.organize_surfaces();
+
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.brainRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        this.scene = new THREE.Scene();
 
-        // camera
         let viewbox = this.$refs.view.getBoundingClientRect();
         let tinybrainbox = this.$refs.tinybrain.getBoundingClientRect();
 
         this.camera = new THREE.PerspectiveCamera(45, viewbox.width / viewbox.height, 1, 5000);
         this.tinyBrainCam = new THREE.PerspectiveCamera(45, tinybrainbox.width / tinybrainbox.height, 1, 5000);
-
         this.camera.position.z = 200;
+
+        //create back scene (to put shadow of surfaces)
+        this.back_scene = new THREE.Scene();
+        var ambientLight = new THREE.AmbientLight(0x505050);
+        this.back_scene.add(ambientLight);
+        this.camera_light = new THREE.PointLight(0xffffff, 0.5);
+        this.camera_light.radius = 10;
+        this.back_scene.add(this.camera_light);
+
+        //create tract scene
+        this.scene = new THREE.Scene();
+        var ambientLight = new THREE.AmbientLight(0x505050);
+        this.scene.add(ambientLight);
+        this.camera_light = new THREE.PointLight(0xffffff, 1);
+        this.camera_light.radius = 10;
+        this.scene.add(this.camera_light);
 
         window.addEventListener("resize", this.resized);
 
-        // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
-        let loader = new THREE.ObjectLoader();
-
-        loader.load('models/brain.json', _scene => {
-            this.tinyBrainScene = _scene;
-            let brainMesh = this.tinyBrainScene.children[1],
-            unnecessaryDirectionalLight = this.tinyBrainScene.children[2];
-            // align the tiny brain with the model displaying fascicles
-
-            brainMesh.rotation.z += Math.PI / 2;
-            brainMesh.material = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
-
-            this.tinyBrainScene.remove(unnecessaryDirectionalLight);
-
-            let amblight = new THREE.AmbientLight(0x101010);
-            this.tinyBrainScene.add(amblight);
-
-            this.brainlight = new THREE.PointLight(0xffffff, 1);
-            this.brainlight.radius = 20;
-            this.brainlight.position.copy(this.tinyBrainCam.position);
-            this.tinyBrainScene.add(this.brainlight);
-        });
-
         // start loading the tract
-        let idx = 0;
-        async.eachLimit(this.config.tracts, 3, (tract, next_tract) => {
-            this.load_tract(tract, idx++, (err, mesh) => {
-                if (err) return next_tract(err);
-                this.add_mesh_to_scene(mesh);
-                this.load_percentage = idx / this.config.tracts.length;
-                tract.mesh = mesh;
-                next_tract();
-            });
-        }, console.log);
+        if(this.config.tracts) {
+            let idx = 0;
+            async.eachSeries(this.config.tracts, (tract, next_tract) => {
+                this.load_tract(tract, idx++, (err, mesh) => {
+                    if (err) return next_tract(err);
+                    this.add_mesh_to_scene(mesh);
+                    this.load_percentage = idx / this.config.tracts.length;
+                    this.loading = tract.name;
+                    tract.mesh = mesh; 
+                    setTimeout(next_tract, 0); //give UI thread time
+                });
+            }, console.error); 
+        }
 
+        //start loading surfaces
+        if(this.config.surfaces) {
+            let vtkloader = new THREE.VTKLoader();
+            async.eachSeries(this.config.surfaces, (surface, next_surface)=>{
+                //console.dir(surface);
+                vtkloader.load(surface.url, geometry=>{
+                    geometry.computeVertexNormals(); //for smooth shading
+
+                    //add to back_scene
+                    let material = new THREE.MeshLambertMaterial({
+                        color: new THREE.Color(surface.color.r/256*0.75, surface.color.g/256*0.75, surface.color.b/256*0.75),
+                        transparent: true,
+                        opacity: 0.25,
+                        depthTest: false,
+                    });
+                    var mesh = new THREE.Mesh( geometry, material );
+                    mesh.rotation.x = -Math.PI/2;
+                    mesh.visible = true;
+                    this.back_scene.add(mesh);
+
+                    //add to back_scene
+                    /*
+                    material = new THREE.MeshLambertMaterial({
+                        color: new THREE.Color(surface.color.r/256*0.75, surface.color.g/256*0.75, surface.color.b/256*0.75),
+                    });
+                    */
+                    material = new THREE.MeshPhongMaterial({
+                        color: new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256),
+                        shininess: 80,
+                    });
+                    mesh = new THREE.Mesh( geometry, material );
+                    mesh.rotation.x = -Math.PI/2;
+                    mesh.visible = false;
+                    this.scene.add(mesh);
+                    surface.mesh = mesh; 
+
+                    setTimeout(next_surface, 0); //give UI thread time
+                });
+            }, console.error);
+        }
+
+        // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
+        // - only load if there are no surfaces
+        if(!this.config.surfaces) {
+            let loader = new THREE.ObjectLoader();
+            loader.load('models/brain.json', _scene => {
+                this.tinyBrainScene = _scene;
+                let brainMesh = this.tinyBrainScene.children[1],
+                unnecessaryDirectionalLight = this.tinyBrainScene.children[2];
+                // align the tiny brain with the model displaying fascicles
+
+                brainMesh.rotation.z += Math.PI / 2;
+                brainMesh.material = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
+
+                this.tinyBrainScene.remove(unnecessaryDirectionalLight);
+
+                let amblight = new THREE.AmbientLight(0x101010);
+                this.tinyBrainScene.add(amblight);
+
+                this.brainlight = new THREE.PointLight(0xffffff, 1);
+                this.brainlight.radius = 20;
+                this.brainlight.position.copy(this.tinyBrainCam.position);
+                this.tinyBrainScene.add(this.brainlight);
+            });
+        }
 
         this.renderer.autoClear = false;
         this.renderer.setSize(viewbox.width, viewbox.height);
-        this.renderer.setClearColor(new THREE.Color(.5,.5,.5));
+        //this.renderer.setClearColor(new THREE.Color(.5,.5,.5));
         this.$refs.view.appendChild(this.renderer.domElement);
 
         this.brainRenderer.autoClear = false;
@@ -103,7 +178,7 @@ Vue.component('tractview', {
         this.handle_hash();
         window.parent.addEventListener("hashchange", e=>{
             this.handle_hash();
-            this.animate_conview();
+            //this.animate();
         });
 
         this.controls.addEventListener('change', e=>{
@@ -131,9 +206,7 @@ Vue.component('tractview', {
             this.controls.autoRotate = false;
         });
 
-        //this.appendStyle();
-
-        this.animate_conview();
+        this.animate();
 
         if (this.config.layers) {
             this.config.layers.forEach(layer => {
@@ -143,9 +216,104 @@ Vue.component('tractview', {
             });
             this.selectedNifti = null;
         }
+
+        this.stats.showPanel(1);
+        this.$refs.stats.appendChild(this.stats.dom);
+        this.stats.dom.style.top = null;
+        this.stats.dom.style.bottom = "5px";
+        this.stats.dom.style.right = null;
+        this.stats.dom.style.left = "5px";
+
+        this.init_gui();
     },
 
     methods: {
+        organize_tracts() {
+            this.tracts = {};
+            if(!this.config.tracts) return;
+            this.config.tracts.forEach(tract=>{
+                let left = false;
+                let right = false;
+
+                //detect hierachy and adjust name
+                let name = tract.name.toLowerCase();
+                if(name.startsWith('left')) {
+                    left = true;
+                    name = tract.name.substring(4);
+                }
+                if(name.endsWith(' l')) {
+                    left = true;
+                    name = tract.name.substring(0, name.length - 2);
+                }
+                if(name.startsWith('right')) {
+                    right = true;
+                    name = tract.name.substring(5);
+                }
+                if(name.endsWith(' r')) {
+                    right = true;
+                    name = tract.name.substring(0, name.length - 2);
+                }
+
+                //if it's not left nor right, pretend that it's left
+                if(!left && !right) left = true;
+
+                //put tract info into appropriate categories
+                if(!this.tracts[name]) this.tracts[name] = {};
+                if(left) this.tracts[name].left = tract;
+                if(right) this.tracts[name].right = tract;
+            });
+        },
+
+        organize_surfaces() {
+            this.surfaces = {};
+            if(!this.config.surfaces) return;
+            this.config.surfaces.forEach(surface=>{
+                let left = false;
+                let right = false;
+
+                //detect hierachy and adjust name
+                let name = surface.name.toLowerCase();
+                if(name.startsWith('left-')) {
+                    left = true;
+                    name = surface.name.substring(5);
+                }
+                if(name.startsWith('l-')) {
+                    left = true;
+                    name = surface.name.substring(2);
+                }
+                if(name.startsWith('right-')) {
+                    right = true;
+                    name = surface.name.substring(6);
+                }
+                if(name.startsWith('r-')) {
+                    right = true;
+                    name = surface.name.substring(2);
+                }
+
+                //if it's not left nor right, pretend that it's left
+                if(!left && !right) left = true;
+
+                //put tract info into appropriate categories
+                if(!this.surfaces[name]) this.surfaces[name] = {};
+                if(left) this.surfaces[name].left = surface;
+                if(right) this.surfaces[name].right = surface;
+                //console.log(surface.name, name, left, right);
+            });
+            console.dir(this.surfaces);
+        },
+
+        init_gui() {
+            var ui = this.gui.addFolder('UI');
+            ui.add(this.controls, 'autoRotate').listen();
+            ui.add(this, 'show_stats');
+            ui.open();
+
+            /*
+            var matrix = this.gui.addFolder('Matrix');
+            matrix.add(this, 'weight_field',  [ 'count', 'density' ]); 
+            matrix.open();
+            */
+        },
 
         handle_hash() {
             let info_string = getHashValue('where');
@@ -169,11 +337,15 @@ Vue.component('tractview', {
             } else this.controls.autoRotate = true;
         },
 
-        animate_conview: function() {
+        animate: function() {
+            this.stats.begin();
+
             this.controls.enableKeys = !this.inputFocused();
             this.controls.update();
+            this.camera_light.position.copy(this.camera.position);
 
             this.renderer.clear();
+            this.renderer.render(this.back_scene, this.camera);
             this.renderer.clearDepth();
             this.renderer.render(this.scene, this.camera);
 
@@ -182,10 +354,10 @@ Vue.component('tractview', {
                 // normalize the main camera's position so that the tiny brain camera is always the same distance away from <0, 0, 0>
                 let pan = this.controls.getPanOffset();
                 let pos3 = new THREE.Vector3(
-                        this.camera.position.x - pan.x,
-                        this.camera.position.y - pan.y,
-                        this.camera.position.z - pan.z
-                        ).normalize();
+                    this.camera.position.x - pan.x,
+                    this.camera.position.y - pan.y,
+                    this.camera.position.z - pan.z
+                ).normalize();
                 this.tinyBrainCam.position.set(pos3.x * 10, pos3.y * 10, pos3.z * 10);
                 this.tinyBrainCam.rotation.copy(this.camera.rotation);
 
@@ -195,7 +367,8 @@ Vue.component('tractview', {
                 this.brainRenderer.render(this.tinyBrainScene, this.tinyBrainCam);
             }
 
-            requestAnimationFrame(this.animate_conview);
+            this.stats.end();
+            requestAnimationFrame(this.animate);
         },
 
         round: function(v) {
@@ -203,76 +376,62 @@ Vue.component('tractview', {
         },
 
         tractFocus: function(LR, basename) {
-            if (this.load_percentage == 1) {
-                this.focused[basename] = true;
-
-                if (LR.left) {
-                    LR.left.material_previous = LR.left.material;
-                    LR.left.material = white_material;
-                }
-                if (LR.right) {
-                    LR.right.material_previous = LR.right.material;
-                    LR.right.material = white_material;
-                }
+            this.focused[basename] = true;
+            if (LR.left) {
+                LR.left.material_previous = LR.left.material;
+                LR.left.material = white_material;
+                //LR.left.visible = true;
+            }
+            if (LR.right) {
+                LR.right.material_previous = LR.right.material;
+                LR.right.material = white_material;
+                //LR.right.visible = true;
             }
         },
 
         tractUnfocus: function(LR, basename) {
-            if (this.load_percentage == 1) {
-                this.focused[basename] = false;
-
-                if (LR.left && LR.left.material_previous) LR.left.material = LR.left.material_previous;
-                if (LR.right && LR.right.material_previous) LR.right.material = LR.right.material_previous;
+            this.focused[basename] = false;
+            if (LR.left && LR.left.material_previous) {
+                LR.left.material = LR.left.material_previous;
+            }
+            if (LR.right && LR.right.material_previous) {
+                LR.right.material = LR.right.material_previous;
             }
         },
 
         resized: function () {
             var viewbox = this.$refs.view.getBoundingClientRect();
-
             this.camera.aspect = viewbox.width / viewbox.height;
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(viewbox.width, viewbox.height);
         },
 
         load_tract: function(tract, index, cb) {
-            fetch(tract.url).then(res=>{
-                return res.json();
-            }).then(json=>{
-                var bundle = json.coords;
 
-                //convert each bundle to threads_pos array
-                var threads_pos = [];
-                bundle.forEach(function(fascicle) {
-                    if (fascicle.length == 1) fascicle = fascicle[0]; //for backward compatibility
-                    var xs = fascicle[0];
-                    var ys = fascicle[1];
-                    var zs = fascicle[2];
-                    for(var i = 1;i < xs.length;++i) {
-                        threads_pos.push(xs[i-1]);
-                        threads_pos.push(ys[i-1]);
-                        threads_pos.push(zs[i-1]);
-                        threads_pos.push(xs[i]);
-                        threads_pos.push(ys[i]);
-                        threads_pos.push(zs[i]);
-                    }
-                });
+            //use web worker to parse the json.. although I still have to spend good chunk of time constructing the BufferGeometry which 
+            //must happen on this thread - as they are not serializable.
+            tract_loader.postMessage(tract);
+            tract_loader.onmessage=(e)=>{
+                //let threads_pos = e.data;
+                let vertices = e.data;
 
-                //then convert that to bufferedgeometry
-                var vertices = new Float32Array(threads_pos);
                 var geometry = new THREE.BufferGeometry();
-                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3 ) );
+                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
                 geometry.vertices = vertices;
                 geometry.tract_index = index;
                 geometry.tract = tract; //metadata..
 
                 let mesh = this.calculateMesh(geometry);
                 mesh.name = tract.name;
-
+                mesh.visible = false;
+                mesh.rotation.x = -Math.PI/2;
+                
                 cb(null, mesh);
-            });
+            }
         },
 
         calculateMesh: function(geometry, mesh) {
+            //console.log("calculateMesh called");
             if (this.color_map) {
                 var vertexShader = `
                     attribute vec4 color;
@@ -375,26 +534,24 @@ Vue.component('tractview', {
                     return mesh;
                 } else {
                     var m = new THREE.LineSegments( geometry, material );
-
                     this.config.tracts[geometry.tract_index].mesh = m;
                     return m;
                 }
             }
 
-            var material;
+            let color;
+            let mul = 1.5;
             if (Array.isArray(geometry.tract.color)) {
-                material = new THREE.LineBasicMaterial({
-                    color: new THREE.Color(geometry.tract.color[0], geometry.tract.color[1], geometry.tract.color[2]),
-                    transparent: true,
-                    opacity: 0.7,
-                });
+                color = new THREE.Color(geometry.tract.color[0]*mul, geometry.tract.color[1]*mul, geometry.tract.color[2]*mul);
             } else {
-                material = new THREE.LineBasicMaterial({
-                    color: new THREE.Color(geometry.tract.color.r, geometry.tract.color.g, geometry.tract.color.b),
-                    transparent: true,
-                    opacity: 0.7,
-                });
+                color = new THREE.Color(geometry.tract.color.r*mul, geometry.tract.color.g*mul, geometry.tract.color.b*mul);
             }
+
+            let material = new THREE.LineBasicMaterial({
+                color,
+                transparent: true,
+                opacity: 0.6,
+            });
 
             if (mesh) {
                 mesh.geometry = geometry;
@@ -404,13 +561,10 @@ Vue.component('tractview', {
 
             var m = new THREE.LineSegments( geometry, material );
             this.config.tracts[geometry.tract_index].mesh = m;
-
-
             return m;
         },
 
         add_mesh_to_scene: function(mesh) {
-            mesh.rotation.x = -Math.PI/2;
             this.meshes.push(mesh);
             this.scene.add(mesh);
         },
@@ -443,7 +597,6 @@ Vue.component('tractview', {
             }], {
                 xaxis: { gridcolor: '#444', tickfont: { color: '#aaa', size: 9 }, title: "Image Intensity" },
                 yaxis: { gridcolor: '#444', tickfont: { color: '#aaa', size: 9 }, title: "Number of Voxels", titlefont: { size: 12 } },
-
                 margin: {
                     t: 5,
                     b: 32,
@@ -452,11 +605,9 @@ Vue.component('tractview', {
                 },
                 font: { color: '#ccc' },
                 titlefont: { color: '#ccc' },
-
                 plot_bgcolor: 'transparent',
                 paper_bgcolor: 'transparent',
                 autosize: true,
-
             }, { displayModeBar: false });
         },
 
@@ -549,9 +700,27 @@ Vue.component('tractview', {
             </style>`;
         }
         */
+        surface_color: function(surface) {
+            let color;
+            if(surface.left) color = surface.left.color;
+            if(surface.right) color = surface.right.color;
+            return `rgb(${128+color.r/2},${128+color.g/2},${128+color.b/2})`;
+        },
+
+        tract_color: function(tract) {
+            let color;
+            if(tract.left) color = tract.left.color;
+            if(tract.right) color = tract.right.color;
+            return `rgb(${128+color[0]*128},${128+color[1]*128},${128+color[2]*128})`;
+        },
     },
 
     computed: {
+        sorted_tracts: function() {
+            if(!this.tracts) return [];
+            return Object.keys(this.tracts).sort();
+        },
+        /*
         sortedMeshes: function() {
             let out = {};
             this.meshes.map(m=>m).sort((_a, _b) => {
@@ -566,7 +735,7 @@ Vue.component('tractview', {
                 if (a == b) return 0;
                 return -1;
             }).forEach(m => {
-                if (m.previous_material && m.material == white_material) m.material = m.previous_material;
+                //if (m.previous_material && m.material == white_material) m.material = m.previous_material;
 
                 if (isRightTract(m.name)) {
                     let basename = removeRightText(m.name);
@@ -580,7 +749,8 @@ Vue.component('tractview', {
             });
 
             return out;
-        }
+        },
+        */
     },
 
     watch: {
@@ -599,39 +769,53 @@ Vue.component('tractview', {
 
     template: `
     <div class="container" style="display:inline-block;">
+        <div ref="stats" v-show="show_stats"/>
          <div ref="style" scoped></div>
          <div id="conview" class="conview" ref="view" style="position:absolute; width: 100%; height:100%;"></div>
          <div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>
-         <div v-if="load_percentage < 1" id="loading" class="loading">Loading... ({{Math.round(load_percentage*100)}}%)</div>
-         <a id="bllogo" class="bllogo" href="https://brainlife.io">brainlife</a>
+         <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
+         <div id="controls" class="controls" :class="{'controls-hidden': !control_visible}">
+            <div v-if="tracts">
+                <div style="clear: right">
+                    <span style="float: right;">
+                        <b>&nbsp;L&nbsp;</b>
+                        <b>&nbsp;R&nbsp;</b>
+                    </span>
+                    <h2>Tracts</h2>
+                </div>
+                <div style="clear: right; margin-bottom: 5px;">
+                    <b style="opacity: 0.3">All</b>
+                    <span style="float: right;">
+                        <input type='checkbox' v-model='all_left' />
+                        <input type='checkbox' v-model='all_right' />
+                    </span>
+                </div>
 
-         <div v-if="sortedMeshes" class='show_hide_button' @click="visible = !visible">&#9776;</div>
-         <div id="controls" class="controls" :class="{'controls-hidden': !visible}">
-           <div v-if='controls'>
-              <input type="checkbox" name="enableRotation" v-model="controls.autoRotate" /> Rotate
-           </div>
-           <table class="tract_toggles" id="tract_toggles">
-              <tr class="row">
-                 <td class='label'><b>Tracts</b></td>
-                 <td class='label'><b>L</b></td>
-                 <td class='label'><b>R</b></td>
-              </tr>
-              <tr class='row'>
-                 <td class='label'><label>All</label></td>
-                 <td class='label'><input type='checkbox' v-model='all_left' /></td>
-                 <td class='label'><input type='checkbox' v-model='all_right' /></td>
-              </tr>
-              <tr class="row">
-                 <td colspan="3" style="padding-top: 5px; margin-bottom: 5px; border-bottom: 1px solid gray;"></td>
-              </tr>
-              <tr v-for="(LR, basename) in sortedMeshes" class='row' @mouseenter="tractFocus(LR, basename)" @mouseleave="tractUnfocus(LR, basename)">
-                 <td class='label'><label>{{basename}}</label></td>
-                 <td class='label'><input v-if="LR.left && load_percentage == 1" type='checkbox' :name='LR.left.name' v-model='LR.left.visible' /></td>
-                 <td class='label'><input v-if="LR.right && load_percentage == 1" type='checkbox' :name='LR.right.name' v-model='LR.right.visible' /></td>
-              </tr>
-           </table>
-           <!-- Nifti Choosing -->
-           <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
+                <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row">
+                <!-- @mouseenter="tractFocus(LR, basename)" @mouseleave="tractUnfocus(LR, basename)">-->
+                    {{name}}
+                    <span style="float: right">
+                        <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' v-model='tracts[name].left.mesh.visible' />
+                        <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' v-model='tracts[name].right.mesh.visible' />
+                    </span>
+                </div>
+           
+                <br>
+            </div>
+            <div v-if="surfaces">
+                <h2>Surfaces</h2>
+                <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row">
+                    {{name}} 
+                    <span style="float: right;">
+                        <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' v-model='surfaces[name].left.mesh.visible' />
+                        <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' v-model='surfaces[name].right.mesh.visible' />
+                    </span>
+                </div>
+                <br>
+            </div>
+
+            <!-- Nifti Choosing -->
+            <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
               <div style="display:inline-block;" v-if="niftis.length > 0">
                  <label style="color:#ccc; width: 120px;">Overlay</label> 
                  <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
@@ -646,41 +830,53 @@ Vue.component('tractview', {
               </div>
               <div class="plots" id="plots" ref="hist"></div>
             </div>
-          </div><!--controls-->
+        </div><!--controls-->
     </div>            
     `
 })
 
 let white_material = new THREE.LineBasicMaterial({
-    color: new THREE.Color(1, 1, 1)
+    color: new THREE.Color(1, 1, 1),
+    transparent: true,
+    opacity: 0.5,
 });
+
 
 function getHashValue(key) {
     var matches = window.parent.location.hash.match(new RegExp(key+'=([^&]*)'));
     return matches ? decodeURIComponent(matches[1]) : null;
 }
 
+/////////////////////////////////////////////////////////////
+// 
+// all these will be removed..
+//
+
 // returns whether or not the tractName is considered to be a left tract
 function isLeftTract(tractName) {
-    return tractName.startsWith('Left ') || tractName.endsWith(' L');
+    let name = tractName.toLowerCase();
+    return name.startsWith('left') || name.endsWith(' l');
 }
 
 // remove the 'left' part of the tract text
 function removeLeftText(tractName) {
-    if (tractName.startsWith('Left ')) tractName = tractName.substring(5);
-    if (tractName.endsWith(' L')) tractName = tractName.substring(0, tractName.length - 2);
+    let name = tractName.toLowerCase();
+    if (name.startsWith('left')) tractName = tractName.substring(5);
+    if (name.endsWith(' l')) tractName = tractName.substring(0, tractName.length - 2);
     return tractName;
 }
 
 // returns whether or not the tractName is considered to be a right tract
 function isRightTract(tractName) {
-    return tractName.startsWith('Right ') || tractName.endsWith(' R');
+    let name = tractName.toLowerCase();
+    return name.startsWith('right') || name.endsWith(' r');
 }
 
 // remove the 'right' part of the tract text
 function removeRightText(tractName) {
-    if (tractName.startsWith('Right ')) tractName = tractName.substring(6);
-    if (tractName.endsWith(' R')) tractName = tractName.substring(0, tractName.length - 2);
+    let name = tractName.toLowerCase();
+    if (name.startsWith('right')) tractName = tractName.substring(6);
+    if (name.endsWith(' r')) tractName = tractName.substring(0, tractName.length - 2);
     return tractName;
 }
 

@@ -113,3 +113,11 @@ end
 ```
 
 Once you have main.js and your configuration set up, you're ready to go!
+
+### Generating Data
+
+* tracts/
+
+* surfaces/
+
+mri_convert $fsdir/mri/aparc+aseg.mgz --out_orientation RAS aparc+aseg.nii.g

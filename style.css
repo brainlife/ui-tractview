@@ -35,6 +35,7 @@ padding: 0px;
 .conview {
 width:100%;
 height: 100%;
+background: radial-gradient( circle, transparent 30%, black 150%), rgb(46, 39, 39);
 }
 .tinybrain {
 position:absolute;
@@ -48,22 +49,37 @@ display:inline-block;
 position:absolute;
 right:0;
 top:0;
-width:auto;
-height:auto;
+width:250px;
+height:100%;
 white-space:nowrap;
-font-size:13px;
-background:rgba(0, 0, 0, .4);
-line-height: 130%;
+font-size:12px;
+font: "Lucida Grande", sans-serif;
+background:rgba(0, 0, 0, .1);
 color: #fff;
-padding: 8px;
+padding: 5px;
 overflow-x:hidden;
 overflow-y:auto;
 max-height:100%;
 transition: opacity 0.3s;
+user-select: none;
+opacity: 0.95;
 }
 .controls.controls-hidden {
 opacity: 0;
 }	
+
+.controls h2 {
+font-size: 13pt;
+opacity: 0.5;
+color: white;
+margin-bottom: 3px;
+}
+.controls .control-row {
+height: 17px;
+}
+.controls .control-row:hover {
+background-color: rgba(0,0,0,0.3);
+}
 
 /* Hide/Show Vertical Alignment */
 .parent {
@@ -129,38 +145,29 @@ margin:0;
 cursor:pointer;
 }
 
-td.label {
-text-overflow:ellipsis;
-}
-
-tr.row {
-opacity:.8;
-}
-tr.row:hover {
-opacity:1;
-}
-tr.row.active label {
-}
 
 .bllogo {
-position: absolute;
-padding-left: 8px;
-padding-top: 8px;
+position: fixed;
+padding: 8px;
 font-size: 23px;
 font-family: "Open Sans";
 font-weight: bold;
 opacity:.2;
 color:white;
 text-decoration:none;
+bottom: 0px;
+left: 0px;
 }
 
 .loading {
-position: absolute;
-bottom:15px;
-left: 100px;
-font-size: 16px;
-opacity:.2;
+position: fixed;
+width: 100%;
+bottom:150px;
 color:white;
+opacity:.2;
+text-align: center;
+pointer-events: none;
+font-size: 200%;
 }
 
 .xyz_input {
@@ -182,3 +189,4 @@ color: #ddd;
 background-color: black;
 }
 
+.dg.a { float: left !important; }
