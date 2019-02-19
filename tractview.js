@@ -49,7 +49,9 @@ Vue.component('tractview', {
             show_stats: true,
 
             raycaster: new THREE.Raycaster(),
-            hovered_surface: null,
+            hovered_surface: null, //on the main ui
+            hovered_obj: null,//on the list
+
             pushed_surface: null,
         };
     },
@@ -157,7 +159,7 @@ Vue.component('tractview', {
                         color: new THREE.Color(surface.color.r/256*1.25, surface.color.g/256*1.25, surface.color.b/256*1.25),
                         transparent: true,
                         opacity: 0.25,
-                        depthTest: false,
+                        depthTest: false, //need this to show tracts on top
                     });
                     mesh.material = mesh._normal_material;
                     this.scene.add(mesh);
@@ -381,8 +383,13 @@ Vue.component('tractview', {
             } else this.controls.autoRotate = true;
         },
 
-        animate: function() {
+        animate() {
             this.stats.begin();
+
+            if(this.hovered_obj) {
+                if(this.hovered_obj.left && this.hovered_obj.left.mesh) this.animate_mesh(this.hovered_obj.left.mesh);
+                if(this.hovered_obj.right && this.hovered_obj.right.mesh) this.animate_mesh(this.hovered_obj.right.mesh);
+            }
 
             this.controls.enableKeys = !this.inputFocused();
             this.controls.update();
@@ -415,7 +422,13 @@ Vue.component('tractview', {
             requestAnimationFrame(this.animate);
         },
 
-        round: function(v) {
+        animate_mesh(mesh) {
+            let now = new Date().getTime();
+            let l = Math.cos((now%1000)*(2*Math.PI/1000));
+            mesh.material.opacity = (l+2)/4;
+        },
+
+        round(v) {
             return Math.round(v * 1e3) / 1e3;
         },
 
@@ -445,7 +458,7 @@ Vue.component('tractview', {
         },
         */
 
-        resized: function () {
+        resized() {
             var viewbox = this.$refs.view.getBoundingClientRect();
             this.camera.aspect = viewbox.width / viewbox.height;
             this.camera.updateProjectionMatrix();
@@ -781,22 +794,32 @@ Vue.component('tractview', {
                 obj.right.mesh.material = obj.right.mesh._highlight_material;
                 obj.right.mesh.visible = true;
             }
+            this.hovered_obj = obj;
         },
 
         mouseleave(obj) {
             //if(!obj) return;
             if(obj.left && obj.left.mesh) {
                 obj.left.mesh.material = obj.left.mesh._normal_material;
-                if(obj.left != this.hovered_surface && !obj.left_check) {
+                if(!obj.left_check) {
                     obj.left.mesh.visible = false;
                 }
             }
             if(obj.right && obj.right.mesh) {
                 obj.right.mesh.material = obj.right.mesh._normal_material;
-                if(obj.right != this.hovered_surface && !obj.right_check) {
+                if(!obj.right_check) {
                     obj.right.mesh.visible = false;
                 }
             }
+
+            //restore original material.opacity
+            if(this.hovered_obj.left && this.hovered_obj.left.mesh) {
+                this.hovered_obj.left.mesh.opacity = this.hovered_obj.left.mesh._normal_material.opacity;
+            }
+            if(this.hovered_obj.right && this.hovered_obj.right.mesh) {
+                this.hovered_obj.right.mesh.opacity = this.hovered_obj.right.mesh._normal_material.opacity;
+            }
+            this.hovered_obj = null;
         },
 
         find_surface(event) {
@@ -826,6 +849,7 @@ Vue.component('tractview', {
 
             this.hovered_surface = obj;
         },
+
         mouseup(event) {
             if(this.pushed_surface) {
                 this.pushed_surface.material = this.pushed_surface._highlight_material;
@@ -837,7 +861,6 @@ Vue.component('tractview', {
             if(obj) {
                 this.pushed_surface = obj;
                 obj.material = obj._xray_material;
-                //this.$forceUpdate();
             }
         },
     },
@@ -937,13 +960,6 @@ Vue.component('tractview', {
     </div>            
     `
 })
-
-let white_material = new THREE.LineBasicMaterial({
-    color: new THREE.Color(1, 1, 1),
-    transparent: true,
-    opacity: 0.5,
-});
-
 
 function getHashValue(key) {
     var matches = window.parent.location.hash.match(new RegExp(key+'=([^&]*)'));
