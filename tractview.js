@@ -104,6 +104,7 @@ Vue.component('tractview', {
                     this.load_percentage = idx / this.config.tracts.length;
                     this.loading = tract.name;
                     tract.mesh = mesh; 
+                    //this.$forceUpdate(); //doesn't work
                     setTimeout(next_tract, 0); //give UI thread time
                 });
             }, console.error); 
@@ -114,6 +115,7 @@ Vue.component('tractview', {
             let vtkloader = new THREE.VTKLoader();
             async.eachSeries(this.config.surfaces, (surface, next_surface)=>{
                 //console.dir(surface);
+                this.loading = surface.filename;
                 vtkloader.load(surface.url, geometry=>{
                     geometry.computeVertexNormals(); //for smooth shading
                     geometry.computeBoundsTree(); //for BVH
@@ -162,7 +164,7 @@ Vue.component('tractview', {
                     });
 
                     this.scene.add(mesh);
-
+                    //this.$forceUpdate(); //doesn't work
                     setTimeout(next_surface, 0); //give UI thread time
                 });
             }, console.error);
@@ -785,7 +787,7 @@ Vue.component('tractview', {
             if(obj) {
                 this.pushed_surface = obj;
                 obj.material = obj._xray_material;
-                this.$forceUpdate();
+                //this.$forceUpdate();
             }
         },
     },
