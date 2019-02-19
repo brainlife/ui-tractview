@@ -88,7 +88,8 @@ Vue.component('tractview', {
             async.eachSeries(this.config.tracts, (tract, next_tract) => {
                 this.load_tract(tract, idx++, (err, mesh) => {
                     if (err) return next_tract(err);
-                    this.add_mesh_to_scene(mesh);
+                    this.meshes.push(mesh);
+                    this.scene.add(mesh);
                     this.load_percentage = idx / this.config.tracts.length;
                     this.loading = tract.name;
                     tract.mesh = mesh; 
@@ -288,6 +289,14 @@ Vue.component('tractview', {
                 if(name.startsWith('r-')) {
                     right = true;
                     name = surface.name.substring(2);
+                }
+                if(name.startsWith('ctx-lh-')) {
+                    left = true;
+                    name = surface.name.substring(7);
+                }
+                if(name.startsWith('ctx-rh-')) {
+                    right = true;
+                    name = surface.name.substring(7);
                 }
 
                 //if it's not left nor right, pretend that it's left
@@ -562,11 +571,6 @@ Vue.component('tractview', {
             var m = new THREE.LineSegments( geometry, material );
             this.config.tracts[geometry.tract_index].mesh = m;
             return m;
-        },
-
-        add_mesh_to_scene: function(mesh) {
-            this.meshes.push(mesh);
-            this.scene.add(mesh);
         },
 
         recalculateMaterials: function() {
