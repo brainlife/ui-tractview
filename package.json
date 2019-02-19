@@ -32,6 +32,7 @@
     "popper.js": "^1.14.7",
     "stats.js": "^0.17.0",
     "three": "^0.101.1",
+    "three-mesh-bvh": "0.0.2",
     "vue": "^2.6.6",
     "webworker-threads": "^0.7.17"
   },
