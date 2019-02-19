@@ -273,6 +273,7 @@ Vue.component('tractview', {
 
                 //detect hierachy and adjust name
                 let name = surface.name.toLowerCase();
+                console.log(name);
                 if(name.startsWith('left-')) {
                     left = true;
                     name = surface.name.substring(5);
@@ -692,26 +693,28 @@ Vue.component('tractview', {
             Object.keys(this.$refs).forEach(k => result = result || (document.activeElement == this.$refs[k]) );
             return result;
         },
-
-        /*
-        appendStyle: function() {
-            this.$refs.style.innerHTML = `
-            <style scoped>
-            </style>`;
-        }
-        */
-        surface_color: function(surface) {
+        
+        surface_color(surface) {
             let color;
             if(surface.left) color = surface.left.color;
             if(surface.right) color = surface.right.color;
             return `rgb(${128+color.r/2},${128+color.g/2},${128+color.b/2})`;
         },
 
-        tract_color: function(tract) {
+        tract_color(tract) {
             let color;
             if(tract.left) color = tract.left.color;
             if(tract.right) color = tract.right.color;
             return `rgb(${128+color[0]*128},${128+color[1]*128},${128+color[2]*128})`;
+        },
+
+        mouseenter_surface(surface) {
+        },
+        mouseleave_surface(surface) {
+        },
+        mouseenter_tract(tract) {
+        },
+        mouseleave_tract(tract) {
         },
     },
 
@@ -720,37 +723,6 @@ Vue.component('tractview', {
             if(!this.tracts) return [];
             return Object.keys(this.tracts).sort();
         },
-        /*
-        sortedMeshes: function() {
-            let out = {};
-            this.meshes.map(m=>m).sort((_a, _b) => {
-                var a = _a.name; var b = _b.name;
-                var a_has_lr = isLeftTract(a) || isRightTract(a);
-                var b_has_lr = isLeftTract(b) || isRightTract(b);
-
-                if (a_has_lr && !b_has_lr) return 1;
-                if (!a_has_lr && b_has_lr) return -1;
-
-                if (a > b) return 1;
-                if (a == b) return 0;
-                return -1;
-            }).forEach(m => {
-                //if (m.previous_material && m.material == white_material) m.material = m.previous_material;
-
-                if (isRightTract(m.name)) {
-                    let basename = removeRightText(m.name);
-                    out[basename] = out[basename] || {};
-                    out[basename].right = m;
-                } else {
-                    let basename = removeLeftText(m.name);
-                    out[basename] = out[basename] || {};
-                    out[basename].left = m;
-                }
-            });
-
-            return out;
-        },
-        */
     },
 
     watch: {
@@ -791,8 +763,8 @@ Vue.component('tractview', {
                     </span>
                 </div>
 
-                <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row">
-                <!-- @mouseenter="tractFocus(LR, basename)" @mouseleave="tractUnfocus(LR, basename)">-->
+                <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row"
+                    @mouseenter="mouseenter_tract(tracts[name])" @mouseleave="mouseleave_tract(tracts[name])">
                     {{name}}
                     <span style="float: right">
                         <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' v-model='tracts[name].left.mesh.visible' />
@@ -804,7 +776,8 @@ Vue.component('tractview', {
             </div>
             <div v-if="surfaces">
                 <h2>Surfaces</h2>
-                <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row">
+                <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row"
+                    @mouseenter="mouseenter_surface(surfaces[name])" @mouseleave="mouseleave_surface(surfaces[name])">
                     {{name}} 
                     <span style="float: right;">
                         <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' v-model='surfaces[name].left.mesh.visible' />
@@ -858,25 +831,9 @@ function isLeftTract(tractName) {
     return name.startsWith('left') || name.endsWith(' l');
 }
 
-// remove the 'left' part of the tract text
-function removeLeftText(tractName) {
-    let name = tractName.toLowerCase();
-    if (name.startsWith('left')) tractName = tractName.substring(5);
-    if (name.endsWith(' l')) tractName = tractName.substring(0, tractName.length - 2);
-    return tractName;
-}
-
 // returns whether or not the tractName is considered to be a right tract
 function isRightTract(tractName) {
     let name = tractName.toLowerCase();
     return name.startsWith('right') || name.endsWith(' r');
-}
-
-// remove the 'right' part of the tract text
-function removeRightText(tractName) {
-    let name = tractName.toLowerCase();
-    if (name.startsWith('right')) tractName = tractName.substring(6);
-    if (name.endsWith(' r')) tractName = tractName.substring(0, tractName.length - 2);
-    return tractName;
 }
 

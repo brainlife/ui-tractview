@@ -62,7 +62,6 @@ overflow-y:auto;
 max-height:100%;
 transition: opacity 0.3s;
 user-select: none;
-opacity: 0.95;
 }
 .controls.controls-hidden {
 opacity: 0;
@@ -79,6 +78,7 @@ height: 17px;
 }
 .controls .control-row:hover {
 background-color: rgba(0,0,0,0.3);
+color: white !important;
 }
 
 /* Hide/Show Vertical Alignment */
@@ -97,23 +97,6 @@ margin-bottom:0 !important;
 display:table-cell;
 vertical-align:middle;
 }
-
-/*
-.container_toggles {
-display:inline-block;
-max-width:500px;
-width:auto;
-height:auto;
-max-height:100%;
-padding: 8px;
-overflow-y:auto;
-overflow-x:hidden;
-transition:max-width .5s, opacity .5s, padding .5s;
-}
-.container_toggles.hidden {
-opacity: 0;
-}
-*/
 
 .nifti_chooser {
 padding-left:4px;
