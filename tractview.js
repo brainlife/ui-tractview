@@ -127,31 +127,28 @@ Vue.component('tractview', {
                         opacity: 0.2,
                         depthTest: false,
                     });
-                    var mesh = new THREE.Mesh( geometry, material );
-                    mesh.rotation.x = -Math.PI/2;
-                    mesh.visible = true;
-                    this.back_scene.add(mesh);
+                    var back_mesh = new THREE.Mesh( geometry, material );
+                    back_mesh.rotation.x = -Math.PI/2;
+                    back_mesh.visible = true;
+                    this.back_scene.add(back_mesh);
 
-                    //add to back_scene
                     /*
-                    normal_material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(surface.color.r/256*0.75, surface.color.g/256*0.75, surface.color.b/256*0.75),
-                    });
-                    */
                     normal_material = new THREE.MeshPhongMaterial({
                         color: new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256),
                         shininess: 80,
                     });
+                    */
 
-                    mesh = new THREE.Mesh( geometry, normal_material );
+                    let mesh = new THREE.Mesh( geometry );
                     mesh.rotation.x = -Math.PI/2;
                     mesh.visible = false;
                     mesh._surface = true;
-
                     surface.mesh = mesh; 
 
                     //store other surfaces
-                    mesh._normal_material = normal_material;
+                    mesh._normal_material = new THREE.MeshLambertMaterial({
+                        color: new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256),
+                    });
                     mesh._highlight_material = new THREE.MeshPhongMaterial({
                         color: new THREE.Color(surface.color.r/256*1.25, surface.color.g/256*1.25, surface.color.b/256*1.25),
                         shininess: 80,
@@ -162,7 +159,7 @@ Vue.component('tractview', {
                         opacity: 0.25,
                         depthTest: false,
                     });
-
+                    mesh.material = mesh._normal_material;
                     this.scene.add(mesh);
                     //this.$forceUpdate(); //doesn't work
                     setTimeout(next_surface, 0); //give UI thread time
@@ -290,7 +287,10 @@ Vue.component('tractview', {
                 if(!left && !right) left = true;
 
                 //put tract info into appropriate categories
-                if(!this.tracts[name]) this.tracts[name] = {};
+                if(!this.tracts[name]) Vue.set(this.tracts, name, {
+                    left_check: false,
+                    right_check: false,
+                });
                 if(left) this.tracts[name].left = tract;
                 if(right) this.tracts[name].right = tract;
             });
@@ -335,7 +335,10 @@ Vue.component('tractview', {
                 if(!left && !right) left = true;
 
                 //put tract info into appropriate categories
-                if(!this.surfaces[name]) this.surfaces[name] = {};
+                if(!this.surfaces[name]) Vue.set(this.surfaces, name, {
+                    left_check: false,
+                    right_check: false,
+                });
                 if(left) this.surfaces[name].left = surface;
                 if(right) this.surfaces[name].right = surface;
                 //console.log(surface.name, name, left, right);
@@ -416,6 +419,7 @@ Vue.component('tractview', {
             return Math.round(v * 1e3) / 1e3;
         },
 
+        /*
         tractFocus: function(LR, basename) {
             this.focused[basename] = true;
             if (LR.left) {
@@ -439,6 +443,7 @@ Vue.component('tractview', {
                 LR.right.material = LR.right.material_previous;
             }
         },
+        */
 
         resized: function () {
             var viewbox = this.$refs.view.getBoundingClientRect();
@@ -570,13 +575,18 @@ Vue.component('tractview', {
                 });
 
                 if (mesh) {
+                    //update
                     mesh.geometry = geometry;
                     mesh.material = material;
                     return mesh;
                 } else {
-                    var m = new THREE.LineSegments( geometry, material );
-                    this.config.tracts[geometry.tract_index].mesh = m;
-                    return m;
+                    //new
+                    mesh = new THREE.LineSegments( geometry, material );
+                    mesh = new THREE.LineSegments( geometry, material );
+                    mesh._normal_material = material;
+                    mesh._highlight_material = highlight_material;
+                    this.config.tracts[geometry.tract_index].mesh = mesh;
+                    return mesh;
                 }
             }
 
@@ -594,15 +604,25 @@ Vue.component('tractview', {
                 opacity: 0.6,
             });
 
+            let highlight_material = new THREE.LineBasicMaterial({
+                color: "white",
+                transparent: true,
+                opacity: 0.8,
+            });
+
             if (mesh) {
+                //update
                 mesh.geometry = geometry;
                 mesh.material = material;
                 return mesh;
+            } else {
+                //new
+                mesh = new THREE.LineSegments( geometry, material );
+                mesh._normal_material = material;
+                mesh._highlight_material = highlight_material;
             }
-
-            var m = new THREE.LineSegments( geometry, material );
-            this.config.tracts[geometry.tract_index].mesh = m;
-            return m;
+            this.config.tracts[geometry.tract_index].mesh = mesh;
+            return mesh;
         },
 
         recalculateMaterials: function() {
@@ -743,13 +763,40 @@ Vue.component('tractview', {
             return `rgb(${128+color[0]*128},${128+color[1]*128},${128+color[2]*128})`;
         },
 
-        mouseenter_surface(surface) {
+        check(obj, left) {
+            if(left) {
+                obj.left.mesh.visible = obj.left_check;
+            } else {
+                obj.right.mesh.visible = obj.right_check;
+            }
         },
-        mouseleave_surface(surface) {
+
+        mouseenter(obj) {
+            //if(!obj) return;
+            if(obj.left && obj.left.mesh) {
+                obj.left.mesh.material = obj.left.mesh._highlight_material;
+                obj.left.mesh.visible = true;
+            }
+            if(obj.right && obj.right.mesh) {
+                obj.right.mesh.material = obj.right.mesh._highlight_material;
+                obj.right.mesh.visible = true;
+            }
         },
-        mouseenter_tract(tract) {
-        },
-        mouseleave_tract(tract) {
+
+        mouseleave(obj) {
+            //if(!obj) return;
+            if(obj.left && obj.left.mesh) {
+                obj.left.mesh.material = obj.left.mesh._normal_material;
+                if(obj.left != this.hovered_surface && !obj.left_check) {
+                    obj.left.mesh.visible = false;
+                }
+            }
+            if(obj.right && obj.right.mesh) {
+                obj.right.mesh.material = obj.right.mesh._normal_material;
+                if(obj.right != this.hovered_surface && !obj.right_check) {
+                    obj.right.mesh.visible = false;
+                }
+            }
         },
 
         find_surface(event) {
@@ -768,20 +815,20 @@ Vue.component('tractview', {
         },
 
         mousemove(event) {
-            /* not much point right now..
             if(event.buttons) return; //ignore dragging
+    
+            //restore previously hovered surface
+            if(this.hovered_surface) this.hovered_surface.material = this.hovered_surface._normal_material;
+    
+            //check to see if we are still hovering, or hovering on new surface
             let obj = this.find_surface(event);
+            if(obj) obj.material = obj._highlight_material;
+
             this.hovered_surface = obj;
-            if(obj) {
-                obj.material = obj._highlight_material;
-            } else if(this.hovered_surface) {
-                this.hovered_surface.material = this.hovered_surface._normal_material;
-            }
-            */
         },
         mouseup(event) {
             if(this.pushed_surface) {
-                this.pushed_surface.material = this.pushed_surface._normal_material;
+                this.pushed_surface.material = this.pushed_surface._highlight_material;
                 this.pushed_surface = null;
             }
         },
@@ -820,9 +867,7 @@ Vue.component('tractview', {
     <div class="container" style="display:inline-block;">
         <div ref="stats" v-show="show_stats"/>
          <div id="conview" class="conview" ref="view" style="position:absolute; width: 100%; height:100%;"
-            @mousemove="mousemove"
-            @mousedown="mousedown"
-            @mouseup="mouseup"/>
+            @mousemove="mousemove" @mousedown="mousedown" @mouseup="mouseup"/>
          <div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>
          <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
          <div id="controls" class="controls" :class="{'controls-hidden': !control_visible}">
@@ -832,7 +877,7 @@ Vue.component('tractview', {
                         <b>&nbsp;L&nbsp;</b>
                         <b>&nbsp;R&nbsp;</b>
                     </span>
-                    <h2>Tracts</h2>
+                    <h2>White Matter Tracts</h2>
                 </div>
                 <div style="clear: right; margin-bottom: 5px;">
                     <b style="opacity: 0.3">All</b>
@@ -843,31 +888,30 @@ Vue.component('tractview', {
                 </div>
 
                 <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row"
-                    @mouseenter="mouseenter_tract(tracts[name])" @mouseleave="mouseleave_tract(tracts[name])">
+                    @mouseenter="mouseenter(tracts[name])" @mouseleave="mouseleave(tracts[name])">
                     {{name}}
                     <span class="checks">
-                        <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' v-model='tracts[name].left.mesh.visible' />
-                        <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' v-model='tracts[name].right.mesh.visible' />
+                        <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' 
+                            @change="check(tracts[name], true)" v-model='tracts[name].left_check' />
+                        <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' 
+                            @change="check(tracts[name], false)" v-model='tracts[name].right_check' />
                     </span>
                 </div>
-           
                 <br>
             </div>
+
             <div v-if="surfaces">
-<<<<<<< HEAD
-                <h2>Surfaces</h2>
-                <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row"
-                    @mouseenter="mouseenter_surface(surfaces[name])" @mouseleave="mouseleave_surface(surfaces[name])">
-=======
                 <div style="clear: right; position: sticky; top: 0px; background-color: rgba(0,0,0,0.7); padding: 5px; margin-bottom: 5px">
-                    <h2>Surfaces</h2>
+                    <h2>Brain Regions</h2>
                 </div>
-                <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row">
->>>>>>> 4eb89e3623cf47b146206878cc8ea808adf5b941
-                    {{name}} 
+                <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row"
+                    @mouseenter="mouseenter(surfaces[name])" @mouseleave="mouseleave(surfaces[name])">
+                    {{name}}
                     <span class="checks">
-                        <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' v-model='surfaces[name].left.mesh.visible' />
-                        <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' v-model='surfaces[name].right.mesh.visible' />
+                        <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' 
+                            @change="check(surfaces[name], true)" v-model='surfaces[name].left_check' />
+                        <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' 
+                            @change="check(surfaces[name], false)" v-model='surfaces[name].right_check' />
                     </span>
                 </div>
                 <br>
