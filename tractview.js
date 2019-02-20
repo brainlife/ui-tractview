@@ -44,9 +44,11 @@ Vue.component('tractview', {
             tracts: null, //tracts organized into left/right
             surfaces: null, //surfaces organized into left/right
 
-            gui: new dat.GUI(),
+            //gui: new dat.GUI(),
             stats: new Stats(),
             show_stats: true,
+            ps_tracts: null,
+            ps_surfaces: null,
 
             raycaster: new THREE.Raycaster(),
             hovered_surface: null, //on the main ui
@@ -106,7 +108,6 @@ Vue.component('tractview', {
                     this.load_percentage = idx / this.config.tracts.length;
                     this.loading = tract.name;
                     tract.mesh = mesh; 
-                    //this.$forceUpdate(); //doesn't work
                     setTimeout(next_tract, 0); //give UI thread time
                 });
             }, console.error); 
@@ -124,9 +125,9 @@ Vue.component('tractview', {
 
                     //add to back_scene
                     let material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256),
+                        color: new THREE.Color(surface.color.r/256*2, surface.color.g/256*2, surface.color.b/256*2),
                         transparent: true,
-                        opacity: 0.2,
+                        opacity: 0.05,
                         depthTest: false,
                     });
                     var back_mesh = new THREE.Mesh( geometry, material );
@@ -158,12 +159,11 @@ Vue.component('tractview', {
                     mesh._xray_material = new THREE.MeshLambertMaterial({
                         color: new THREE.Color(surface.color.r/256*1.25, surface.color.g/256*1.25, surface.color.b/256*1.25),
                         transparent: true,
-                        opacity: 0.25,
+                        opacity: 0.43,
                         depthTest: false, //need this to show tracts on top
                     });
                     mesh.material = mesh._normal_material;
                     this.scene.add(mesh);
-                    //this.$forceUpdate(); //doesn't work
                     setTimeout(next_surface, 0); //give UI thread time
                 });
             }, console.error);
@@ -196,7 +196,6 @@ Vue.component('tractview', {
 
         this.renderer.autoClear = false;
         this.renderer.setSize(viewbox.width, viewbox.height);
-        //this.renderer.setClearColor(new THREE.Color(.5,.5,.5));
         this.$refs.view.appendChild(this.renderer.domElement);
 
         this.brainRenderer.autoClear = false;
@@ -255,7 +254,9 @@ Vue.component('tractview', {
         this.stats.dom.style.right = null;
         this.stats.dom.style.left = "5px";
 
-        this.init_gui();
+        //this.init_gui();
+        this.ps_tracts = new PerfectScrollbar(this.$refs.tracts);
+        this.ps_surfaces = new PerfectScrollbar(this.$refs.surfaces);
     },
 
     methods: {
@@ -345,21 +346,16 @@ Vue.component('tractview', {
                 if(right) this.surfaces[name].right = surface;
                 //console.log(surface.name, name, left, right);
             });
-            console.dir(this.surfaces);
         },
 
+        /*
         init_gui() {
             var ui = this.gui.addFolder('UI');
             ui.add(this.controls, 'autoRotate').listen();
             ui.add(this, 'show_stats');
             ui.open();
-
-            /*
-            var matrix = this.gui.addFolder('Matrix');
-            matrix.add(this, 'weight_field',  [ 'count', 'density' ]); 
-            matrix.open();
-            */
         },
+        */
 
         handle_hash() {
             let info_string = getHashValue('where');
@@ -391,7 +387,7 @@ Vue.component('tractview', {
                 if(this.hovered_obj.right && this.hovered_obj.right.mesh) this.animate_mesh(this.hovered_obj.right.mesh);
             }
 
-            this.controls.enableKeys = !this.inputFocused();
+            //this.controls.enableKeys = !this.inputFocused();
             this.controls.update();
             this.camera_light.position.copy(this.camera.position);
 
@@ -604,7 +600,7 @@ Vue.component('tractview', {
             }
 
             let color;
-            let mul = 1.5;
+            let mul = 2.0;
             if (Array.isArray(geometry.tract.color)) {
                 color = new THREE.Color(geometry.tract.color[0]*mul, geometry.tract.color[1]*mul, geometry.tract.color[2]*mul);
             } else {
@@ -614,7 +610,7 @@ Vue.component('tractview', {
             let material = new THREE.LineBasicMaterial({
                 color,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.5,
             });
 
             let highlight_material = new THREE.LineBasicMaterial({
@@ -756,11 +752,13 @@ Vue.component('tractview', {
             this.showAll();
         },
 
+        /*
         inputFocused: function() {
             let result = false;
             Object.keys(this.$refs).forEach(k => result = result || (document.activeElement == this.$refs[k]) );
             return result;
         },
+        */
         
         surface_color(surface) {
             let color;
@@ -887,76 +885,86 @@ Vue.component('tractview', {
     },
 
     template: `
-    <div class="container" style="display:inline-block;">
+    <div class="container">
         <div ref="stats" v-show="show_stats"/>
-         <div id="conview" class="conview" ref="view" style="position:absolute; width: 100%; height:100%;"
+        <div id="conview" class="conview" ref="view" style="position:absolute; width: 100%; height:100%;"
             @mousemove="mousemove" @mousedown="mousedown" @mouseup="mouseup"/>
-         <div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>
-         <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
-         <div id="controls" class="controls" :class="{'controls-hidden': !control_visible}">
-            <div v-if="tracts">
-                <div style="clear: right; position: sticky; top: 0px; background-color: rgba(0,0,0,0.7); padding: 5px; margin-bottom: 5px">
-                    <span class="checks">
-                        <b>&nbsp;L&nbsp;</b>
-                        <b>&nbsp;R&nbsp;</b>
-                    </span>
-                    <h2>White Matter Tracts</h2>
-                </div>
-                <div style="clear: right; margin-bottom: 5px;">
-                    <b style="opacity: 0.3">All</b>
-                    <span class="checks">
-                        <input type='checkbox' v-model='all_left' />
-                        <input type='checkbox' v-model='all_right' />
-                    </span>
-                </div>
+        <div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>
+        <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
 
-                <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row"
-                    @mouseenter="mouseenter(tracts[name])" @mouseleave="mouseleave(tracts[name])">
-                    {{name}}
-                    <span class="checks">
-                        <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' 
-                            @change="check(tracts[name], true)" v-model='tracts[name].left_check' />
-                        <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' 
-                            @change="check(tracts[name], false)" v-model='tracts[name].right_check' />
-                    </span>
-                </div>
-                <br>
+        <div class="controls" style="left: 0;">
+            <div class="control-row" style="margin: 8px 0px">
+                <span class="checks">
+                    <b>&nbsp;L&nbsp;</b>
+                    <b>&nbsp;R&nbsp;</b>
+                </span>
+                <h2>Brain Regions</h2>
             </div>
+            <div class="scrollable" ref="surfaces">
+                <div v-if="surfaces">
+                    <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row"
+                        @mouseenter="mouseenter(surfaces[name])" @mouseleave="mouseleave(surfaces[name])">
+                        {{name}}
+                        <span class="checks">
+                            <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' 
+                                @change="check(surfaces[name], true)" v-model='surfaces[name].left_check' />
+                            <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' 
+                                @change="check(surfaces[name], false)" v-model='surfaces[name].right_check' />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
 
-            <div v-if="surfaces">
-                <div style="clear: right; position: sticky; top: 0px; background-color: rgba(0,0,0,0.7); padding: 5px; margin-bottom: 5px">
-                    <h2>Brain Regions</h2>
-                </div>
-                <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row"
-                    @mouseenter="mouseenter(surfaces[name])" @mouseleave="mouseleave(surfaces[name])">
-                    {{name}}
-                    <span class="checks">
-                        <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' 
-                            @change="check(surfaces[name], true)" v-model='surfaces[name].left_check' />
-                        <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' 
-                            @change="check(surfaces[name], false)" v-model='surfaces[name].right_check' />
-                    </span>
-                </div>
-                <br>
+        <div class="controls" style="right: 0">
+            <div class="control-row" style="margin: 8px 0px">
+                <span class="checks">
+                    <b>&nbsp;L&nbsp;</b>
+                    <b>&nbsp;R&nbsp;</b>
+                </span>
+                <h2>White Matter Tracts</h2>
             </div>
+            <div class="scrollable" ref="tracts" style="left: inherit; right: 0">
+                <div v-if="tracts">
+                    <div class="control-row">
+                        <b style="opacity: 0.3">All</b>
+                        <span class="checks">
+                            <input type='checkbox' v-model='all_left' />
+                            <input type='checkbox' v-model='all_right' />
+                        </span>
+                    </div>
 
-            <!-- Nifti Choosing -->
-            <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
-              <div style="display:inline-block;" v-if="niftis.length > 0">
-                 <label style="color:#ccc; width: 120px;">Overlay</label> 
-                 <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
-                    <option :value="null">(No Overlay)</option>
-                    <option v-for="(n, i) in niftis" :value="i">{{n.filename}}</option>
-                 </select>
-              </div>
-              <br />
-              <div class="upload_div">
-                 <label for="upload_nifti">Upload Overlay Image (.nii.gz)</label>
-                 <input type="file" style="visibility:hidden;max-height:0;max-width:5px;" name="upload_nifti" id="upload_nifti" @change="upload_file"></input>
-              </div>
-              <div class="plots" id="plots" ref="hist"></div>
+                    <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row"
+                        @mouseenter="mouseenter(tracts[name])" @mouseleave="mouseleave(tracts[name])">
+                        {{name}}
+                        <span class="checks">
+                            <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' 
+                                @change="check(tracts[name], true)" v-model='tracts[name].left_check' />
+                            <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' 
+                                @change="check(tracts[name], false)" v-model='tracts[name].right_check' />
+                        </span>
+                    </div>
+
+                    <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
+                        <div style="display:inline-block;" v-if="niftis.length > 0">
+                            <label style="color:#ccc; width: 120px;">Overlay</label> 
+                            <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
+                            <option :value="null">(No Overlay)</option>
+                            <option v-for="(n, i) in niftis" :value="i">{{n.filename}}</option>
+                            </select>
+                        </div>
+                        <br />
+                        <div class="upload_div">
+                            <label for="upload_nifti">Upload Overlay Image (.nii.gz)</label>
+                            <input type="file" style="visibility:hidden;max-height:0;max-width:5px;" name="upload_nifti" id="upload_nifti" @change="upload_file"></input>
+                        </div>
+                        <div class="plots" id="plots" ref="hist"></div>
+                    </div>
+                </div>
             </div>
-        </div><!--controls-->
+            <br>
+        </div>
     </div>            
     `
 })
