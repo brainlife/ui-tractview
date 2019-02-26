@@ -40,51 +40,7 @@
         if(debug_config) debug_config = JSON.parse(debug_config);
 		let config = debug_config || window.parent.config || window.config;
         */
-		let config = window.parent.config || window.config;
-<<<<<<< HEAD
-		let jwt = localStorage.getItem('jwt');
-		
-		if (!jwt) {
-			displayError('Error: No user authorization token (JWT) found in local storage for authentication.');
-		} else {
-			if(config) {
-					let jwt = localStorage.getItem("jwt");
-					config.tracts.forEach(tract=>{
-							tract.url += "?at="+jwt;
-					});
-					console.dir(config);
-			} else {
-					config = JSON.parse(localStorage.getItem("debug_config"));
-			}
-            if (!config) {
-                displayError('Error: No config object found in local storage to load tracts from.');
-            }
-			window.myconfig = config;
-			
-			if (Detector.webgl) {
-				new Vue({
-						el: '#tractview',
-						components: ['tractview'],
-						template: `
-								<tractview :config='window.myconfig'></tractview>
-						`
-				});
-			}
-			else {
-				displayError('Error: Your browser does not support WebGL, so the TractViewer is unable to be initiated.');
-			}
-		}
-		
-		function displayError(message) {
-			new Vue({
-				el: '#tractview',
-				template: `
-					<div style="position:relative;width:100%;height:100%;background:black;color:white;padding:10px;font-size:30px;font-family:Roboto;">
-						${message}
-					</div>`
-			});
-		}
-=======
+	let config = window.parent.config || window.config;
         if(!config) {
             //debug/demo mode.. load testdata
             let testdata = "testdata/wmaseg";
@@ -106,7 +62,7 @@
             //production mode.. append jwt to config.
             let jwt = localStorage.getItem("jwt");
             if(jwt) config.tracts.forEach(tract=>{
-                tract.url += "&at="+jwt;
+                tract.url += "?at="+jwt;
             });
             init();
         }
@@ -128,8 +84,6 @@
                 }
             });
         }
-
->>>>>>> 72a887cd5681616da44ce2ea47f680858f935854
 	</script>
 </body>
 </html>

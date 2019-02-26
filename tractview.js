@@ -871,16 +871,24 @@ Vue.component('tractview', {
     },
 
     watch: {
-        all_left: function() {
-            this.meshes.forEach(m => {
-                if (!isRightTract(m.name)) m.visible = this.all_left;
-            });
+        all_left: function(v) {
+            for(let name in this.tracts) {
+		let tract = this.tracts[name];
+		if(tract.left) {
+			tract.left_check = v;	
+			tract.left.mesh.visible = v;
+		}
+            }
         },
 
         all_right: function() {
-            this.meshes.forEach(m => {
-                if (isRightTract(m.name)) m.visible = this.all_right;
-            });
+            for(let name in this.tracts) {
+		let tract = this.tracts[name];
+		if(tract.right) {
+			tract.right_check = v;	
+			tract.right.mesh.visible = v;
+		}
+            }
         },
     },
 
@@ -892,7 +900,7 @@ Vue.component('tractview', {
         <div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>
         <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
 
-        <div class="controls" style="left: 0;">
+        <div class="controls" style="left: 0;" v-if="config.surfaces">
             <div class="control-row" style="margin: 8px 0px">
                 <span class="checks">
                     <b>&nbsp;L&nbsp;</b>
