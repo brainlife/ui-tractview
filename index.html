@@ -51,7 +51,7 @@
 			if(config) {
 					let jwt = localStorage.getItem("jwt");
 					config.tracts.forEach(tract=>{
-							tract.url += "&at="+jwt;
+							tract.url += "?at="+jwt;
 					});
 					console.dir(config);
 			} else {
