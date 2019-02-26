@@ -1,48 +1,47 @@
 <!doctype html>
 <html>
-
 <head>
 	<title>Tractview</title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF8">
 	<link href="//fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-	
-	<style>
-		* {
-			margin: 0;
-			padding: 0;
-		}
-
-		body,
-		html {
-			width: 100%;
-			height: 100%;
-			overflow: hidden;
-		}
-	</style>
-
+    <link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="node_modules/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 </head>
-
 <body>
-	<div style="display:inline-block; position:relative; width: 100%; height:100%;">
-		<div id="tractview"></div>
-	</div>
-	
+    <div id="tractview" v-cloak>
+        <div class="error" v-if="error">{{error}}</div>
+        <tractview :config="config" v-else></tractview>
+    </div>
+    <a class="bllogo" href="https://brainlife.io">brainlife.io</a>
+    
 	<!-- Dep Scripts -->
 	<script type="text/javascript" src="node_modules/three/build/three.min.js"></script>
 	<script type="text/javascript" src="node_modules/panning-orbit-controls/dist/panning-orbit-controls.js"></script>
-	<script type="text/javascript" src="node_modules/three/examples/js/Detector.js"></script>
 	<script type="text/javascript" src="node_modules/three/examples/js/loaders/VTKLoader.js"></script>
+	<script type="text/javascript" src="node_modules/three/examples/js/loaders/deprecated/LegacyJSONLoader.js"></script>
+
+    <script type="text/javascript" src="node_modules/dat.gui/build/dat.gui.min.js"></script>
+    <script type="text/javascript" src="node_modules/stats.js/build/stats.min.js"></script>
+    <script type="text/javascript" src="node_modules/three-mesh-bvh/umd/index.js"></script>
 
 	<script type="text/javascript" src="node_modules/pako/dist/pako_inflate.min.js"></script>
 	<script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
+	<script type="text/javascript" src="node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
 
 	<!-- Main Scripts -->
-	<script type="text/javascript" src="dist.bundled.js"></script>
-	<script type="text/javascript" src="lib/stats.js"></script>
-	<script type="text/javascript" src="tractview.js"></script>
-	
+	<script type="text/javascript" src="lib/dist.bundled.js"></script>
+    <script type="text/javascript" src="tractview.js"></script>
+    <!--<script type="text/javascript" src="testdata/config.js"></script>-->
+
 	<script>
+        /*
+        let debug_config = localStorage.getItem("debug_config");
+        if(debug_config) debug_config = JSON.parse(debug_config);
+		let config = debug_config || window.parent.config || window.config;
+        */
 		let config = window.parent.config || window.config;
+<<<<<<< HEAD
 		let jwt = localStorage.getItem('jwt');
 		
 		if (!jwt) {
@@ -85,7 +84,52 @@
 					</div>`
 			});
 		}
+=======
+        if(!config) {
+            //debug/demo mode.. load testdata
+            let testdata = "testdata/wmaseg";
+            config = {};
+            fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
+                config.tracts = data;
+                config.tracts.forEach(tract=>{
+                    tract.url = testdata+"/tracts/"+tract.filename;
+                });
+                fetch(testdata+"/surfaces/index.json").then(res=>res.json()).then(data=>{
+                    config.surfaces = data;
+                    config.surfaces.forEach(surface=>{
+                        surface.url = testdata+"/surfaces/"+surface.filename;
+                    });
+                    init();
+                });
+            });
+        } else {
+            //production mode.. append jwt to config.
+            let jwt = localStorage.getItem("jwt");
+            if(jwt) config.tracts.forEach(tract=>{
+                tract.url += "&at="+jwt;
+            });
+            init();
+        }
+
+        function init() {
+            console.log("using config"); 
+            console.dir(config);
+            new Vue({
+                el: '#tractview',
+                data: function() {
+                    return {
+                        error: null,
+                        config,
+                    }
+                },
+                components: ['tractview'],
+                created() {
+                    //if (!Detector.webgl) this.error = "Your browser does not support WebGL, so the TractViewer is unable to be initiated.";
+                }
+            });
+        }
+
+>>>>>>> 72a887cd5681616da44ce2ea47f680858f935854
 	</script>
 </body>
-
 </html>

@@ -1,35 +1,43 @@
 {
   "name": "ui-tractview",
-  "version": "1.0.2",
-  "description": "tracts viewer",
-  "main": "undefined",
+  "version": "1.0.3",
+  "description": "brainlife tractviewer",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "lite-server"
+    "dev": "lite-server",
+    "deploy-prod": "ssh root@brainlife.io 'cd /root/docker/nginx/static/ui-tractview && git pull'"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/brain-life/ui-tractview.git"
   },
   "author": "",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/brain-life/ui-tractview/issues"
   },
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
-    "@types/jquery": "^3.3.1",
-    "async": "^2.6.0",
-    "bootstrap": "^3.3.7",
+    "@types/jquery": "^3.3.9",
+    "async": "^2.6.2",
+    "bootstrap": "^4.3.1",
+    "dat.gui": "^0.7.5",
+    "eslint": "^5.14.0",
     "jquery": "^3.3.1",
     "jquery-file-upload": "^4.0.11",
     "ndarray": "^1.0.18",
     "nifti-js": "^1.0.1",
     "pako": "^1.0.6",
     "panning-orbit-controls": "^1.0.1",
-    "plotly.js": "^1.37.1",
-    "three": "^0.92.0",
-    "vue": "^2.5.16",
-    "webworker-threads": "^0.7.13"
+    "perfect-scrollbar": "^1.4.0",
+    "plotly.js": "^1.44.4",
+    "popper.js": "^1.14.7",
+    "stats.js": "^0.17.0",
+    "three": "^0.101.1",
+    "three-mesh-bvh": "0.0.2",
+    "vue": "^2.6.6",
+    "webworker-threads": "^0.7.17"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.1"
   }
 }
