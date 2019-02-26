@@ -881,7 +881,7 @@ Vue.component('tractview', {
             }
         },
 
-        all_right: function() {
+        all_right: function(v) {
             for(let name in this.tracts) {
 		let tract = this.tracts[name];
 		if(tract.right) {
