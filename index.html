@@ -32,14 +32,8 @@
 	<!-- Main Scripts -->
 	<script type="text/javascript" src="lib/dist.bundled.js"></script>
     <script type="text/javascript" src="tractview.js"></script>
-    <!--<script type="text/javascript" src="testdata/config.js"></script>-->
 
 	<script>
-        /*
-        let debug_config = localStorage.getItem("debug_config");
-        if(debug_config) debug_config = JSON.parse(debug_config);
-		let config = debug_config || window.parent.config || window.config;
-        */
 		let config = window.parent.config || window.config;
         if(!config) {
             //debug/demo mode.. load testdata
@@ -62,7 +56,10 @@
             //production mode.. append jwt to config.
             let jwt = localStorage.getItem("jwt");
             if(jwt) config.tracts.forEach(tract=>{
-                tract.url += "&at="+jwt;
+                tract.url += "?at="+jwt;
+            });
+            if(jwt) config.surfaces.forEach(surface=>{
+                surface.url += "?at="+jwt;
             });
             init();
         }
