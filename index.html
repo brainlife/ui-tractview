@@ -60,10 +60,10 @@
         } else {
             //production mode.. append jwt to config.
             let jwt = localStorage.getItem("jwt");
-            if(jwt) config.tracts.forEach(tract=>{
+            if(jwt && config.tracts) config.tracts.forEach(tract=>{
                 tract.url += "?at="+jwt;
             });
-            if(jwt) config.surfaces.forEach(surface=>{
+            if(jwt && config.surfaces) config.surfaces.forEach(surface=>{
                 surface.url += "?at="+jwt;
             });
             init();
