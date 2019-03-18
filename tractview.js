@@ -228,7 +228,8 @@ Vue.component('tractview', {
                     this.round(this.controls.target.z)
                 ].join(";");
                 let where = "where=" + pos_params + "/" + target_params;
-                window.parent.location.hash = where;
+                //window.parent.location.hash = where;
+                history.replaceState(undefined, undefined, "#"+where);
             }, 100);
         });
 
@@ -247,14 +248,15 @@ Vue.component('tractview', {
             this.selectedNifti = null;
         }
 
+        /*
         this.stats.showPanel(1);
         this.$refs.stats.appendChild(this.stats.dom);
         this.stats.dom.style.top = null;
         this.stats.dom.style.bottom = "5px";
         this.stats.dom.style.right = null;
-        this.stats.dom.style.left = "5px";
+        this.stats.dom.style.left = "255px";
+        */
 
-        //this.init_gui();
         this.ps_tracts = new PerfectScrollbar(this.$refs.tracts);
         this.ps_surfaces = new PerfectScrollbar(this.$refs.surfaces);
     },
@@ -926,6 +928,9 @@ Vue.component('tractview', {
         </div>
 
         <div class="controls" style="right: 0">
+            <div class="rotateControl" v-if="controls">
+                <input type="checkbox" v-model="controls.autoRotate"> rotate</input>
+            </div>
             <div class="control-row" style="margin: 8px 0px">
                 <span class="checks">
                     <b>&nbsp;L&nbsp;</b>

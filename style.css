@@ -142,7 +142,7 @@ opacity:.2;
 color:white;
 text-decoration:none;
 bottom: 0px;
-left: 0px;
+right: 250px;
 }
 
 .loading {
@@ -173,6 +173,12 @@ color: #ddd;
 }
 .show_hide_button:hover {
 background-color: black;
+}
+.rotateControl {
+position: fixed;
+bottom: 0px;
+left: 260px;
+height: 25px;
 }
 
 /*
