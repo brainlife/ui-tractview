@@ -135,13 +135,6 @@ Vue.component('tractview', {
                     back_mesh.visible = true;
                     this.back_scene.add(back_mesh);
 
-                    /*
-                    normal_material = new THREE.MeshPhongMaterial({
-                        color: new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256),
-                        shininess: 80,
-                    });
-                    */
-
                     let mesh = new THREE.Mesh( geometry );
                     mesh.rotation.x = -Math.PI/2;
                     mesh.visible = false;
@@ -151,10 +144,14 @@ Vue.component('tractview', {
                     //store other surfaces
                     mesh._normal_material = new THREE.MeshLambertMaterial({
                         color: new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256),
+                        transparent: true,
+                        opacity: 1,
                     });
                     mesh._highlight_material = new THREE.MeshPhongMaterial({
                         color: new THREE.Color(surface.color.r/256*1.25, surface.color.g/256*1.25, surface.color.b/256*1.25),
                         shininess: 80,
+                        transparent: true,
+                        opacity: 1,
                     });
                     mesh._xray_material = new THREE.MeshLambertMaterial({
                         color: new THREE.Color(surface.color.r/256*1.25, surface.color.g/256*1.25, surface.color.b/256*1.25),
@@ -248,15 +245,6 @@ Vue.component('tractview', {
             this.selectedNifti = null;
         }
 
-        /*
-        this.stats.showPanel(1);
-        this.$refs.stats.appendChild(this.stats.dom);
-        this.stats.dom.style.top = null;
-        this.stats.dom.style.bottom = "5px";
-        this.stats.dom.style.right = null;
-        this.stats.dom.style.left = "255px";
-        */
-
         this.ps_tracts = new PerfectScrollbar(this.$refs.tracts);
         this.ps_surfaces = new PerfectScrollbar(this.$refs.surfaces);
     },
@@ -310,7 +298,7 @@ Vue.component('tractview', {
 
                 //detect hierachy and adjust name
                 let name = surface.name.toLowerCase();
-                console.log(name);
+                //console.log(name);
                 if(name.startsWith('left-')) {
                     left = true;
                     name = surface.name.substring(5);
@@ -391,16 +379,13 @@ Vue.component('tractview', {
 
         animate() {
             this.stats.begin();
-
             if(this.hovered_obj) {
                 if(this.hovered_obj.left && this.hovered_obj.left.mesh) this.animate_mesh(this.hovered_obj.left.mesh);
                 if(this.hovered_obj.right && this.hovered_obj.right.mesh) this.animate_mesh(this.hovered_obj.right.mesh);
             }
 
-            //this.controls.enableKeys = !this.inputFocused();
             this.controls.update();
             this.camera_light.position.copy(this.camera.position);
-
             this.renderer.clear();
             this.renderer.render(this.back_scene, this.camera);
             this.renderer.clearDepth();
@@ -417,13 +402,10 @@ Vue.component('tractview', {
                 ).normalize();
                 this.tinyBrainCam.position.set(pos3.x * 10, pos3.y * 10, pos3.z * 10);
                 this.tinyBrainCam.rotation.copy(this.camera.rotation);
-
                 this.brainlight.position.copy(this.tinyBrainCam.position);
-
                 this.brainRenderer.clear();
                 this.brainRenderer.render(this.tinyBrainScene, this.tinyBrainCam);
             }
-
             this.stats.end();
             requestAnimationFrame(this.animate);
         },
@@ -911,24 +893,18 @@ Vue.component('tractview', {
         <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
 
         <div class="controls" style="left: 0;" v-if="config.surfaces">
-            <div class="control-row" style="margin: 8px 0px">
-                <span class="checks">
-                    <b>&nbsp;L&nbsp;</b>
-                    <b>&nbsp;R&nbsp;</b>
-                </span>
+            <div class="control-row" style="margin: 8px 0px; position: relative;">
+                <b class="check check-left">&nbsp;L&nbsp;</b>
+                <b class="check check-right">&nbsp;R&nbsp;</b>
                 <h2>Brain Regions</h2>
             </div>
             <div class="scrollable" ref="surfaces">
                 <div v-if="surfaces">
-                    <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row"
+                    <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row" style="position: relaive;"
                         @mouseenter="mouseenter(surfaces[name])" @mouseleave="mouseleave(surfaces[name])">
                         {{name}}
-                        <span class="checks">
-                            <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' 
-                                @change="check(surfaces[name], true)" v-model='surfaces[name].left_check' />
-                            <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' 
-                                @change="check(surfaces[name], false)" v-model='surfaces[name].right_check' />
-                        </span>
+                        <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' class="check check-left" @change="check(surfaces[name], true)" v-model='surfaces[name].left_check' />
+                        <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' class="check check-right" @change="check(surfaces[name], false)" v-model='surfaces[name].right_check' />
                     </div>
                 </div>
             </div>
@@ -939,32 +915,24 @@ Vue.component('tractview', {
             <div class="rotateControl" v-if="controls">
                 <input type="checkbox" v-model="controls.autoRotate"> rotate</input>
             </div>
-            <div class="control-row" style="margin: 8px 0px">
-                <span class="checks">
-                    <b>&nbsp;L&nbsp;</b>
-                    <b>&nbsp;R&nbsp;</b>
-                </span>
+            <div class="control-row" style="margin: 8px 0px; position: relative;">
+                <b class="check check-left">&nbsp;L&nbsp;</b>
+                <b class="check check-right">&nbsp;R&nbsp;</b>
                 <h2>White Matter Tracts</h2>
             </div>
             <div class="scrollable" ref="tracts" style="left: inherit; right: 0">
                 <div v-if="tracts">
                     <div class="control-row">
-                        <b style="opacity: 0.3">All</b>
-                        <span class="checks">
-                            <input type='checkbox' v-model='all_left' />
-                            <input type='checkbox' v-model='all_right' />
-                        </span>
+                        <b style="opacity: 0.3; position: relative;">All</b>
+                        <input type='checkbox' v-model='all_left' class="check check-left"/>
+                        <input type='checkbox' v-model='all_right' class="check check-right"/>
                     </div>
 
-                    <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row"
+                    <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row" style="position: relative;"
                         @mouseenter="mouseenter(tracts[name])" @mouseleave="mouseleave(tracts[name])">
                         {{name}}
-                        <span class="checks">
-                            <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' 
-                                @change="check(tracts[name], true)" v-model='tracts[name].left_check' />
-                            <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' 
-                                @change="check(tracts[name], false)" v-model='tracts[name].right_check' />
-                        </span>
+                        <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' class="check check-left" @change="check(tracts[name], true)" v-model='tracts[name].left_check' />
+                        <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' class="check check-right" @change="check(tracts[name], false)" v-model='tracts[name].right_check' />
                     </div>
 
                     <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">

@@ -78,13 +78,17 @@ padding-left: 10px;
 background-color: rgba(0,0,0,0.3);
 color: white !important;
 }
-.controls .checks {
-float: right;
-margin-right: 15px;
+.controls .check {
+position: absolute;
 opacity: 0.6;
 }
+.controls .check-left {
+right: 35px;
+}
+.controls .check-right {
+right: 15px;
+}
 
-/* Hide/Show Vertical Alignment */
 .parent {
 padding-right:4px;
 }
