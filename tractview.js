@@ -313,6 +313,10 @@ Vue.component('tractview', {
                     left = true;
                     name = surface.name.substring(5);
                 }
+                if(name.endsWith('_left')) {
+                    left = true;
+                    name = surface.name.substring(0, name.length-5);
+                }
                 if(name.startsWith('l-')) {
                     left = true;
                     name = surface.name.substring(2);
@@ -320,6 +324,10 @@ Vue.component('tractview', {
                 if(name.startsWith('right-')) {
                     right = true;
                     name = surface.name.substring(6);
+                }
+                if(name.endsWith('_right')) {
+                    right = true;
+                    name = surface.name.substring(0, name.length-6);
                 }
                 if(name.startsWith('r-')) {
                     right = true;
