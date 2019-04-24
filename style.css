@@ -35,7 +35,10 @@ padding: 0px;
 .conview {
 width:100%;
 height: 100%;
+/*
 background: radial-gradient( circle, transparent 30%, black 150%), rgb(46, 39, 39);
+*/
+    background: #111;
 }
 .tinybrain {
 position:absolute;
