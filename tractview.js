@@ -124,8 +124,14 @@ Vue.component('tractview', {
                     geometry.computeBoundsTree(); //for BVH
 
                     //add to back_scene
+                    let color;
+                    if(surface.color.r) {
+                        color = new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256);
+                    } else if(Array.isArray(surface.color)) {
+                        color = new THREE.Color(surface.color[0], surface.color[1], surface.color[2]);
+                    }
                     let material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(surface.color.r/256*2, surface.color.g/256*2, surface.color.b/256*2),
+                        color: new THREE.Color(color).multiplyScalar(2),
                         transparent: true,
                         opacity: 0.05,
                         depthTest: false,
@@ -143,18 +149,18 @@ Vue.component('tractview', {
 
                     //store other surfaces
                     mesh._normal_material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256),
+                        color: new THREE.Color(color),
                         transparent: true,
                         opacity: 1,
                     });
                     mesh._highlight_material = new THREE.MeshPhongMaterial({
-                        color: new THREE.Color(surface.color.r/256*1.25, surface.color.g/256*1.25, surface.color.b/256*1.25),
+                        color: new THREE.Color(color).multiplyScalar(1.25),
                         shininess: 80,
                         transparent: true,
                         opacity: 1,
                     });
                     mesh._xray_material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(surface.color.r/256*1.25, surface.color.g/256*1.25, surface.color.b/256*1.25),
+                        color: new THREE.Color(color).multiplyScalar(1.25),
                         transparent: true,
                         opacity: 0.43,
                         depthTest: false, //need this to show tracts on top
