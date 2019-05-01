@@ -125,10 +125,10 @@ Vue.component('tractview', {
 
                     //add to back_scene
                     let color;
-                    if(surface.color.r) {
-                        color = new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256);
-                    } else if(Array.isArray(surface.color)) {
+                    if(Array.isArray(surface.color)) {
                         color = new THREE.Color(surface.color[0], surface.color[1], surface.color[2]);
+                    } else {
+                        color = new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256);
                     }
                     let material = new THREE.MeshLambertMaterial({
                         color: new THREE.Color(color).multiplyScalar(2),
@@ -762,14 +762,22 @@ Vue.component('tractview', {
             let color;
             if(surface.left) color = surface.left.color;
             if(surface.right) color = surface.right.color;
-            return `rgb(${128+color.r/2},${128+color.g/2},${128+color.b/2})`;
+            if(Array.isArray(color)) {
+                return `rgb(${128+color[0]*256/2},${128+color[1]*256/2},${128+color[2]*256/2})`;
+            } else {
+                return `rgb(${128+color.r/2},${128+color.g/2},${128+color.b/2})`;
+            }
         },
 
         tract_color(tract) {
             let color;
             if(tract.left) color = tract.left.color;
             if(tract.right) color = tract.right.color;
-            return `rgb(${128+color[0]*128},${128+color[1]*128},${128+color[2]*128})`;
+            if(Array.isArray(color)) {
+                return `rgb(${128+color[0]*256/2},${128+color[1]*256/2},${128+color[2]*256/2})`;
+            } else {
+                return `rgb(${128+color.r/2},${128+color.g/2},${128+color.b/2})`;
+            }
         },
 
         check(obj, left) {
