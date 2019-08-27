@@ -42,15 +42,17 @@
         */
         if(!config) {
             //debug/demo mode.. load testdata
-            let testdata = "testdata/wmaseg";
+            let testdata = "testdata";
             config = {};
             fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
                 config.tracts = data;
+                if(!Array.isArray(data)) config.tracts = [data];
                 config.tracts.forEach(tract=>{
                     tract.url = testdata+"/tracts/"+tract.filename;
                 });
                 fetch(testdata+"/surfaces/index.json").then(res=>res.json()).then(data=>{
                     config.surfaces = data;
+                    if(!Array.isArray(data)) config.surfaces = [data];
                     config.surfaces.forEach(surface=>{
                         surface.url = testdata+"/surfaces/"+surface.filename;
                     });
@@ -58,7 +60,13 @@
                 });
             });
         } else {
-            //production mode.. append jwt to config.
+            //production mode.. 
+
+            //handle a case where there is only 1 surface / tract object
+            if(config.tracts && !Array.isArray(config.tracts)) config.tracts = [config.tracts];
+            if(config.surfaces && !Array.isArray(config.surfaces)) config.surfaces = [config.surfaces];
+
+            //append jwt to config.
             let jwt = localStorage.getItem("jwt");
             if(jwt && config.tracts) config.tracts.forEach(tract=>{
                 tract.url += "?at="+jwt;
