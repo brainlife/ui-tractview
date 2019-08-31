@@ -110,7 +110,11 @@ Vue.component('tractview', {
                     tract.mesh = mesh; 
                     setTimeout(next_tract, 0); //give UI thread time
                 });
-            }, console.error); 
+            }, err=>{
+                if(err) console.error(err);
+                console.log("finished loading all tracts");
+                this.$forceUpdate();
+            })
         }
 
         //start loading surfaces

@@ -1,4 +1,4 @@
-importScripts('node_modules/three/build/three.min.js');
+//importScripts('node_modules/three/build/three.min.js');
 
 //parsing large json and converting them to Float32Array is alow,
 //so let's do this on another thread and pass back the vertices
@@ -12,10 +12,13 @@ onmessage = function(e) {
         var bundle = json.coords;
         console.log(tract.url, bundle.length);
 
+        if(bundle[0].length > 3) bundle = bundle[0]; //unwind 
+
         //convert each bundle to threads_pos array
         var threads_pos = [];
-        bundle/*.splice(0, 5)*/.forEach(function(fascicle) {
-            if (fascicle.length == 1) fascicle = fascicle[0]; //for backward compatibility
+        bundle.forEach(function(fascicle) {
+            if (fascicle.length == 1) fascicle = fascicle[0]; 
+
             var xs = fascicle[0];
             var ys = fascicle[1];
             var zs = fascicle[2];

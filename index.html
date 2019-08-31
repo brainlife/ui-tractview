@@ -42,6 +42,7 @@
         */
         if(!config) {
             //debug/demo mode.. load testdata
+            //let testdata = "testdata/cleaned";
             let testdata = "testdata/wmaseg";
             config = {};
             fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
@@ -56,6 +57,9 @@
                     config.surfaces.forEach(surface=>{
                         surface.url = testdata+"/surfaces/"+surface.filename;
                     });
+                    init();
+                }).catch(err=>{
+                    console.log("not using surfaces");
                     init();
                 });
             });
