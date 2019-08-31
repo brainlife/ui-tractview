@@ -43,7 +43,8 @@
         if(!config) {
             //debug/demo mode.. load testdata
             //let testdata = "testdata/cleaned";
-            let testdata = "testdata/wmaseg";
+            //let testdata = "testdata/wmaseg";
+            let testdata = "testdata/alt";
             config = {};
             fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
                 config.tracts = data;

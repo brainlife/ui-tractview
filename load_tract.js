@@ -12,7 +12,7 @@ onmessage = function(e) {
         var bundle = json.coords;
         console.log(tract.url, bundle.length);
 
-        if(bundle[0].length > 3) bundle = bundle[0]; //unwind 
+        if(bundle[0] && bundle[0].length > 3) bundle = bundle[0]; //unwind 
 
         //convert each bundle to threads_pos array
         var threads_pos = [];
