@@ -35,16 +35,8 @@
 
 	<script>
 		let config = window.parent.config || window.config;
-        /*
-        let debug_config = localStorage.getItem("debug_config");
-        if(debug_config) debug_config = JSON.parse(debug_config);
-		let config = debug_config || window.parent.config || window.config;
-        */
         if(!config) {
-            //debug/demo mode.. load testdata
-            //let testdata = "testdata/cleaned";
-            //let testdata = "testdata/wmaseg";
-            let testdata = "testdata/alt";
+            let testdata = "testdata/optic";
             config = {};
             fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
                 config.tracts = data;

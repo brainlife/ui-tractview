@@ -147,7 +147,7 @@ Vue.component('tractview', {
 
                     let mesh = new THREE.Mesh( geometry );
                     mesh.rotation.x = -Math.PI/2;
-                    mesh.visible = false;
+                    mesh.visible = surface.show || false;
                     mesh._surface = true;
                     surface.mesh = mesh; 
 
@@ -296,6 +296,8 @@ Vue.component('tractview', {
                 });
                 if(left) this.tracts[name].left = tract;
                 if(right) this.tracts[name].right = tract;
+                if(left && tract.show) this.tracts[name].left_check = tract.show;
+                if(right && tract.show) this.tracts[name].right_check = tract.show;
             });
         },
 
@@ -352,18 +354,11 @@ Vue.component('tractview', {
                 });
                 if(left) this.surfaces[name].left = surface;
                 if(right) this.surfaces[name].right = surface;
+                if(left && surface.show) this.surfaces[name].left_check = surface.show;
+                if(right && surface.show) this.surfaces[name].right_check = surface.show;
                 //console.log(surface.name, name, left, right);
             });
         },
-
-        /*
-        init_gui() {
-            var ui = this.gui.addFolder('UI');
-            ui.add(this.controls, 'autoRotate').listen();
-            ui.add(this, 'show_stats');
-            ui.open();
-        },
-        */
 
         handle_hash() {
             let info_string = getHashValue('where');
@@ -430,32 +425,6 @@ Vue.component('tractview', {
             return Math.round(v * 1e3) / 1e3;
         },
 
-        /*
-        tractFocus: function(LR, basename) {
-            this.focused[basename] = true;
-            if (LR.left) {
-                LR.left.material_previous = LR.left.material;
-                LR.left.material = white_material;
-                //LR.left.visible = true;
-            }
-            if (LR.right) {
-                LR.right.material_previous = LR.right.material;
-                LR.right.material = white_material;
-                //LR.right.visible = true;
-            }
-        },
-
-        tractUnfocus: function(LR, basename) {
-            this.focused[basename] = false;
-            if (LR.left && LR.left.material_previous) {
-                LR.left.material = LR.left.material_previous;
-            }
-            if (LR.right && LR.right.material_previous) {
-                LR.right.material = LR.right.material_previous;
-            }
-        },
-        */
-
         resized() {
             var viewbox = this.$refs.view.getBoundingClientRect();
             this.camera.aspect = viewbox.width / viewbox.height;
@@ -480,7 +449,7 @@ Vue.component('tractview', {
 
                 let mesh = this.calculateMesh(geometry);
                 mesh.name = tract.name;
-                mesh.visible = false;
+                mesh.visible = tract.show || false;
                 mesh.rotation.x = -Math.PI/2;
                 
                 cb(null, mesh);
@@ -488,7 +457,6 @@ Vue.component('tractview', {
         },
 
         calculateMesh: function(geometry, mesh) {
-            //console.log("calculateMesh called");
             if (this.color_map) {
                 var vertexShader = `
                     attribute vec4 color;
