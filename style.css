@@ -138,18 +138,17 @@ margin:0;
 cursor:pointer;
 }
 
-
 .bllogo {
 position: fixed;
 padding: 8px;
 font-size: 23px;
 font-family: "Open Sans";
 font-weight: bold;
-opacity:.2;
+opacity:.3;
 color:white;
 text-decoration:none;
 bottom: 0px;
-right: 250px;
+right: 0px;
 }
 
 .loading {
@@ -183,9 +182,20 @@ background-color: black;
 }
 .rotateControl {
 position: fixed;
-bottom: 0px;
+bottom: 5px;
 left: 260px;
-height: 25px;
+}
+.controls-help {
+position: fixed;
+bottom: 5px;
+right: 255px;
+opacity: 0.7;
+}
+.controls-help span {
+font-size: 6pt;
+width: 25px;
+display: inline-block;
+text-align: center;
 }
 
 /*

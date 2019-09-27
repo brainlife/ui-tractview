@@ -108,12 +108,12 @@ Vue.component('tractview', {
                     this.load_percentage = idx / this.config.tracts.length;
                     this.loading = tract.name;
                     tract.mesh = mesh; 
+                    this.$forceUpdate();
                     setTimeout(next_tract, 0); //give UI thread time
                 });
             }, err=>{
                 if(err) console.error(err);
                 console.log("finished loading all tracts");
-                this.$forceUpdate();
             })
         }
 
@@ -121,7 +121,6 @@ Vue.component('tractview', {
         if(this.config.surfaces) {
             let vtkloader = new THREE.VTKLoader();
             async.eachSeries(this.config.surfaces, (surface, next_surface)=>{
-                //console.dir(surface);
                 this.loading = surface.filename;
                 vtkloader.load(surface.url, geometry=>{
                     geometry.computeVertexNormals(); //for smooth shading
@@ -171,9 +170,12 @@ Vue.component('tractview', {
                     });
                     mesh.material = mesh._normal_material;
                     this.scene.add(mesh);
+                    this.$forceUpdate();
                     setTimeout(next_surface, 0); //give UI thread time
                 });
-            }, console.error);
+            }, err=>{
+                console.log("finished loading all surfaces");
+            });
         }
 
         // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
@@ -352,11 +354,14 @@ Vue.component('tractview', {
                     left_check: false,
                     right_check: false,
                 });
-                if(left) this.surfaces[name].left = surface;
-                if(right) this.surfaces[name].right = surface;
-                if(left && surface.show) this.surfaces[name].left_check = surface.show;
-                if(right && surface.show) this.surfaces[name].right_check = surface.show;
-                //console.log(surface.name, name, left, right);
+                if(left) {
+                    this.surfaces[name].left = surface;
+                    this.surfaces[name].left_check = surface.show||false;
+                }
+                if(right) {
+                    this.surfaces[name].right = surface;
+                    this.surfaces[name].right_check = surface.show||false;
+                }
             });
         },
 
@@ -898,8 +903,15 @@ Vue.component('tractview', {
         </div>
 
         <div class="controls" style="right: 0">
+            <div class="controls-help">
+                <span>Rotate</span>
+                <span>Zoom</span>
+                <span>Pan</span>
+                <br>
+                <img src="controls.png" height="40px"/>
+            </div>
             <div class="rotateControl" v-if="controls">
-                <input type="checkbox" v-model="controls.autoRotate"> rotate</input>
+                <input type="checkbox" v-model="controls.autoRotate"> Auto-Rotate</input>
             </div>
             <div class="control-row" style="margin: 8px 0px; position: relative;">
                 <b class="check check-left">&nbsp;L&nbsp;</b>
