@@ -10,25 +10,45 @@ onmessage = function(e) {
         return res.json();
     }).then(json=>{
         var bundle = json.coords;
-        console.log(tract.url, bundle.length);
+        console.log(tract.url);
 
+        let node = bundle;
+        /*
+        while(node) {
+            console.log(node.length);
+            node = node[0];
+        }
+        */
+
+        if(bundle.length == 1 && bundle[0][0].length == 3) bundle = bundle[0]; //1>N>3>[] v.s. N>1>3>[]
+
+        //bundle = bundle[0];
+        /*
         //if(bundle[0] && bundle[0].length > 3) bundle = bundle[0]; //unwind 
         let depth = 0;
         let node = bundle[0];
-        while(Array.isArray(node)) {
+        while(node.length == 1 && Array.isArray(node)) {
             depth++;
             node = node[0];
         }
-        console.log("depth", depth);
+        console.log(tract.url, "depth", depth);
         if(depth == 4) {
             console.log("unwinding",depth);
             bundle = bundle[0];
         }
+        console.dir(bundle);
+        console.dir(bundle);
+        console.log(bundle.length, "fibers");
+        */
 
         //convert each bundle to threads_pos array
         var threads_pos = [];
         bundle.forEach(function(fascicle) {
-            if (fascicle.length == 1) fascicle = fascicle[0]; 
+            //unwind the [ [[...]], [[...]], [[...]] ]  into > [ [...],[...],[...] ] 
+            if (fascicle.length == 1 && fascicle[0].length == 3) {
+                fascicle = fascicle[0]; 
+            }
+
             var xs = fascicle[0];
             var ys = fascicle[1];
             var zs = fascicle[2];
