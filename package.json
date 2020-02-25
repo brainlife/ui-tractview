@@ -4,8 +4,8 @@
   "description": "brainlife tractviewer",
   "scripts": {
     "dev": "lite-server",
-    "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull'",
-    "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull'"
+    "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard'",
+    "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard'"
   },
   "repository": {
     "type": "git",

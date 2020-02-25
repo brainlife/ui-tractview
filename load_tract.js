@@ -19,7 +19,8 @@ onmessage = function(e) {
             depth++;
             node = node[0];
         }
-        if(depth > 3) {
+        console.log("depth", depth);
+        if(depth == 4) {
             console.log("unwinding",depth);
             bundle = bundle[0];
         }
