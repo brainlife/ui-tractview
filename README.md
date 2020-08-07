@@ -2,9 +2,9 @@
 
 HTML5 White Matter Tractography Viewer - Used to visualize output from white matter tractography.
 
-[Demo](https://brainlife.io/ui/tractview/demo.html) 
+[Demo at brainlife.io](https://brainlife.io/ui/tractview/demo.html) 
 
-![Preview Image](https://raw.githubusercontent.com/brain-life/brainlife.github.io/master/images/ui-logos/tractview.png)
+[brainlife.io DOI](https://doi.org/10.25663/brainlife.ui.2)
 
 ### Authors
 - Soichi Hayashi (hayashis@iu.edu)
@@ -26,6 +26,10 @@ brainlife.io is publicly funded and for the sustainability of the project it is 
 We kindly ask that you cite the following articles when publishing papers or code using this code. 
 
 1. Avesani, P., McPherson, B., Hayashi, S. et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. Sci Data 6, 69 (2019). [https://doi.org/10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
+
+#### MIT Copyright (c) 2020 brainlife.io The University of Texas at Austin and Indiana University
+
+![Preview Image](https://raw.githubusercontent.com/brain-life/brainlife.github.io/master/images/ui-logos/tractview.png)
 
 
 ## Dependencies
