@@ -2,9 +2,7 @@
 
 HTML5 White Matter Tractography Viewer - Used to visualize output from white matter tractography.
 
-[Demo at brainlife.io](https://brainlife.io/ui/tractview/demo.html) 
-
-[brainlife.io DOI](https://doi.org/10.25663/brainlife.ui.2)
+[Demo at brainlife.io](https://brainlife.io/ui/tractview/demo.html) | [brainlife.io DOI](https://doi.org/10.25663/brainlife.ui.2)
 
 ### Authors
 - Soichi Hayashi (hayashis@iu.edu)
