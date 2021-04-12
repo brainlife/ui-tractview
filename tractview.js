@@ -32,6 +32,9 @@ Vue.component('tractview', {
             camera: null,
             controls: null,
 
+            showStart: false,
+            showEnd: false,
+
             camera_light: null,
 
             tinyBrainScene: null,
@@ -95,19 +98,51 @@ Vue.component('tractview', {
 
         window.addEventListener("resize", this.resized);
 
+        const textureLoader = new THREE.TextureLoader();
+        const pointSprite = textureLoader.load('point.png');
+
         // start loading the tract
         if(this.config.tracts) {
             let idx = 0;
             let tracts = new THREE.Object3D();
             this.scene.add(tracts);
             async.eachSeries(this.config.tracts, (tract, next_tract) => {
-                this.load_tract(tract, idx++, (err, mesh) => {
+                this.load_tract(tract, idx++, (err, lineGeometry, startPointGeometry, endPointGeometry) => {
                     if (err) return next_tract(err);
-                    this.meshes.push(mesh);
-                    tracts.add(mesh);
+
+                    //create fiber mesh
+                    const lineMesh = this.calculateMesh(lineGeometry);
+                    lineMesh.name = tract.name;
+                    lineMesh.visible = tract.show || false;
+                    lineMesh.rotation.x = -Math.PI/2;
+                    this.meshes.push(lineMesh);
+                    tracts.add(lineMesh);
                     this.load_percentage = idx / this.config.tracts.length;
                     this.loading = tract.name;
-                    tract.mesh = mesh; 
+                    tract.mesh = lineMesh; 
+
+                    //create start point particles
+                    const startPointMaterial = new THREE.PointsMaterial( { 
+                        size: 2, map: pointSprite, 
+                        blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+                    startPointMaterial.color.setHSL( 0.5, 0.5, 0.3 ); //blue
+                    const startPoints = new THREE.Points(startPointGeometry, startPointMaterial);
+                    startPoints.visible = tract.show || false;
+                    startPoints.rotation.x = -Math.PI/2;
+                    tracts.add(startPoints);
+                    tract.start = startPoints; 
+                    
+                    //create end point particles
+                    const endPointMaterial = new THREE.PointsMaterial( { 
+                        size: 2, map: pointSprite, 
+                        blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+                    endPointMaterial.color.setHSL( 0, 0.5, 0.3 ); //red
+                    const endPoints = new THREE.Points(endPointGeometry, endPointMaterial);
+                    endPoints.visible = tract.show || false;
+                    endPoints.rotation.x = -Math.PI/2;
+                    tracts.add(endPoints);
+                    tract.end = endPoints; 
+
                     this.$forceUpdate();
                     setTimeout(next_tract, 0); //give UI thread time
                 });
@@ -421,9 +456,13 @@ Vue.component('tractview', {
         },
 
         animate_mesh(mesh) {
-            let now = new Date().getTime();
-            let l = Math.cos((now%1000)*(2*Math.PI/1000));
-            mesh.material.opacity = (l+2)/4;
+            const now = new Date().getTime();
+            const l = Math.cos((now/4%1000)*(2*Math.PI/1000)); //-1.0 ~ -1.0 (every 4 seconds)
+            mesh.material.opacity = Math.abs(l)/2+0.25;  //0.25 ~ 0.75
+
+            //our mesh consists of bunch of fibers.. not just 1.. so we can't animate fiber
+            //orientation with this
+            //mesh.geometry.setDrawRange(0, l*mesh.geometry.vertices.length/3);
         },
 
         round(v) {
@@ -444,20 +483,36 @@ Vue.component('tractview', {
             tract_loader.postMessage(tract);
             tract_loader.onmessage=(e)=>{
                 //let threads_pos = e.data;
-                let vertices = e.data;
+                let {lines, startPoints, endPoints} = e.data;
 
+                //create LineGeometry
                 var geometry = new THREE.BufferGeometry();
-                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                geometry.vertices = vertices;
+                geometry.addAttribute('position', new THREE.BufferAttribute(lines, 3));
+                geometry.vertices = lines;
                 geometry.tract_index = index;
                 geometry.tract = tract; //metadata..
 
+                //start points
+                var startGeometry = new THREE.BufferGeometry();
+                startGeometry.addAttribute('position', new THREE.BufferAttribute(startPoints, 3));
+                startGeometry.vertices = lines;
+                startGeometry.tract_index = index;
+                startGeometry.tract = tract; //metadata..
+               
+                //end points
+                var endGeometry = new THREE.BufferGeometry();
+                endGeometry.addAttribute('position', new THREE.BufferAttribute(endPoints, 3));
+                endGeometry.vertices = lines;
+                endGeometry.tract_index = index;
+                endGeometry.tract = tract; //metadata..
+                /*
                 let mesh = this.calculateMesh(geometry);
                 mesh.name = tract.name;
                 mesh.visible = tract.show || false;
                 mesh.rotation.x = -Math.PI/2;
-                
-                cb(null, mesh);
+                */
+                 
+                cb(null, geometry, startGeometry, endGeometry);
             }
         },
 
@@ -763,6 +818,7 @@ Vue.component('tractview', {
             } else {
                 obj.right.mesh.visible = obj.right_check;
             }
+            this.updateEndStartVisibility();
         },
 
         mouseenter(obj) {
@@ -776,6 +832,7 @@ Vue.component('tractview', {
                 obj.right.mesh.visible = true;
             }
             this.hovered_obj = obj;
+            this.updateEndStartVisibility();
         },
 
         mouseleave(obj) {
@@ -784,12 +841,16 @@ Vue.component('tractview', {
                 obj.left.mesh.material = obj.left.mesh._normal_material;
                 if(!obj.left_check) {
                     obj.left.mesh.visible = false;
+                    obj.left.start.visible = false;
+                    obj.left.end.visible = false;
                 }
             }
             if(obj.right && obj.right.mesh) {
                 obj.right.mesh.material = obj.right.mesh._normal_material;
                 if(!obj.right_check) {
                     obj.right.mesh.visible = false;
+                    obj.right.start.visible = false;
+                    obj.right.end.visible = false;
                 }
             }
 
@@ -844,6 +905,21 @@ Vue.component('tractview', {
                 obj.material = obj._xray_material;
             }
         },
+
+        updateEndStartVisibility() {
+            console.log(this.showStart, this.showEnd);
+            for(let name in this.tracts) {
+                let tract = this.tracts[name];
+                if(tract.left && tract.left.mesh) {
+                    tract.left.start.visible = tract.left.mesh.visible && this.showStart;
+                    tract.left.end.visible = tract.left.mesh.visible && this.showEnd;
+                }
+                if(tract.right && tract.right.mesh) {
+                    tract.right.start.visible = tract.right.mesh.visible && this.showStart;
+                    tract.right.end.visible = tract.right.mesh.visible && this.showEnd;
+                }
+            }
+        },
     },
 
     computed: {
@@ -856,22 +932,31 @@ Vue.component('tractview', {
     watch: {
         all_left: function(v) {
             for(let name in this.tracts) {
-		let tract = this.tracts[name];
-		if(tract.left) {
-			tract.left_check = v;	
-			tract.left.mesh.visible = v;
-		}
+                let tract = this.tracts[name];
+                if(tract.left) {
+                    tract.left_check = v;   
+                    tract.left.mesh.visible = v;
+                }
             }
+            this.updateEndStartVisibility();
         },
 
         all_right: function(v) {
             for(let name in this.tracts) {
-		let tract = this.tracts[name];
-		if(tract.right) {
-			tract.right_check = v;	
-			tract.right.mesh.visible = v;
-		}
+                let tract = this.tracts[name];
+                if(tract.right) {
+                    tract.right_check = v;  
+                    tract.right.mesh.visible = v;
+                }
             }
+            this.updateEndStartVisibility();
+        },
+
+        showStart: function() {
+            this.updateEndStartVisibility();
+        },
+        showEnd: function() {
+            this.updateEndStartVisibility();
         },
     },
 
@@ -911,7 +996,16 @@ Vue.component('tractview', {
                 <img src="controls.png" height="40px"/>
             </div>
             <div class="rotateControl" v-if="controls">
-                <input type="checkbox" v-model="controls.autoRotate"> Auto-Rotate</input>
+                <input type="checkbox" v-model="controls.autoRotate">Auto-Rotate</input>
+                &nbsp;
+                <input type="checkbox" v-model="showStart">
+                    <span style="color: #58f">Show Fiber Startpoint</span> 
+                </input>
+                &nbsp;
+                <input type="checkbox" v-model="showEnd">
+                    <span style="color: #f55">Show Fiber Endpoint</span>
+                </input>
+                &nbsp;
             </div>
             <div class="control-row" style="margin: 8px 0px; position: relative;">
                 <b class="check check-left">&nbsp;L&nbsp;</b>
@@ -959,22 +1053,5 @@ Vue.component('tractview', {
 function getHashValue(key) {
     var matches = window.parent.location.hash.match(new RegExp(key+'=([^&]*)'));
     return matches ? decodeURIComponent(matches[1]) : null;
-}
-
-/////////////////////////////////////////////////////////////
-// 
-// all these will be removed..
-//
-
-// returns whether or not the tractName is considered to be a left tract
-function isLeftTract(tractName) {
-    let name = tractName.toLowerCase();
-    return name.startsWith('left') || name.endsWith(' l');
-}
-
-// returns whether or not the tractName is considered to be a right tract
-function isRightTract(tractName) {
-    let name = tractName.toLowerCase();
-    return name.startsWith('right') || name.endsWith(' r');
 }
 

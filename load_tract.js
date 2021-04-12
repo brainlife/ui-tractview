@@ -2,47 +2,19 @@
 
 //parsing large json and converting them to Float32Array is alow,
 //so let's do this on another thread and pass back the vertices
+let total = 0;
 onmessage = function(e) {
-    //console.log("message received");
     let tract = e.data;
-    //console.dir(tract);
-    fetch(tract.url).then(res=>{
-        return res.json();
-    }).then(json=>{
-        var bundle = json.coords;
+    fetch(tract.url).then(res=>res.json()).then(json=>{
         console.log(tract.url);
 
-        let node = bundle;
-        /*
-        while(node) {
-            console.log(node.length);
-            node = node[0];
-        }
-        */
-
+        var bundle = json.coords;
         if(bundle.length == 1 && bundle[0][0].length == 3) bundle = bundle[0]; //1>N>3>[] v.s. N>1>3>[]
-
-        //bundle = bundle[0];
-        /*
-        //if(bundle[0] && bundle[0].length > 3) bundle = bundle[0]; //unwind 
-        let depth = 0;
-        let node = bundle[0];
-        while(node.length == 1 && Array.isArray(node)) {
-            depth++;
-            node = node[0];
-        }
-        console.log(tract.url, "depth", depth);
-        if(depth == 4) {
-            console.log("unwinding",depth);
-            bundle = bundle[0];
-        }
-        console.dir(bundle);
-        console.dir(bundle);
-        console.log(bundle.length, "fibers");
-        */
 
         //convert each bundle to threads_pos array
         var threads_pos = [];
+        var starts = [];
+        var ends = [];
         bundle.forEach(function(fascicle) {
             //unwind the [ [[...]], [[...]], [[...]] ]  into > [ [...],[...],[...] ] 
             if (fascicle.length == 1 && fascicle[0].length == 3) {
@@ -52,6 +24,12 @@ onmessage = function(e) {
             var xs = fascicle[0];
             var ys = fascicle[1];
             var zs = fascicle[2];
+            const l = xs.length;
+
+            starts.push(xs[0], ys[0], zs[0]);
+            ends.push(xs[l-1], ys[l-1], zs[l-1]);
+            total+=1
+
             for(var i = 1;i < xs.length;++i) {
                 threads_pos.push(xs[i-1]);
                 threads_pos.push(ys[i-1]);
@@ -61,7 +39,12 @@ onmessage = function(e) {
                 threads_pos.push(zs[i]);
             }
         });
-        var vertices = new Float32Array(threads_pos);      
-        postMessage(vertices);
+
+        postMessage({
+            lines: new Float32Array(threads_pos),
+            startPoints: new Float32Array(starts),
+            endPoints: new Float32Array(ends),
+        });
+        console.log("total", total);
     });
 }

@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
 <head>
-	<title>Tractview</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF8">
-	<link href="//fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <title>Tractview</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF8">
+    <link href="//fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link href="node_modules/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
@@ -15,28 +15,28 @@
     </div>
     <a class="bllogo" href="https://brainlife.io">brainlife.io</a>
     
-	<!-- Dep Scripts -->
-	<script type="text/javascript" src="node_modules/three/build/three.min.js"></script>
-	<script type="text/javascript" src="node_modules/panning-orbit-controls/dist/panning-orbit-controls.js"></script>
-	<script type="text/javascript" src="node_modules/three/examples/js/loaders/VTKLoader.js"></script>
-	<script type="text/javascript" src="node_modules/three/examples/js/loaders/deprecated/LegacyJSONLoader.js"></script>
+    <!-- Dep Scripts -->
+    <script type="text/javascript" src="node_modules/three/build/three.min.js"></script>
+    <script type="text/javascript" src="node_modules/panning-orbit-controls/dist/panning-orbit-controls.js"></script>
+    <script type="text/javascript" src="node_modules/three/examples/js/loaders/VTKLoader.js"></script>
+    <script type="text/javascript" src="node_modules/three/examples/js/loaders/deprecated/LegacyJSONLoader.js"></script>
 
     <script type="text/javascript" src="node_modules/dat.gui/build/dat.gui.min.js"></script>
     <script type="text/javascript" src="node_modules/stats.js/build/stats.min.js"></script>
     <script type="text/javascript" src="node_modules/three-mesh-bvh/umd/index.js"></script>
 
-	<script type="text/javascript" src="node_modules/pako/dist/pako_inflate.min.js"></script>
-	<script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
-	<script type="text/javascript" src="node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="node_modules/pako/dist/pako_inflate.min.js"></script>
+    <script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
+    <script type="text/javascript" src="node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
 
-	<!-- Main Scripts -->
-	<script type="text/javascript" src="lib/dist.bundled.js"></script>
+    <!-- Main Scripts -->
+    <script type="text/javascript" src="lib/dist.bundled.js"></script>
     <script type="text/javascript" src="tractview.js"></script>
 
-	<script>
-		let config = window.parent.config || window.config;
+    <script>
+        let config = window.parent.config || window.config;
         if(!config) {
-            let testdata = "testdata/optic";
+            let testdata = "testdata/0001";
             config = {};
             fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
                 config.tracts = data;
@@ -91,6 +91,6 @@
                 }
             });
         }
-	</script>
+    </script>
 </body>
 </html>
