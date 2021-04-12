@@ -841,16 +841,12 @@ Vue.component('tractview', {
                 obj.left.mesh.material = obj.left.mesh._normal_material;
                 if(!obj.left_check) {
                     obj.left.mesh.visible = false;
-                    obj.left.start.visible = false;
-                    obj.left.end.visible = false;
                 }
             }
             if(obj.right && obj.right.mesh) {
                 obj.right.mesh.material = obj.right.mesh._normal_material;
                 if(!obj.right_check) {
                     obj.right.mesh.visible = false;
-                    obj.right.start.visible = false;
-                    obj.right.end.visible = false;
                 }
             }
 
@@ -907,7 +903,6 @@ Vue.component('tractview', {
         },
 
         updateEndStartVisibility() {
-            console.log(this.showStart, this.showEnd);
             for(let name in this.tracts) {
                 let tract = this.tracts[name];
                 if(tract.left && tract.left.mesh) {
