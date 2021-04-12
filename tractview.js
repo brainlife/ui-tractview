@@ -831,8 +831,9 @@ Vue.component('tractview', {
                 obj.right.mesh.material = obj.right.mesh._highlight_material;
                 obj.right.mesh.visible = true;
             }
-            this.hovered_obj = obj;
             this.updateEndStartVisibility();
+
+            this.hovered_obj = obj;
         },
 
         mouseleave(obj) {
@@ -849,6 +850,7 @@ Vue.component('tractview', {
                     obj.right.mesh.visible = false;
                 }
             }
+            this.updateEndStartVisibility();
 
             //restore original material.opacity
             if(this.hovered_obj.left && this.hovered_obj.left.mesh) {
