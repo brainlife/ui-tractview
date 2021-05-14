@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "lite-server",
     "bundle": "browserify -r nifti-js -r ndarray -r async -r pako > dep.bundle.js",
-    "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard'",
-    "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard'"
+    "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard' && npm update",
+    "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard' && npm update"
   },
   "repository": {
     "type": "git",
@@ -25,14 +25,14 @@
     "nifti-js": "^1.0.1",
     "pako": "^2.0.3",
     "panning-orbit-controls": "^1.0.1",
-    "perfect-scrollbar": "^1.4.0",
+    "perfect-scrollbar": "^1.5.1",
     "plotly.js": "^1.58.4",
     "stats.js": "^0.17.0",
-    "three": "^0.127.0",
+    "three": "^0.128.0",
     "three-mesh-bvh": "0.3.7",
     "vue": "^2.6.12"
   },
   "devDependencies": {
-    "eslint": "^7.24.0"
+    "eslint": "^7.26.0"
   }
 }
