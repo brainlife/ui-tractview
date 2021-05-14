@@ -65,17 +65,16 @@
                 });
             },
 
-            //load template surface if not set
+            //use template surface if not set
             next=>{
-                if(!config.surfaces) {
-                    filename="0.mni152-a2009s-Whole-Brain.vtk";
-                    config.templateSurface = {
-                        color: {b: 255, g: 255, r: 255},
-                        filename,
-                        url: "template/surfaces/"+filename,
-                    };
-                }
-                next();
+                if!config.surfaces) return next();
+
+                filename="0.mni152-a2009s-Whole-Brain.vtk";
+                config.templateSurface = {
+                    color: {b: 255, g: 255, r: 255},
+                    filename,
+                    url: "template/surfaces/"+filename,
+                };
             },
 
             //add jwt
@@ -94,6 +93,8 @@
                 if(jwt && config.surfaces) config.surfaces.forEach(surface=>{
                     surface.url += "?at="+jwt;
                 });
+
+                next();
             },
         ], err=>{
             if(err) throw err;
