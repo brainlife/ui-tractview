@@ -4,6 +4,7 @@
   "description": "brainlife tractviewer",
   "scripts": {
     "dev": "lite-server",
+    "bundle": "browserify -r nifti-js -r ndarray -r async -r pako > dep.bundle.js",
     "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard'",
     "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard'"
   },
@@ -18,26 +19,20 @@
   },
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
-    "@types/jquery": "^3.5.5",
-    "async": "^2.6.2",
-    "bootstrap": "^4.6.0",
+    "async": "^3.2.0",
     "dat.gui": "^0.7.7",
-    "eslint": "^5.14.0",
-    "jquery": "^3.5.5",
-    "jquery-file-upload": "^4.0.11",
     "ndarray": "^1.0.18",
     "nifti-js": "^1.0.1",
-    "pako": "^1.0.6",
+    "pako": "^2.0.3",
     "panning-orbit-controls": "^1.0.1",
     "perfect-scrollbar": "^1.4.0",
     "plotly.js": "^1.58.4",
-    "popper.js": "^1.14.7",
     "stats.js": "^0.17.0",
-    "three": "^0.101.1",
-    "three-mesh-bvh": "0.0.2",
+    "three": "^0.127.0",
+    "three-mesh-bvh": "0.3.7",
     "vue": "^2.6.12"
   },
   "devDependencies": {
-    "eslint": "^5.12.1"
+    "eslint": "^7.24.0"
   }
 }

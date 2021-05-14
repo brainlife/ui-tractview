@@ -13,68 +13,92 @@
         <div class="error" v-if="error">{{error}}</div>
         <tractview :config="config" v-else></tractview>
     </div>
-    <a class="bllogo" href="https://brainlife.io">brainlife.io</a>
+    <a class="bllogo" href="https://brainlife.io">brainlife.io <img src="logo.svg"/></a>
     
-    <!-- Dep Scripts -->
     <script type="text/javascript" src="node_modules/three/build/three.min.js"></script>
     <script type="text/javascript" src="node_modules/panning-orbit-controls/dist/panning-orbit-controls.js"></script>
     <script type="text/javascript" src="node_modules/three/examples/js/loaders/VTKLoader.js"></script>
-    <script type="text/javascript" src="node_modules/three/examples/js/loaders/deprecated/LegacyJSONLoader.js"></script>
-
     <script type="text/javascript" src="node_modules/dat.gui/build/dat.gui.min.js"></script>
     <script type="text/javascript" src="node_modules/stats.js/build/stats.min.js"></script>
     <script type="text/javascript" src="node_modules/three-mesh-bvh/umd/index.js"></script>
-
-    <script type="text/javascript" src="node_modules/pako/dist/pako_inflate.min.js"></script>
     <script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
     <script type="text/javascript" src="node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="node_modules/plotly.js/dist/plotly-basic.min.js"></script>
 
-    <!-- Main Scripts -->
-    <script type="text/javascript" src="lib/dist.bundled.js"></script>
+    <script type="text/javascript" src="dep.bundle.js"></script>
     <script type="text/javascript" src="tractview.js"></script>
 
     <script>
         let config = window.parent.config || window.config;
-        if(!config) {
-            let testdata = "testdata/0001";
-            config = {};
-            fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
-                config.tracts = data;
-                if(!Array.isArray(data)) config.tracts = [data];
-                config.tracts.forEach(tract=>{
-                    tract.url = testdata+"/tracts/"+tract.filename;
-                });
+        const demoMode = !config;
+        const testdata = "testdata/0001";
+        //const testdata = "testdata/nosurf";
+        async.series([
+
+            //load demo tracts
+            next=>{
+                if(!demoMode) return next();
+                config = {};
+                fetch(testdata+"/tracts/tracts.json").then(res=>res.json()).then(data=>{
+                    config.tracts = data;
+                    if(!Array.isArray(data)) config.tracts = [data];
+                    config.tracts.forEach(tract=>{
+                        tract.url = testdata+"/tracts/"+tract.filename;
+                    });
+                    next();
+                }).catch(next);
+            },
+
+            //load demo surface
+            next=>{
+                if(!demoMode) return next();
                 fetch(testdata+"/surfaces/index.json").then(res=>res.json()).then(data=>{
                     config.surfaces = data;
                     if(!Array.isArray(data)) config.surfaces = [data];
                     config.surfaces.forEach(surface=>{
                         surface.url = testdata+"/surfaces/"+surface.filename;
                     });
-                    init();
+                    next();
                 }).catch(err=>{
-                    console.log("not using surfaces");
-                    init();
+                    console.log("no surface? it's ok");
+                    next();
                 });
-            });
-        } else {
-            //production mode.. 
+            },
 
-            //handle a case where there is only 1 surface / tract object
-            if(config.tracts && !Array.isArray(config.tracts)) config.tracts = [config.tracts];
-            if(config.surfaces && !Array.isArray(config.surfaces)) config.surfaces = [config.surfaces];
+            //load template surface if not set
+            next=>{
+                if(!config.surfaces) {
+                    filename="0.mni152-a2009s-Whole-Brain.vtk";
+                    config.templateSurface = {
+                        color: {b: 255, g: 255, r: 255},
+                        filename,
+                        url: "template/surfaces/"+filename,
+                    };
+                }
+                next();
+            },
 
-            //append jwt to config.
-            let jwt = localStorage.getItem("jwt");
-            if(jwt && config.tracts) config.tracts.forEach(tract=>{
-                tract.url += "?at="+jwt;
-            });
-            if(jwt && config.surfaces) config.surfaces.forEach(surface=>{
-                surface.url += "?at="+jwt;
-            });
-            init();
-        }
+            //add jwt
+            next=>{
+                if(demoMode) return next();
 
-        function init() {
+                //handle a case where there is only 1 surface / tract object
+                if(config.tracts && !Array.isArray(config.tracts)) config.tracts = [config.tracts];
+                if(config.surfaces && !Array.isArray(config.surfaces)) config.surfaces = [config.surfaces];
+
+                //append jwt to config.
+                let jwt = localStorage.getItem("jwt");
+                if(jwt && config.tracts) config.tracts.forEach(tract=>{
+                    tract.url += "?at="+jwt;
+                });
+                if(jwt && config.surfaces) config.surfaces.forEach(surface=>{
+                    surface.url += "?at="+jwt;
+                });
+            },
+        ], err=>{
+            if(err) throw err;
+
+            //now ready to start tractview
             console.log("using config"); 
             console.dir(config);
             new Vue({
@@ -90,7 +114,7 @@
                     //if (!Detector.webgl) this.error = "Your browser does not support WebGL, so the TractViewer is unable to be initiated.";
                 }
             });
-        }
+        });
     </script>
 </body>
 </html>

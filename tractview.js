@@ -2,6 +2,12 @@ let debounce_hashupdate;
 
 let tract_loader = new Worker("load_tract.js")
 
+//require is enabled by browserify 
+const async = require('async');
+const nifti = require('nifti-js');
+const ndarray = require('ndarray');
+const pako = require('pako');
+
 Vue.component('tractview', {
     props: [ "config" ],
 
@@ -153,71 +159,73 @@ Vue.component('tractview', {
         }
 
         //start loading surfaces
-        if(this.config.surfaces) {
-            let vtkloader = new THREE.VTKLoader();
-            async.eachSeries(this.config.surfaces, (surface, next_surface)=>{
-                this.loading = surface.filename;
-                vtkloader.load(surface.url, geometry=>{
-                    geometry.computeVertexNormals(); //for smooth shading
-                    geometry.computeBoundsTree(); //for BVH
+        let vtkloader = new THREE.VTKLoader();
+        let surfaces = this.config.surfaces || [this.config.templateSurface]; //template surface should be set if there are no surfaces
+        async.eachSeries(surfaces, (surface, next_surface)=>{
+            this.loading = surface.filename;
+            console.log("loading", surface.url);
+            vtkloader.load(surface.url, geometry=>{
+                geometry.computeVertexNormals(); //for smooth shading
+                geometry.computeBoundsTree(); //for BVH
 
-                    //add to back_scene
-                    let color;
-                    if(Array.isArray(surface.color)) {
-                        color = new THREE.Color(surface.color[0], surface.color[1], surface.color[2]);
-                    } else {
-                        color = new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256);
-                    }
-                    let material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(color).multiplyScalar(2),
-                        transparent: true,
-                        opacity: 0.05,
-                        depthTest: false,
-                    });
-                    var back_mesh = new THREE.Mesh( geometry, material );
-                    back_mesh.rotation.x = -Math.PI/2;
-                    back_mesh.visible = true;
-                    this.back_scene.add(back_mesh);
-
-                    let mesh = new THREE.Mesh( geometry );
-                    mesh.rotation.x = -Math.PI/2;
-                    mesh.visible = surface.show || false;
-                    mesh._surface = true;
-                    surface.mesh = mesh; 
-
-                    //store other surfaces
-                    mesh._normal_material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(color),
-                        transparent: true,
-                        opacity: 1,
-                    });
-                    mesh._highlight_material = new THREE.MeshPhongMaterial({
-                        color: new THREE.Color(color).multiplyScalar(1.25),
-                        shininess: 80,
-                        transparent: true,
-                        opacity: 1,
-                    });
-                    mesh._xray_material = new THREE.MeshLambertMaterial({
-                        color: new THREE.Color(color).multiplyScalar(1.25),
-                        transparent: true,
-                        opacity: 0.43,
-                        depthTest: false, //need this to show tracts on top
-                    });
-                    mesh.material = mesh._normal_material;
-                    this.scene.add(mesh);
-                    this.$forceUpdate();
-                    setTimeout(next_surface, 0); //give UI thread time
+                //add to back_scene
+                let color;
+                if(Array.isArray(surface.color)) {
+                    color = new THREE.Color(surface.color[0], surface.color[1], surface.color[2]);
+                } else {
+                    color = new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256);
+                }
+                let material = new THREE.MeshLambertMaterial({
+                    color: new THREE.Color(color).multiplyScalar(2),
+                    transparent: true,
+                    opacity: 0.05,
+                    depthTest: false,
                 });
-            }, err=>{
-                console.log("finished loading all surfaces");
-            });
-        }
+                var back_mesh = new THREE.Mesh( geometry, material );
+                back_mesh.rotation.x = -Math.PI/2;
+                back_mesh.visible = true;
+                this.back_scene.add(back_mesh);
 
+                let mesh = new THREE.Mesh( geometry );
+                mesh.rotation.x = -Math.PI/2;
+                mesh.visible = surface.show || false;
+                mesh._surface = true;
+                surface.mesh = mesh; 
+
+                //store other surfaces
+                mesh._normal_material = new THREE.MeshLambertMaterial({
+                    color: new THREE.Color(color),
+                    transparent: true,
+                    opacity: 1,
+                });
+                mesh._highlight_material = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color(color).multiplyScalar(1.25),
+                    shininess: 80,
+                    transparent: true,
+                    opacity: 1,
+                });
+                mesh._xray_material = new THREE.MeshLambertMaterial({
+                    color: new THREE.Color(color).multiplyScalar(1.25),
+                    transparent: true,
+                    opacity: 0.43,
+                    depthTest: false, //need this to show tracts on top
+                });
+                mesh.material = mesh._normal_material;
+                this.scene.add(mesh);
+                this.$forceUpdate();
+                setTimeout(next_surface, 0); //give UI thread time
+            });
+        }, err=>{
+            console.log("finished loading all surfaces");
+        });
+
+        /*
         // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
         // - only load if there are no surfaces
         if(!this.config.surfaces) {
             let loader = new THREE.ObjectLoader();
-            loader.load('models/brain.json', _scene => {
+            console.log("loading brian.json");
+            loader.load('brain.json', _scene => {
                 this.tinyBrainScene = _scene;
                 let brainMesh = this.tinyBrainScene.children[1],
                 unnecessaryDirectionalLight = this.tinyBrainScene.children[2];
@@ -235,8 +243,13 @@ Vue.component('tractview', {
                 this.brainlight.radius = 20;
                 this.brainlight.position.copy(this.tinyBrainCam.position);
                 this.tinyBrainScene.add(this.brainlight);
+            }, xhr=>{
+                console.log("loading brain.json", xhr);
+            }, err=>{
+                console.error(err);
             });
         }
+        */
 
         this.renderer.autoClear = false;
         this.renderer.setSize(viewbox.width, viewbox.height);
@@ -292,8 +305,8 @@ Vue.component('tractview', {
             this.selectedNifti = null;
         }
 
-        this.ps_tracts = new PerfectScrollbar(this.$refs.tracts);
-        this.ps_surfaces = new PerfectScrollbar(this.$refs.surfaces);
+        if(this.$refs.tracts) this.ps_tracts = new PerfectScrollbar(this.$refs.tracts);
+        if(this.$refs.surfaces) this.ps_surfaces = new PerfectScrollbar(this.$refs.surfaces);
     },
 
     methods: {
@@ -505,12 +518,6 @@ Vue.component('tractview', {
                 endGeometry.vertices = lines;
                 endGeometry.tract_index = index;
                 endGeometry.tract = tract; //metadata..
-                /*
-                let mesh = this.calculateMesh(geometry);
-                mesh.name = tract.name;
-                mesh.visible = tract.show || false;
-                mesh.rotation.x = -Math.PI/2;
-                */
                  
                 cb(null, geometry, startGeometry, endGeometry);
             }
@@ -782,14 +789,6 @@ Vue.component('tractview', {
             this.showAll();
         },
 
-        /*
-        inputFocused: function() {
-            let result = false;
-            Object.keys(this.$refs).forEach(k => result = result || (document.activeElement == this.$refs[k]) );
-            return result;
-        },
-        */
-        
         surface_color(surface) {
             let color;
             if(surface.left) color = surface.left.color;
@@ -1011,7 +1010,7 @@ Vue.component('tractview', {
             </div>
             <div class="scrollable" ref="tracts" style="left: inherit; right: 0">
                 <div v-if="tracts">
-                    <div class="control-row">
+                    <div class="control-row" style="border-bottom: 1px solid #fff3; padding-bottom: 5px; margin-bottom: 5px;">
                         <b style="opacity: 0.3; position: relative;">All</b>
                         <input type='checkbox' v-model='all_left' class="check check-left"/>
                         <input type='checkbox' v-model='all_right' class="check check-right"/>
