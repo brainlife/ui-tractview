@@ -6,7 +6,7 @@ let total = 0;
 onmessage = function(e) {
     let tract = e.data;
     fetch(tract.url).then(res=>res.json()).then(json=>{
-        console.log(tract.url);
+        //console.log(tract.url);
 
         var bundle = json.coords;
         if(bundle.length == 1 && bundle[0][0].length == 3) bundle = bundle[0]; //1>N>3>[] v.s. N>1>3>[]
@@ -45,6 +45,6 @@ onmessage = function(e) {
             startPoints: new Float32Array(starts),
             endPoints: new Float32Array(ends),
         });
-        console.log("total", total);
+        //console.log("total", total);
     });
 }

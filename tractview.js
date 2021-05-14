@@ -163,7 +163,7 @@ Vue.component('tractview', {
         let surfaces = this.config.surfaces || [this.config.templateSurface]; //template surface should be set if there are no surfaces
         async.eachSeries(surfaces, (surface, next_surface)=>{
             this.loading = surface.filename;
-            console.log("loading", surface.url);
+            //console.log("loading", surface.url);
             vtkloader.load(surface.url, geometry=>{
                 geometry.computeVertexNormals(); //for smooth shading
                 geometry.computeBoundsTree(); //for BVH
@@ -291,7 +291,7 @@ Vue.component('tractview', {
         });
 
         this.controls.addEventListener('start', ()=>{
-            this.controls.autoRotate = false;
+            //this.controls.autoRotate = false;
         });
 
         this.animate();
@@ -500,21 +500,21 @@ Vue.component('tractview', {
 
                 //create LineGeometry
                 var geometry = new THREE.BufferGeometry();
-                geometry.addAttribute('position', new THREE.BufferAttribute(lines, 3));
+                geometry.setAttribute('position', new THREE.BufferAttribute(lines, 3));
                 geometry.vertices = lines;
                 geometry.tract_index = index;
                 geometry.tract = tract; //metadata..
 
                 //start points
                 var startGeometry = new THREE.BufferGeometry();
-                startGeometry.addAttribute('position', new THREE.BufferAttribute(startPoints, 3));
+                startGeometry.setAttribute('position', new THREE.BufferAttribute(startPoints, 3));
                 startGeometry.vertices = lines;
                 startGeometry.tract_index = index;
                 startGeometry.tract = tract; //metadata..
                
                 //end points
                 var endGeometry = new THREE.BufferGeometry();
-                endGeometry.addAttribute('position', new THREE.BufferAttribute(endPoints, 3));
+                endGeometry.setAttribute('position', new THREE.BufferAttribute(endPoints, 3));
                 endGeometry.vertices = lines;
                 endGeometry.tract_index = index;
                 endGeometry.tract = tract; //metadata..
@@ -608,7 +608,7 @@ Vue.component('tractview', {
                         }
                     }
                 }
-                geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 4));
+                geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 4));
                 let material = new THREE.ShaderMaterial({
                     vertexShader,
                     fragmentShader,
@@ -861,19 +861,17 @@ Vue.component('tractview', {
             this.hovered_obj = null;
         },
 
-        find_surface(event) {
-            let mouse = new THREE.Vector2();
+        findSurface(event) {
+            const mouse = new THREE.Vector2();
             mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
             mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
             this.raycaster.setFromCamera( mouse, this.camera );
-            let intersects = this.raycaster.intersectObjects(this.scene.children);
+            const intersects = this.raycaster.intersectObjects(this.scene.children.filter(c=>c.visible && c._surface));
 
-            //select first roi mesh
-            for(let i = 0;i < intersects.length; ++i) {
-                let obj = intersects[i].object;
-                if(obj._surface) return obj;
-            }
-            return null;
+            //find the find intersect
+            if(!intersects.length) return null;
+            return intersects[0].object;
+            
         },
 
         mousemove(event) {
@@ -883,7 +881,7 @@ Vue.component('tractview', {
             if(this.hovered_surface) this.hovered_surface.material = this.hovered_surface._normal_material;
     
             //check to see if we are still hovering, or hovering on new surface
-            let obj = this.find_surface(event);
+            let obj = this.findSurface(event);
             if(obj) obj.material = obj._highlight_material;
 
             this.hovered_surface = obj;
@@ -896,7 +894,7 @@ Vue.component('tractview', {
             }
         },
         mousedown(event) {
-            let obj = this.find_surface(event);
+            let obj = this.findSurface(event);
             if(obj) {
                 this.pushed_surface = obj;
                 obj.material = obj._xray_material;
@@ -992,7 +990,7 @@ Vue.component('tractview', {
                 <img src="controls.png" height="40px"/>
             </div>
             <div class="rotateControl" v-if="controls">
-                <input type="checkbox" v-model="controls.autoRotate">Auto-Rotate</input>
+                <input type="checkbox" v-model="controls.autoRotate"> Auto-Rotate</input>
                 &nbsp;
                 <input type="checkbox" v-model="showStart">
                     <span style="color: #58f">Show Fiber Startpoint</span> 
