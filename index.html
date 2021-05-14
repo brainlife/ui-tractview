@@ -67,7 +67,7 @@
 
             //use template surface if not set
             next=>{
-                if!config.surfaces) return next();
+                if(!config.surfaces) return next();
 
                 filename="0.mni152-a2009s-Whole-Brain.vtk";
                 config.templateSurface = {
