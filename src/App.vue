@@ -9,10 +9,8 @@ import * as THREE from 'three'
 
 import { ITractConfig, ISurfaceConfig, ISurfaceLR, ITractLR } from './interfaces'
 
-// @ts-ignore
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-// @ts-ignore
 import { VTKLoader } from 'three/examples/jsm/loaders/VTKLoader.js'
 
 // @ts-ignore
@@ -30,7 +28,7 @@ const three = {
     camera_light: new THREE.PointLight(0xffffff, 0.9),
     raycaster: new THREE.Raycaster(),
 
-    stats: new Stats(),
+    stats: new Stats(), //for fps
 }
 
 export default defineComponent({
@@ -63,9 +61,6 @@ export default defineComponent({
     },
 
     mounted() {
-        //console.log("App mounted");
-        //console.dir(this.config);
-
         //handle config params
         // @ts-ignore (we inject config via window.parent.config which is not standard)
         let config = window.parent.config || window.config;
@@ -108,7 +103,6 @@ export default defineComponent({
     methods: {
 
         async init() {
-            //not sure if we need to do this still?
             // @ts-ignore
             THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
             // @ts-ignore
@@ -160,13 +154,11 @@ export default defineComponent({
                 tract.mesh = linemesh;
                 tract.normal_material = normal_material;
                 tract.highlight_material = highlight_material;
-                //this.meshes.push(linemesh);
 
                 linemesh.name = tract.name;
                 linemesh.visible = false; //tract.show || false;
                 linemesh.rotation.x = -Math.PI/2;
                 tracts.add(linemesh);
-                //tract.mesh = lineMesh; 
 
                 //create start point particles
                 const startPointMaterial = new THREE.PointsMaterial( { 
@@ -226,7 +218,6 @@ export default defineComponent({
 
                             starts.push(xs[0], ys[0], zs[0]);
                             ends.push(xs[l-1], ys[l-1], zs[l-1]);
-                            //total+=1
 
                             for(var i = 1;i < xs.length;++i) {
                                 threads_pos.push(xs[i-1]);
@@ -292,13 +283,11 @@ export default defineComponent({
                 });
                 let back_mesh = new THREE.Mesh( geometry, back_material );
                 back_mesh.rotation.x = -Math.PI/2;
-                //back_mesh.visible = true;
                 three.back_scene.add(back_mesh);
 
                 let mesh = new THREE.Mesh( geometry );
                 mesh.rotation.x = -Math.PI/2;
-                mesh.visible = false;//surface.show || false;
-                //mesh._surface = true;
+                mesh.visible = false;
                 surface.mesh = mesh;
 
                 //store other surfaces
@@ -338,7 +327,6 @@ export default defineComponent({
                     tract.url = dataurl+"/tracts/"+tract.filename;
                     // @ts-ignore
                     tract.color = new THREE.Color(tract.color[0]/2+0.5, tract.color[1]/2+0.5, tract.color[2]/2+0.5); //always array?
-                    //tract.color = new THREE.Color(tract.color[0], tract.color[1], tract.color[2]); //always array?
                 });
                 fetch(dataurl+"/surfaces/index.json").then(res=>res.json()).then(data=>{
                     if(!Array.isArray(data)) data = [data];
@@ -393,10 +381,6 @@ export default defineComponent({
 
                 if(left) this.tracts[name].left = tract;
                 if(right) this.tracts[name].right = tract;
-                /* who uses this?
-                if(left && tract.show) this.tracts[name].left_check = tract.show;
-                if(right && tract.show) this.tracts[name].right_check = tract.show;
-                */
             });
 
             this.surfaces = {};
@@ -451,11 +435,9 @@ export default defineComponent({
 
                 if(left) {
                     this.surfaces[name].left = surface;
-                    //this.surfaces[name].left_check = surface.show||false;
                 }
                 if(right) {
                     this.surfaces[name].right = surface;
-                    //this.surfaces[name].right_check = surface.show||false;
                 }
 
             });
@@ -481,13 +463,6 @@ export default defineComponent({
             this.controls.orbit = new OrbitControls(three.camera, three.renderer.domElement);
             this.controls.orbit.enableDamping = true;
             this.controls.orbit.dampingFactor = 0.25;
-            
-            /*
-            //stop auto rotation when user start moving.
-            this.controls.orbit.addEventListener('start', ()=>{
-                this.controls.orbit.autoRotate = false;
-            });
-            */
     
             const axesHelper = new THREE.AxesHelper( 10 );
             three.scene.add( axesHelper );
@@ -556,18 +531,6 @@ export default defineComponent({
                 if(!obj.right_check) obj.right.mesh.visible = false;
             }
             this.updateVisibility();
-            /*
-            if(this.hoveredLR) {
-                //restore original material.opacity
-                if(this.hoveredLR.left && this.hoveredLR.left.mesh) {
-                    this.hoveredLR.left.mesh.opacity = this.hoveredLR.left.normal_material.opacity;
-                }
-                if(this.hoveredLR.right && this.hoveredLR.right.mesh) {
-                    this.hoveredLR.right.mesh.opacity = this.hoveredLR.right.normal_material.opacity;
-                }
-                this.hoveredLR = null;
-            }
-            */
             this.hoveredLR = null;
         },
 
@@ -634,7 +597,6 @@ export default defineComponent({
     },
 
     components: {
-        //HelloWorld
         SurfaceController,
         TractController,
     }
@@ -643,12 +605,10 @@ export default defineComponent({
 </script>
 
 <template>
-<!--<img alt="Vue logo" src="./assets/logo.png" />-->
 <span class="loading" v-if="!config.tracts">Loading Config</span>
 <div id="app" v-if="config.tracts">
 
     <div class="mainview" ref="view" @mousedown="mousedown" @mouseup="mouseup"/>
-    <!--<div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>-->
 
     <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
 
@@ -772,46 +732,6 @@ html, body {
     right: 15px;
 }
 
-.parent {
-    padding-right:4px;
-}
-.list-group-item.table {
-    height:auto !important;
-}
-.table {
-    display:table;
-    height:100%;
-    margin-bottom:0 !important;
-}
-.cell {
-    display:table-cell;
-    vertical-align:middle;
-}
-
-/*.control-row:hover
-.nifti_chooser {
-    padding-left:4px;
-    display:inline-block;
-}
-.nifti_select {
-    margin-bottom:4px;
-}
-.gamma_input {
-    max-width: 45px;
-}
-*/
-
-.plots {
-    display:none;
-    width:200px;
-    height:200px;
-}
-
-.upload_div {
-    color:#999;
-    margin-bottom:10px;
-}
-
 input[type="checkbox"] {
     vertical-align:middle;
     margin:0;
@@ -840,10 +760,6 @@ input[type="checkbox"] {
     text-align: center;
     pointer-events: none;
     font-size: 200%;
-}
-
-.xyz_input {
-    max-width:44px;
 }
 
 .show_hide_button {

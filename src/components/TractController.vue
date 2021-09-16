@@ -61,7 +61,6 @@ export default defineComponent({
         },
         
         menuitementer(tract: ITractLR) {
-            //console.log("TractController menuitementer", tract);
             this.$emit("menuitementer", tract);
         },
         menuitemleave(tract: ITractLR) {
@@ -111,27 +110,6 @@ export default defineComponent({
                     @change="check(tracts[name], false)" 
                     v-model='tracts[name].right_check' />
             </div>
-            <!--
-            <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
-                <div style="display:inline-block;" v-if="niftis.length > 0">
-                    <label style="color:#ccc; width: 120px;">Overlay</label>
-                    <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
-                    <option :value="null">(No Overlay)</option>
-                    <option v-for="(n, i) in niftis" :key="i" :value="i">{{n.filename}}</option>
-                    </select>
-                </div>
-                <br />
-                <div class="upload_div">
-                    <label for="upload_nifti">Upload Overlay Image (.nii.gz)</label>
-                    <input type="file" 
-                        style="visibility:hidden;max-height:0;max-width:5px;" 
-                        name="upload_nifti" 
-                        id="upload_nifti" 
-                        @change="upload_file"/>
-                </div>
-                <div class="plots" id="plots" ref="hist"></div>
-            </div>
-            -->
         </div>
     </div>
 </div>
