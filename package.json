@@ -1,52 +1,27 @@
 {
-  "name": "ui-tractview",
-  "version": "1.0.4",
-  "description": "brainlife tractviewer",
+  "name": "tractview",
+  "version": "0.0.0",
   "scripts": {
-    "dev": "lite-server",
-    "bundle": "browserify -r nifti-js -r ndarray -r async -r pako > dep.bundle.js",
-    "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard && npm ci'",
-    "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard && npm ci'"
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build --base=/ui/tractview/"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/brain-life/ui-tractview.git"
-  },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/brain-life/ui-tractview/issues"
-  },
-  "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
-<<<<<<< HEAD
-    "async": "^3.2.0",
-    "dat.gui": "^0.7.7",
-    "ndarray": "^1.0.18",
-    "nifti-js": "^1.0.1",
-    "pako": "^2.0.3",
-    "panning-orbit-controls": "^1.0.1",
-    "perfect-scrollbar": "^1.5.1",
-    "plotly.js": "^1.58.4",
+    "axios": "^0.21.4",
+    "perfect-scrollbar": "^1.5.2",
+    "simple-web-worker": "^1.2.0",
     "stats.js": "^0.17.0",
-    "three": "^0.128.0",
-    "three-mesh-bvh": "0.3.7",
-    "vue": "^2.6.12"
+    "three": "^0.132.2",
+    "three-mesh-bvh": "^0.4.3",
+    "vue": "^3.2.10"
   },
   "devDependencies": {
-    "eslint": "^7.26.0"
-=======
-    "@types/jquery": "^3.2.16",
-    "async": "^2.6.0",
-    "bootstrap": "^3.3.7",
-    "jquery": "^3.2.1",
-    "jquery-file-upload": "^4.0.5",
-    "ndarray": "^1.0.18",
-    "nifti-js": "^1.0.1",
-    "pako": "^1.0.6",
-    "panning-orbit-controls": "^1.0.0",
-    "plotly.js": "^1.31.2",
-    "three": "^0.88.0"
->>>>>>> 73bb6a93477a1366cdb9c4d21869c186f2e33e94
+    "@types/node": "^16.9.0",
+    "@types/three": "^0.131.1",
+    "@vitejs/plugin-vue": "^1.6.2",
+    "@vue/compiler-sfc": "^3.2.10",
+    "sass": "^1.41.0",
+    "typescript": "^4.3.2",
+    "vite": "^2.5.6",
+    "vue-tsc": "^0.3.0"
   }
 }
