@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "lite-server",
     "bundle": "browserify -r nifti-js -r ndarray -r async -r pako > dep.bundle.js",
-    "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard' && npm update",
-    "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard' && npm update"
+    "deploy": "ssh -A test.brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard && npm ci'",
+    "deploy-prod": "ssh -A brainlife.io 'cd /usr/local/static/ui-tractview && git pull && git reset --hard && npm ci'"
   },
   "repository": {
     "type": "git",
