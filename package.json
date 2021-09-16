@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/brain-life/ui-tractview#readme",
   "dependencies": {
+<<<<<<< HEAD
     "async": "^3.2.0",
     "dat.gui": "^0.7.7",
     "ndarray": "^1.0.18",
@@ -34,5 +35,18 @@
   },
   "devDependencies": {
     "eslint": "^7.26.0"
+=======
+    "@types/jquery": "^3.2.16",
+    "async": "^2.6.0",
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
+    "jquery-file-upload": "^4.0.5",
+    "ndarray": "^1.0.18",
+    "nifti-js": "^1.0.1",
+    "pako": "^1.0.6",
+    "panning-orbit-controls": "^1.0.0",
+    "plotly.js": "^1.31.2",
+    "three": "^0.88.0"
+>>>>>>> 73bb6a93477a1366cdb9c4d21869c186f2e33e94
   }
 }

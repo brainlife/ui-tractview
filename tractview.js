@@ -1,534 +1,535 @@
-let debounce_hashupdate;
 
-let tract_loader = new Worker("load_tract.js")
+var ndarray = require('ndarray');
+var nifti = require('nifti-js');
+var async = require('async');
 
-//require is enabled by browserify 
-const async = require('async');
-const nifti = require('nifti-js');
-const ndarray = require('ndarray');
-const pako = require('pako');
+var Plotly = require('plotly.js/lib/core');
+Plotly.register([require('plotly.js/lib/histogram')]);
 
-Vue.component('tractview', {
-    props: [ "config" ],
+var TractView = {
 
-    data () {
-        return {
-            load_percentage: 1,
-            loading: null,
+    /**
+     * Inits the tractography viewer
+     * 
+     * @param {String} config.selector -> Query selector for the element that will contain the tractview control
+     * @param {Object[]} config.tracts -> Array containing name,color,and url for each tracts to load
+     * 
+     * (Optional)
+     * @param {String} config.preview_scene_path -> Path to the scene to use which portrays the orientation of the brain
+     */
+    init: function(config) {
+        if (!config) throw "Error: No config provided";
 
-            all_left: false,
-            all_right: false,
-            control_visible: true,
+        var color_map, color_map_head, all_geometry = [], all_mesh = [], global_hist = [],
+            brainRotationX = -Math.PI/2, bgcolor = [96, 96, 96];
+        
+        // global uniforms
+        var gamma_value = 1, dataMin_value = 1, dataMax_value = 1;
+        
+        // set up for later
+        //config.num_fibers = 0;
+        config.LRtractNames = {};
 
-            meshes: [],
+        if (typeof config.selector != 'string')
+            throw "Error: config.selector not provided or not set to a string";
+        if (typeof config.tracts != 'object')
+            throw "Error: config.tracts not provided";
 
-            dataMin: 0,
-            dataMax: 0,
-            gamma: 1,
+        var user_container = $(config.selector);
+        if (user_container.length == 0)
+            throw `Error: Selector '${config.selector}' did not match any elements`;
 
-            color_map: null,
-            color_map_head: null,
-            hist: [],
-            focused: {},
+        populateHtml(user_container);
 
-            scene: null,
-            back_scene: null,
-
-            renderer: null,
-            camera: null,
-            controls: null,
-
-            showStart: false,
-            showEnd: false,
-
-            camera_light: null,
-
-            tinyBrainScene: null,
-            tinyBrainCam: null,
-            brainRenderer: null,
-
-            niftis: [],
-            selectedNifti: null,
-
-            tracts: null, //tracts organized into left/right
-            surfaces: null, //surfaces organized into left/right
-
-            //gui: new dat.GUI(),
-            stats: new Stats(),
-            show_stats: true,
-            ps_tracts: null,
-            ps_surfaces: null,
-
-            raycaster: new THREE.Raycaster(),
-            hovered_surface: null, //on the main ui
-            hovered_obj: null,//on the list
-
-            pushed_surface: null,
-        };
-    },
-
-    mounted() {
-        //weird way to register fast raycaster
-        THREE.BufferGeometry.prototype.computeBoundsTree = window.MeshBVHLib.computeBoundsTree;
-        THREE.BufferGeometry.prototype.disposeBoundsTree = window.MeshBVHLib.disposeBoundsTree;
-        THREE.Mesh.prototype.raycast = window.MeshBVHLib.acceleratedRaycast;
-
-        this.organize_tracts();
-        this.organize_surfaces();
-
-        this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        this.brainRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-
-        let viewbox = this.$refs.view.getBoundingClientRect();
-        let tinybrainbox = this.$refs.tinybrain.getBoundingClientRect();
-
-        this.camera = new THREE.PerspectiveCamera(45, viewbox.width / viewbox.height, 1, 5000);
-        this.tinyBrainCam = new THREE.PerspectiveCamera(45, tinybrainbox.width / tinybrainbox.height, 1, 5000);
-        this.camera.position.z = 200;
-
-        //create back scene (to put shadow of surfaces)
-        this.back_scene = new THREE.Scene();
-        var ambientLight = new THREE.AmbientLight(0x404040);
-        this.back_scene.add(ambientLight);
-        this.camera_light = new THREE.PointLight(0xffffff, 0.2);
-        this.camera_light.radius = 10;
-        this.back_scene.add(this.camera_light);
-
-        //create tract scene
-        this.scene = new THREE.Scene();
-        var ambientLight = new THREE.AmbientLight(0x505050);
-        this.scene.add(ambientLight);
-        this.camera_light = new THREE.PointLight(0xffffff, 1);
-        this.camera_light.radius = 10;
-        this.scene.add(this.camera_light);
-
-        window.addEventListener("resize", this.resized);
-
-        const textureLoader = new THREE.TextureLoader();
-        const pointSprite = textureLoader.load('point.png');
-
-        // start loading the tract
-        if(this.config.tracts) {
-            let idx = 0;
-            let tracts = new THREE.Object3D();
-            this.scene.add(tracts);
-            async.eachSeries(this.config.tracts, (tract, next_tract) => {
-                this.load_tract(tract, idx++, (err, lineGeometry, startPointGeometry, endPointGeometry) => {
-                    if (err) return next_tract(err);
-
-                    //create fiber mesh
-                    const lineMesh = this.calculateMesh(lineGeometry);
-                    lineMesh.name = tract.name;
-                    lineMesh.visible = tract.show || false;
-                    lineMesh.rotation.x = -Math.PI/2;
-                    this.meshes.push(lineMesh);
-                    tracts.add(lineMesh);
-                    this.load_percentage = idx / this.config.tracts.length;
-                    this.loading = tract.name;
-                    tract.mesh = lineMesh; 
-
-                    //create start point particles
-                    const startPointMaterial = new THREE.PointsMaterial( { 
-                        size: 2, map: pointSprite, 
-                        blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
-                    startPointMaterial.color.setHSL( 0.5, 0.5, 0.3 ); //blue
-                    const startPoints = new THREE.Points(startPointGeometry, startPointMaterial);
-                    startPoints.visible = tract.show || false;
-                    startPoints.rotation.x = -Math.PI/2;
-                    tracts.add(startPoints);
-                    tract.start = startPoints; 
-                    
-                    //create end point particles
-                    const endPointMaterial = new THREE.PointsMaterial( { 
-                        size: 2, map: pointSprite, 
-                        blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
-                    endPointMaterial.color.setHSL( 0, 0.5, 0.3 ); //red
-                    const endPoints = new THREE.Points(endPointGeometry, endPointMaterial);
-                    endPoints.visible = tract.show || false;
-                    endPoints.rotation.x = -Math.PI/2;
-                    tracts.add(endPoints);
-                    tract.end = endPoints; 
-
-                    this.$forceUpdate();
-                    setTimeout(next_tract, 0); //give UI thread time
-                });
-            }, err=>{
-                if(err) console.error(err);
-                console.log("finished loading all tracts");
-            })
+        var scene, camera, renderer, stats;
+        if(config.debug) {
+            console.log("initializing fps stats graph for debug mode");
+            stats = new Stats();
+            user_container.append(stats.dom);
         }
 
-        //start loading surfaces
-        let vtkloader = new THREE.VTKLoader();
-        let surfaces = this.config.surfaces || [this.config.templateSurface]; //template surface should be set if there are no surfaces
-        async.eachSeries(surfaces, (surface, next_surface)=>{
-            this.loading = surface.filename;
-            //console.log("loading", surface.url);
-            vtkloader.load(surface.url, geometry=>{
-                geometry.computeVertexNormals(); //for smooth shading
-                geometry.computeBoundsTree(); //for BVH
+        var user_uploaded_files = {};
 
-                //add to back_scene
-                let color;
-                if(Array.isArray(surface.color)) {
-                    color = new THREE.Color(surface.color[0], surface.color[1], surface.color[2]);
+        var view = user_container.find("#conview"),
+        tinyBrain = user_container.find("#tinybrain"),
+        controls_el = user_container.find("#controls"),
+        container_toggles = user_container.find("#container_toggles"),
+        tract_toggles_el = user_container.find("#tract_toggles"),
+        hide_show_el = user_container.find("#hide_show"),
+        hide_show_text_el = user_container.find("#hide_show_text"),
+        nifti_select_el = user_container.find("#nifti_select"),
+        gamma_input_el = user_container.find("#gamma_input"),
+        plots_el = user_container.find("#plots");
+        
+        let debounce = null;
+        
+        create_nifti_options();
+        $("#upload_nifti").on('change', function() {
+            // should we allow multiple uploads at once?
+            // for now just one, easy to expand
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.addEventListener('load', function(buffer) {
+                // if file was already uploaded with same name we could use unique tokens or just override the old one, as is done here (simplicity over extensibility)
+                if (user_uploaded_files[file.name]) console.log(`Warning: file with name ${file.name} was already uploaded; the old one will be overwritten`);
+                else nifti_select_el.append($("<option/>").text(file.name).val(`user_uploaded|${file.name}`));
+                
+                // buffer is reader.result
+                user_uploaded_files[file.name] = reader.result;
+                
+                // to autouse the uploaded nifti, or to not autouse the uploaded nifti, that is the question
+                // for now I think yes...
+                // but if you think no then remove the following line:
+                nifti_select_el.val(`user_uploaded|${file.name}`).trigger('change');
+            });
+            reader.readAsArrayBuffer(this.files[0]);
+        });
+        
+        init_conview();
+
+        function init_conview() {
+            renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+            var brainRenderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+
+            scene = new THREE.Scene();
+
+            //camera
+            camera = new THREE.PerspectiveCamera( 45, view.width() / view.height(), 1, 5000);
+            var brainCam = new THREE.PerspectiveCamera( 45, tinyBrain.width() / tinyBrain.height(), 1, 5000 );
+            camera.position.z = 200;
+
+            //resize view
+            function resized() {
+                camera.aspect = view.width() / view.height();
+                camera.updateProjectionMatrix();
+                renderer.setSize(view.width(), view.height());
+            }
+            $(window).on('resize', resized);
+            view.on('resize', resized);
+
+            // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
+            var loader = new THREE.ObjectLoader();
+            var tinyBrainScene, brainlight;
+
+            if (config.preview_scene_path) {
+                loader.load(config.preview_scene_path, _scene => {
+                    tinyBrainScene = _scene;
+                    var brainMesh = tinyBrainScene.children[1], unnecessaryDirectionalLight = tinyBrainScene.children[2];
+                    // align the tiny brain with the model displaying fascicles
+
+                    brainMesh.rotation.z += Math.PI / 2;
+                    brainMesh.material = new THREE.MeshLambertMaterial({color: 0xffcc99});
+
+                    tinyBrainScene.remove(unnecessaryDirectionalLight);
+
+                    var amblight = new THREE.AmbientLight(0x101010);
+                    tinyBrainScene.add(amblight);
+
+                    brainlight = new THREE.PointLight(0xffffff, 1);
+                    brainlight.radius = 20;
+                    brainlight.position.copy(brainCam.position);
+                    tinyBrainScene.add(brainlight);
+                });
+            }
+
+            // sort + make non-LR based tracts appear first
+            config.tracts.sort((_a, _b) => {
+                var a = _a.name;
+                var b = _b.name;
+                var a_has_lr = isLeftTract(a) || isRightTract(a);
+                var b_has_lr = isLeftTract(b) || isRightTract(b);
+
+                if (a_has_lr && !b_has_lr) return 1;
+                if (!a_has_lr && b_has_lr) return -1;
+
+                if (a > b) return 1;
+                if (a == b) return 0;
+                return -1;
+            });
+
+            // make 'All' button that toggles everything on/off
+            var checkbox_all = $('<input type="checkbox" id="checkbox_all" checked />');
+            checkbox_all.on('change', e => {
+                for (let tractName in config.LRtractNames) {
+                    let toggle = config.LRtractNames[tractName];
+                    if (toggle.left) {
+                        if (toggle.left.checkbox[0].checked != e.target.checked) toggle.left.checkbox.click();
+                        if (toggle.right.checkbox[0].checked != e.target.checked) toggle.right.checkbox.click();
+                    } else {
+                        if (toggle.checkbox[0].checked != e.target.checked) toggle.checkbox.click();
+                    }
+                }
+            });
+
+            // add header toggles to controls
+            tract_toggles_el.append(
+                $('<tr/>').addClass('header').append([
+                    $('<td><label class="all" for="checkbox_all">All</label></td>').append(checkbox_all),
+                    $('<td><label>Left</label></td>'),
+                    $('<td><label>Right</label></td>')
+                ])
+            );
+
+            // group together tract names in the following way:
+            // tractName -> { left: {tractNameLeft, mesh}, right: {tractNameRight, mesh} }
+            // or tractName -> {mesh} if there are no children
+            config.tracts.forEach(tract=>{
+
+                //convert color array to THREE.Color
+                tract.color = new THREE.Color(tract.color[0], tract.color[1], tract.color[2]);
+
+                var rawName = tract.name.replace(/ [LR]$|^(Left|Right) /g, "");
+                if (rawName != tract.name) {
+                    config.LRtractNames[rawName] = config.LRtractNames[rawName] || {};
+                    if (isLeftTract(tract.name)) config.LRtractNames[rawName].left = tract;
+                    else config.LRtractNames[rawName].right = tract;
+                } else config.LRtractNames[rawName] = tract;   // standalone, not left or right
+            });
+
+            let white_material = new THREE.LineBasicMaterial({
+                color: new THREE.Color(1,1,1),
+            });
+
+            // add tract toggles to controls
+            for (let tractName in config.LRtractNames) {
+                let subTracts = config.LRtractNames[tractName];
+
+                // toggles that only have a name and a single checkbox
+                if (!~Object.keys(subTracts).indexOf('left')) {
+                    var row = makeToggle(tractName, {
+                        hideRightToggle: true,
+                        onchange_left: (left_checked) => {
+                            if (!subTracts.mesh) return;
+                            subTracts.mesh.visible = left_checked;
+                            subTracts.mesh.visible_back = left_checked;
+                            // if (!left_checked) row.addClass('disabled');
+                            // else row.removeClass('disabled');
+                        },
+                        onmouseenter: e => {
+                            if (!subTracts.mesh) return;
+                            //subTracts.mesh.visible = true;
+                            //subTracts.mesh.material.color = new THREE.Color(1, 1, 1);
+                            subTracts.mesh.visible_back = subTracts.mesh.visible;
+                            subTracts.mesh.material_back = subTracts.mesh.material;
+                            subTracts.mesh.visible = true;
+                            subTracts.mesh.material = white_material;
+                        },
+                        onmouseleave: e => {
+                            if (!subTracts.mesh || !subTracts.mesh.material_back) return;
+                            //subTracts.mesh.visible = restore.visible;
+                            subTracts.mesh.visible = subTracts.mesh.visible_back;
+                            subTracts.mesh.material = subTracts.mesh.material_back;
+                        }
+                    });
+
+                    subTracts.checkbox = row.checkbox_left;
                 } else {
-                    color = new THREE.Color(surface.color.r/256, surface.color.g/256, surface.color.b/256);
+                    // toggles that have both L + R checkboxes, almost the same as code above, just done twice
+                    let left = subTracts.left;
+                    let right = subTracts.right;
+
+                    var row = makeToggle(tractName, {
+                        onchange_left: (left_checked, none_checked) => {
+                            if (!left.mesh) return;
+                            left.mesh.visible = left_checked;
+                            left.mesh.visible_back = left_checked;
+                            //left._restore.visible = left_checked;
+                        },
+                        onchange_right: (right_checked, none_checked) => {
+                            if (!right.mesh) return;
+                            right.mesh.visible = right_checked;
+                            right.mesh.visible_back = right_checked;
+                            //right._restore.visible = right_checked;
+                        },
+                        onmouseenter: e => {
+                            if (!left.mesh || !right.mesh) return;
+                            left.mesh.visible_back = left.mesh.visible;
+                            right.mesh.visible_back = right.mesh.visible;
+                            left.mesh.material_back = left.mesh.material;
+                            right.mesh.material_back = right.mesh.material;
+                            left.mesh.visible = true;
+                            right.mesh.visible = true;
+                            left.mesh.material = white_material;
+                            right.mesh.material = white_material;
+                        },
+                        onmouseleave: e => {
+                            if (!left.mesh || !right.mesh || !left.mesh.material_back || !right.mesh.material_back) return;
+                            left.mesh.visible = left.mesh.visible_back;
+                            left.mesh.material = left.mesh.material_back;
+                            right.mesh.visible = right.mesh.visible_back;
+                            right.mesh.material = right.mesh.material_back;
+                        }
+                    });
+
+                    left.checkbox = row.checkbox_left;
+                    right.checkbox = row.checkbox_right;
                 }
-                let material = new THREE.MeshLambertMaterial({
-                    color: new THREE.Color(color).multiplyScalar(2),
-                    transparent: true,
-                    opacity: 0.05,
-                    depthTest: false,
-                });
-                var back_mesh = new THREE.Mesh( geometry, material );
-                back_mesh.rotation.x = -Math.PI/2;
-                back_mesh.visible = true;
-                this.back_scene.add(back_mesh);
-
-                let mesh = new THREE.Mesh( geometry );
-                mesh.rotation.x = -Math.PI/2;
-                mesh.visible = surface.show || false;
-                mesh._surface = true;
-                surface.mesh = mesh; 
-
-                //store other surfaces
-                mesh._normal_material = new THREE.MeshLambertMaterial({
-                    color: new THREE.Color(color),
-                    transparent: true,
-                    opacity: 1,
-                });
-                mesh._highlight_material = new THREE.MeshPhongMaterial({
-                    color: new THREE.Color(color).multiplyScalar(1.25),
-                    shininess: 80,
-                    transparent: true,
-                    opacity: 1,
-                });
-                mesh._xray_material = new THREE.MeshLambertMaterial({
-                    color: new THREE.Color(color).multiplyScalar(1.25),
-                    transparent: true,
-                    opacity: 0.43,
-                    depthTest: false, //need this to show tracts on top
-                });
-                mesh.material = mesh._normal_material;
-                this.scene.add(mesh);
-                this.$forceUpdate();
-                setTimeout(next_surface, 0); //give UI thread time
-            });
-        }, err=>{
-            console.log("finished loading all surfaces");
-        });
-
-        /*
-        // add tiny brain (to show the orientation of the brain while the user looks at fascicles)
-        // - only load if there are no surfaces
-        if(!this.config.surfaces) {
-            let loader = new THREE.ObjectLoader();
-            console.log("loading brian.json");
-            loader.load('brain.json', _scene => {
-                this.tinyBrainScene = _scene;
-                let brainMesh = this.tinyBrainScene.children[1],
-                unnecessaryDirectionalLight = this.tinyBrainScene.children[2];
-                // align the tiny brain with the model displaying fascicles
-
-                brainMesh.rotation.z += Math.PI / 2;
-                brainMesh.material = new THREE.MeshLambertMaterial({ color: 0xffcc99 });
-
-                this.tinyBrainScene.remove(unnecessaryDirectionalLight);
-
-                let amblight = new THREE.AmbientLight(0x101010);
-                this.tinyBrainScene.add(amblight);
-
-                this.brainlight = new THREE.PointLight(0xffffff, 1);
-                this.brainlight.radius = 20;
-                this.brainlight.position.copy(this.tinyBrainCam.position);
-                this.tinyBrainScene.add(this.brainlight);
-            }, xhr=>{
-                console.log("loading brain.json", xhr);
-            }, err=>{
-                console.error(err);
-            });
-        }
-        */
-
-        this.renderer.autoClear = false;
-        this.renderer.setSize(viewbox.width, viewbox.height);
-        this.$refs.view.appendChild(this.renderer.domElement);
-
-        this.brainRenderer.autoClear = false;
-        this.brainRenderer.setSize(tinybrainbox.width, tinybrainbox.height);
-        this.$refs.tinybrain.appendChild(this.brainRenderer.domElement);
-
-        // use OrbitControls and make camera light follow camera position
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-
-        this.handle_hash();
-        window.parent.addEventListener("hashchange", e=>{
-            this.handle_hash();
-            //this.animate();
-        });
-
-        this.controls.addEventListener('change', e=>{
-            let pan = this.controls.getPanOffset();
-
-            //update URL hash
-            clearTimeout(debounce_hashupdate);
-            debounce_hashupdate = setTimeout(()=>{
-                let pos_params = [ 
-                    this.round(this.camera.position.x), 
-                    this.round(this.camera.position.y), 
-                    this.round(this.camera.position.z)
-                ].join(";");
-                let target_params = [ 
-                    this.round(this.controls.target.x), 
-                    this.round(this.controls.target.y), 
-                    this.round(this.controls.target.z)
-                ].join(";");
-                let where = "where=" + pos_params + "/" + target_params;
-                //window.parent.location.hash = where;
-                history.replaceState(undefined, undefined, "#"+where);
-            }, 100);
-        });
-
-        this.controls.addEventListener('start', ()=>{
-            //this.controls.autoRotate = false;
-        });
-
-        this.animate();
-
-        if (this.config.layers) {
-            this.config.layers.forEach(layer => {
-                let condensed_filename = layer.url;
-                if (condensed_filename.indexOf('/') != -1) condensed_filename = condensed_filename.substring(condensed_filename.lastIndexOf('/')+1);
-                this.niftis.push({ user_uploaded: false, url: layer.url, user_uploaded: false, filename: condensed_filename });
-            });
-            this.selectedNifti = null;
-        }
-
-        if(this.$refs.tracts) this.ps_tracts = new PerfectScrollbar(this.$refs.tracts);
-        if(this.$refs.surfaces) this.ps_surfaces = new PerfectScrollbar(this.$refs.surfaces);
-    },
-
-    methods: {
-        organize_tracts() {
-            this.tracts = {};
-            if(!this.config.tracts) return;
-            this.config.tracts.forEach(tract=>{
-                let left = false;
-                let right = false;
-
-                //detect hierachy and adjust name
-                let name = tract.name.toLowerCase();
-                if(name.startsWith('left')) {
-                    left = true;
-                    name = tract.name.substring(4);
-                }
-                if(name.endsWith(' l')) {
-                    left = true;
-                    name = tract.name.substring(0, name.length - 2);
-                }
-                if(name.startsWith('right')) {
-                    right = true;
-                    name = tract.name.substring(5);
-                }
-                if(name.endsWith(' r')) {
-                    right = true;
-                    name = tract.name.substring(0, name.length - 2);
-                }
-
-                //if it's not left nor right, pretend that it's left
-                if(!left && !right) left = true;
-
-                //put tract info into appropriate categories
-                if(!this.tracts[name]) Vue.set(this.tracts, name, {
-                    left_check: false,
-                    right_check: false,
-                });
-                if(left) this.tracts[name].left = tract;
-                if(right) this.tracts[name].right = tract;
-                if(left && tract.show) this.tracts[name].left_check = tract.show;
-                if(right && tract.show) this.tracts[name].right_check = tract.show;
-            });
-        },
-
-        organize_surfaces() {
-            this.surfaces = {};
-            if(!this.config.surfaces) return;
-            this.config.surfaces.forEach(surface=>{
-                let left = false;
-                let right = false;
-
-                //detect hierachy and adjust name
-                let name = surface.name.toLowerCase();
-                //console.log(name);
-                if(name.startsWith('left-')) {
-                    left = true;
-                    name = surface.name.substring(5);
-                }
-                if(name.endsWith('_left')) {
-                    left = true;
-                    name = surface.name.substring(0, name.length-5);
-                }
-                if(name.startsWith('l-')) {
-                    left = true;
-                    name = surface.name.substring(2);
-                }
-                if(name.startsWith('right-')) {
-                    right = true;
-                    name = surface.name.substring(6);
-                }
-                if(name.endsWith('_right')) {
-                    right = true;
-                    name = surface.name.substring(0, name.length-6);
-                }
-                if(name.startsWith('r-')) {
-                    right = true;
-                    name = surface.name.substring(2);
-                }
-                if(name.startsWith('ctx-lh-')) {
-                    left = true;
-                    name = surface.name.substring(7);
-                }
-                if(name.startsWith('ctx-rh-')) {
-                    right = true;
-                    name = surface.name.substring(7);
-                }
-
-                //if it's not left nor right, pretend that it's left
-                if(!left && !right) left = true;
-
-                //put tract info into appropriate categories
-                if(!this.surfaces[name]) Vue.set(this.surfaces, name, {
-                    left_check: false,
-                    right_check: false,
-                });
-                if(left) {
-                    this.surfaces[name].left = surface;
-                    this.surfaces[name].left_check = surface.show||false;
-                }
-                if(right) {
-                    this.surfaces[name].right = surface;
-                    this.surfaces[name].right_check = surface.show||false;
-                }
-            });
-        },
-
-        handle_hash() {
-            let info_string = getHashValue('where');
-            if (info_string) {
-                let info = info_string.split('/');
-                let pos = (info[0] || '').split(';');
-                let orig = (info[1] || '').split(';');
-
-                if (pos) {
-                    this.camera.position.x = +pos[0];
-                    this.camera.position.y = +pos[1];
-                    this.camera.position.z = +pos[2];
-                }
-                if (orig) {
-                    this.controls.target.x = +orig[0];
-                    this.controls.target.y = +orig[1];
-                    this.controls.target.z = +orig[2];
-
-                    this.controls.setPubPanOffset(+orig[0], +orig[1], +orig[2]);
-                }
-            } else this.controls.autoRotate = true;
-        },
-
-        animate() {
-            this.stats.begin();
-            if(this.hovered_obj) {
-                if(this.hovered_obj.left && this.hovered_obj.left.mesh) this.animate_mesh(this.hovered_obj.left.mesh);
-                if(this.hovered_obj.right && this.hovered_obj.right.mesh) this.animate_mesh(this.hovered_obj.right.mesh);
+                tract_toggles_el.append(row);
             }
 
-            this.controls.update();
-            this.camera_light.position.copy(this.camera.position);
-            this.renderer.clear();
-            this.renderer.render(this.back_scene, this.camera);
-            this.renderer.clearDepth();
-            this.renderer.render(this.scene, this.camera);
+            // configure hiding/showing the panel
+            hide_show_text_el.text('Hide Controls');
+            hide_show_el.on("click", e => {
+                if (container_toggles.css('opacity') == '0') {
+                    container_toggles.css({ 'max-width': '500px', 'opacity': 1 });
+                    controls_el.css({ 'overflow-y': 'auto' });
+                    hide_show_text_el.text('Hide Controls');
+                } else {
+                    hide_show_el.css('min-height', container_toggles.height() + 'px');
+                    container_toggles.css({ 'max-width': '0px', 'opacity': 0 });
+                    controls_el.css({ 'overflow-y': 'hidden' });
+                    hide_show_text_el.text('Show Controls');
+                }
+            });
 
-            // handle display of the tiny brain preview
-            if (this.tinyBrainScene) {
-                // normalize the main camera's position so that the tiny brain camera is always the same distance away from <0, 0, 0>
-                let pan = this.controls.getPanOffset();
-                let pos3 = new THREE.Vector3(
-                    this.camera.position.x - pan.x,
-                    this.camera.position.y - pan.y,
-                    this.camera.position.z - pan.z
-                ).normalize();
-                this.tinyBrainCam.position.set(pos3.x * 10, pos3.y * 10, pos3.z * 10);
-                this.tinyBrainCam.rotation.copy(this.camera.rotation);
-                this.brainlight.position.copy(this.tinyBrainCam.position);
-                this.brainRenderer.clear();
-                this.brainRenderer.render(this.tinyBrainScene, this.tinyBrainCam);
+            // start loading the tract
+            var idx = 0;
+            async.eachLimit(config.tracts, 3, (tract, next_tract)=>{
+                load_tract(tract, idx++, (err, mesh)=>{
+                    if(err) return next_tract(err);
+                    add_mesh_to_scene(mesh);
+                    //config.num_fibers += res.coords.length;
+                    tract.mesh = mesh;
+                    next_tract();
+                });
+            }, err=>console.log);
+
+            renderer.autoClear = false;
+            renderer.setSize(view.width(), view.height());
+            view.append(renderer.domElement);
+
+            brainRenderer.autoClear = false;
+            brainRenderer.setSize(tinyBrain.width(), tinyBrain.height());
+            tinyBrain.append(brainRenderer.domElement);
+
+            //use OrbitControls and make camera light follow camera position
+            var controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.autoRotate = true;
+            controls.addEventListener('change', function(e) {
+                //rotation changes
+            });
+            controls.addEventListener('start', function(){
+                //use interacting with control
+                gamma_input_el.trigger({type: "blur"});
+                controls.autoRotate = false;
+            });
+            
+            gamma_input_el.on('change', gamma_changed);
+            gamma_input_el.on('keyup', gamma_changed);
+            updateAllShaders();
+            
+            function animate_conview() {
+                controls.enableKeys = !gamma_input_el.is(":focus");
+                controls.update();
+
+                renderer.clear();
+                renderer.clearDepth();
+                renderer.render( scene, camera );
+
+                // handle display of the tiny brain preview
+                if (tinyBrainScene) {
+                    // normalize the main camera's position so that the tiny brain camera is always the same distance away from <0, 0, 0>
+                    var pan = controls.getPanOffset();
+                    var pos3 = new THREE.Vector3(camera.position.x - pan.x, camera.position.y - pan.y, camera.position.z - pan.z).normalize();
+                    brainCam.position.set(pos3.x * 10, pos3.y * 10, pos3.z * 10);
+                    brainCam.rotation.copy(camera.rotation);
+
+                    brainlight.position.copy(brainCam.position);
+
+                    brainRenderer.clear();
+                    brainRenderer.render(tinyBrainScene, brainCam);
+                }
+
+                requestAnimationFrame( animate_conview );
+                if(config.debug) stats.update();
             }
-            this.stats.end();
-            requestAnimationFrame(this.animate);
-        },
 
-        animate_mesh(mesh) {
-            const now = new Date().getTime();
-            const l = Math.cos((now/4%1000)*(2*Math.PI/1000)); //-1.0 ~ -1.0 (every 4 seconds)
-            mesh.material.opacity = Math.abs(l)/2+0.25;  //0.25 ~ 0.75
+            animate_conview();
+        }
 
-            //our mesh consists of bunch of fibers.. not just 1.. so we can't animate fiber
-            //orientation with this
-            //mesh.geometry.setDrawRange(0, l*mesh.geometry.vertices.length/3);
-        },
+        // helper method for making toggles
+        function makeToggle(tractName, options) {
+            options = options || {};
 
-        round(v) {
-            return Math.round(v * 1e3) / 1e3;
-        },
+            // row that contains the text of the toggle, as well as the left/right checkboxes
+            let row = $("<tr/>"),
+            td_label = $("<td/>"),
+            label = $("<label/>"),
+            td_left = $("<td/>"),
+            checkbox_left = $("<input/>").attr({ 'type': 'checkbox', 'checked': true }),
+            td_right = $("<td/>"),
+            checkbox_right = $("<input/>").attr({ 'type': 'checkbox', 'checked': true });
 
-        resized() {
-            var viewbox = this.$refs.view.getBoundingClientRect();
-            this.camera.aspect = viewbox.width / viewbox.height;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(viewbox.width, viewbox.height);
-        },
+            label.text(tractName);
 
-        load_tract: function(tract, index, cb) {
+            // mouse events
+            row.on('mouseenter', e => {
+                row.addClass('active');
+                if (options.onmouseenter) options.onmouseenter(e);
+            });
+            row.on('mouseleave', e => {
+                row.removeClass('active');
+                if (options.onmouseleave) options.onmouseleave(e);
+            });
 
-            //use web worker to parse the json.. although I still have to spend good chunk of time constructing the BufferGeometry which 
-            //must happen on this thread - as they are not serializable.
-            tract_loader.postMessage(tract);
-            tract_loader.onmessage=(e)=>{
-                //let threads_pos = e.data;
-                let {lines, startPoints, endPoints} = e.data;
+            checkbox_left.on('change', e => {
+                var left_checked = checkbox_left[0].checked || false,
+                right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
 
-                //create LineGeometry
+                if (options.onchange_left) options.onchange_left(left_checked, !left_checked && !right_checked);
+            });
+            checkbox_right.on('change', e => {
+                var left_checked = checkbox_left[0].checked || false,
+                right_checked = checkbox_right[0].checked || options.hideRightToggle || false;
+
+                if (options.onchange_right) options.onchange_right(right_checked, !left_checked && !right_checked);
+            });
+
+            // add everything
+            td_label.addClass('label').append(label);
+            td_left.addClass('left').append(checkbox_left);
+            td_right.addClass('right');
+            if (!options.hideRightToggle) td_right.append(checkbox_right)
+            row.addClass('row');
+            row.append([td_label, td_left, td_right]);
+
+            row.checkbox_left = checkbox_left;
+            row.checkbox_right = checkbox_right;
+
+            return row;
+        }
+
+        function load_tract(tract, index, cb) {
+            console.log("loading tract", tract.url);
+            fetch(tract.url).then(res=>{
+                return res.json();
+            }).then(json=>{
+                var bundle = json.coords;
+
+                /* this does not prevent chrome from crashing..
+                if(bundle.length > 1000) {
+                    console.log(tract, "has too many bundles - trimming at 1000", bundle.length);
+                    bundle = bundle.slice(0, 1000);
+                }
+                */
+
+                //convert each bundle to threads_pos array
+                var threads_pos = [];
+                bundle.forEach(function(fascicle) {
+                    if (fascicle[0] instanceof Array) fascicle = fascicle[0]; //for backward compatibility
+                    var xs = fascicle[0];
+                    var ys = fascicle[1];
+                    var zs = fascicle[2];
+                    for(var i = 1;i < xs.length;++i) {
+                        threads_pos.push(xs[i-1]);
+                        threads_pos.push(ys[i-1]);
+                        threads_pos.push(zs[i-1]);
+                        threads_pos.push(xs[i]);
+                        threads_pos.push(ys[i]);
+                        threads_pos.push(zs[i]);
+                    }
+                });
+
+                //then convert that to bufferedgeometry
+                var vertices = new Float32Array(threads_pos);
                 var geometry = new THREE.BufferGeometry();
-                geometry.setAttribute('position', new THREE.BufferAttribute(lines, 3));
-                geometry.vertices = lines;
+                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3 ) );
+                geometry.vertices = vertices;
                 geometry.tract_index = index;
                 geometry.tract = tract; //metadata..
 
-                //start points
-                var startGeometry = new THREE.BufferGeometry();
-                startGeometry.setAttribute('position', new THREE.BufferAttribute(startPoints, 3));
-                startGeometry.vertices = lines;
-                startGeometry.tract_index = index;
-                startGeometry.tract = tract; //metadata..
-               
-                //end points
-                var endGeometry = new THREE.BufferGeometry();
-                endGeometry.setAttribute('position', new THREE.BufferAttribute(endPoints, 3));
-                endGeometry.vertices = lines;
-                endGeometry.tract_index = index;
-                endGeometry.tract = tract; //metadata..
-                 
-                cb(null, geometry, startGeometry, endGeometry);
-            }
-        },
+                all_geometry.push(geometry);
 
-        calculateMesh: function(geometry, mesh) {
-            if (this.color_map) {
+                cb(null, calculateMesh(geometry));
+            });
+        }
+        
+        function destroyPlot() {
+            // plots_el.html('');
+            Plotly.purge(plots_el[0]);
+            plots_el[0].style.display = "none";
+        }
+        
+        function makePlot() {
+            destroyPlot();
+            
+            var zero_to_one = [];
+            for (var x = 0; x <= 100; x++) {
+                zero_to_one.push(x / 100);
+                global_hist[x] = global_hist[x] || 0;
+            }
+            
+            plots_el[0].style.display = "inline-block";
+            Plotly.plot(plots_el[0], [{
+                x: zero_to_one,
+                y: global_hist,
+            }], {
+                xaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Image Intensity" },
+                yaxis: { gridcolor: '#444', tickfont: { color: '#aaa' }, title: "Number of Voxels" },
+                
+                margin: {
+                    t: 5,
+                    b: 32,
+                    l: 52,
+                    r: 30
+                },
+                font: { color: '#ccc' },
+                titlefont: { color: '#ccc' },
+                
+                plot_bgcolor: 'transparent',
+                paper_bgcolor: 'transparent',
+                autosize: true,
+                
+                //margin: {t: 0, b: 35, r: 0},
+            }, { displayModeBar: false });
+        }
+        
+        function gamma_changed() {
+            gamma_value = +this.value;
+            let tmp = setTimeout(function() {
+                if (debounce == tmp)
+                    updateAllShaders();
+            }, 500);
+            debounce = tmp;
+        }
+        
+        // update all shaders, namely their uniforms
+        function updateAllShaders() {
+            all_mesh.forEach(mesh => {
+                if (mesh.material.uniforms) {
+                    // console.log(mesh.material.uniforms);
+                    mesh.material.uniforms["gamma"].value = gamma_value;
+                    if (mesh.material.uniforms["dataMin"]) mesh.material.uniforms["dataMin"].value = dataMin_value;
+                    if (mesh.material.uniforms["dataMax"]) mesh.material.uniforms["dataMax"].value = dataMax_value;
+                }
+            });
+            
+            // update background depending on gamma
+            var transform96 = Math.pow(96 / 255, 1 / gamma_value);
+            renderer.setClearColor(new THREE.Color(transform96,transform96,transform96));
+        }
+
+        // returns whether or not the tractName is considered to be a left tract
+        function isLeftTract(tractName) {
+            return tractName.startsWith('Left ') || tractName.endsWith(' L');
+        }
+        // returns whether or not the tractName is considered to be a right tract
+        function isRightTract(tractName) {
+            return tractName.startsWith('Right ') || tractName.endsWith(' R');
+        }
+
+        function add_mesh_to_scene(mesh) {
+            mesh.rotation.x = brainRotationX;
+            all_mesh.push(mesh);
+            scene.add(mesh);
+        }
+
+        function calculateMesh(geometry) {
+            if (color_map) {
                 var vertexShader = `
                     attribute vec4 color;
                     varying vec4 vColor;
-
+                    
                     void main(){
                         vColor = color;
                         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -540,512 +541,352 @@ Vue.component('tractview', {
                     uniform float dataMin;
                     uniform float dataMax;
                     uniform float gamma;
-
+                    
                     float transformify(float value) {
                         return pow(value / dataMax, 1.0 / gamma) * dataMax;
                     }
-
+                    
                     void main(){
                         gl_FragColor = vec4(transformify(vColor.r), transformify(vColor.g), transformify(vColor.b), vColor.a);
                     }
                 `;
-
+                
                 var cols = [];
                 var hist = [];
                 for (var i = 0; i < geometry.vertices.length; i += 3) {
                     //convert webgl to voxel coordinates
-                    var vx, vy, vz;
-                    if (i == geometry.vertices.length - 3) {
-                        vx = geometry.vertices[i];
-                        vy = geometry.vertices[i+1];
-                        vz = geometry.vertices[i+2];
-                    } else {
-                        vx = (geometry.vertices[i] + geometry.vertices[i+3])/2;
-                        vy = (geometry.vertices[i+1] + geometry.vertices[i+4])/2;
-                        vz = (geometry.vertices[i+2] + geometry.vertices[i+5])/2;
-                    }
-
-                    var x = Math.round((vx - this.color_map_head.spaceOrigin[0]) / this.color_map_head.thicknesses[0]);
-                    var y = Math.round((vy - this.color_map_head.spaceOrigin[1]) / this.color_map_head.thicknesses[1]);
-                    var z = Math.round((vz - this.color_map_head.spaceOrigin[2]) / this.color_map_head.thicknesses[2]);
+                    var x = Math.round((geometry.vertices[i] - color_map_head.spaceOrigin[0]) / color_map_head.thicknesses[0]);
+                    var y = Math.round((geometry.vertices[i+1] - color_map_head.spaceOrigin[1]) / color_map_head.thicknesses[1]);
+                    var z = Math.round((geometry.vertices[i+2] - color_map_head.spaceOrigin[2]) / color_map_head.thicknesses[2]);
 
                     //find voxel value
-                    var v = this.color_map.get(z, y, x);
-                    if (isNaN(v)) {
-                        // if the color is invalid, then just gray out that part of the tract
-                        cols.push(.5);
-                        cols.push(.5);
-                        cols.push(.5);
-                        cols.push(1.0);
-                    } else {
-                        var normalized_v = (v - this.dataMin) / (this.dataMax - this.dataMin);
-                        var overlay_v = (v - this.sdev_m5) / (this.sdev_5 - this.sdev_m5);
+                    var v = color_map.get(z, y, x);
 
-                        //clip..
-                        // if(normalized_v < 0.1) normalized_v = 0.1;
-                        // if(normalized_v > 1) normalized_v = 1;
+                    var normalized_v = (v - dataMin_value) / (dataMax_value - dataMin_value);
+                    
+                    //clip..
+                    if(normalized_v < 0.1) normalized_v = 0.1;
+                    if(normalized_v > 1) normalized_v = 1;
 
-                        if(overlay_v < 0.1) overlay_v = 0.1;
-                        if(overlay_v > 1) overlay_v = 1;
-
-                        //compute histogram
-                        var hv = Math.round(normalized_v*256);
-                        var glob_hv = Math.round(normalized_v * 100);
-                        hist[hv] = (hist[hv] || 0) + 1;
-                        this.hist[glob_hv] = (this.hist[glob_hv] || 0) + 1;
-
-                        if (Array.isArray(geometry.tract.color)) {
-                            cols.push(geometry.tract.color[0] * overlay_v);
-                            cols.push(geometry.tract.color[1] * overlay_v);
-                            cols.push(geometry.tract.color[2] * overlay_v);
-                            cols.push(1.0);
-                        }
-                        else {
-                            cols.push(geometry.tract.color.r * overlay_v);
-                            cols.push(geometry.tract.color.g * overlay_v);
-                            cols.push(geometry.tract.color.b * overlay_v);
-                            cols.push(1.0);
-                        }
-                    }
+                    //compute histogram
+                    var hv = Math.round(normalized_v*256);
+                    var glob_hv = Math.round(normalized_v*100);
+                    hist[hv] = (hist[hv] || 0) + 1;
+                    global_hist[glob_hv] = (global_hist[glob_hv] || 0) + 1;
+                    
+                    cols.push(geometry.tract.color.r*normalized_v);
+                    cols.push(geometry.tract.color.g*normalized_v);
+                    cols.push(geometry.tract.color.b*normalized_v);
+                    cols.push(1.0);
                 }
-                geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 4));
-                let material = new THREE.ShaderMaterial({
+                geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 4));
+                
+                var m = new THREE.LineSegments( geometry, new THREE.ShaderMaterial({
                     vertexShader,
                     fragmentShader,
                     uniforms: {
-                        "gamma": { value: this.gamma },
+                        "gamma": { value: gamma_value },
                         "dataMin": { value: 1 },
                         "dataMax": { value: 1 },
                     },
                     transparent: true,
+                }) );
+                
+                config.tracts[geometry.tract_index].mesh = m;
+                return m;
+            }
+            
+            var material = new THREE.LineBasicMaterial({
+                color: geometry.tract.color,
+                transparent: true,
+                opacity: 0.7,
+            });
+            var m = new THREE.LineSegments( geometry, material );
+            config.tracts[geometry.tract_index].mesh = m;
+            
+            return m;
+        }
+        
+        function reselectAll() {
+            for (let tractName in config.LRtractNames) {
+                let toggle = config.LRtractNames[tractName];
+                if (toggle.left) {
+                    toggle.left.checkbox.click().click();
+                    toggle.right.checkbox.click().click();
+                } else toggle.checkbox.click().click();
+            }
+        }
+        
+        function recalculateMaterials() {
+            global_hist = [];
+            while (all_mesh.length)
+                scene.remove(all_mesh.pop());
+
+            all_geometry.forEach(geometry => {
+                add_mesh_to_scene( calculateMesh(geometry) );
+            });
+        }
+
+        function create_nifti_options() {
+            let preloaded = [];
+            nifti_select_el.append($("<option/>").html("None").val('none'));
+            //nifti_select_el.append($("<option/>").html("Rainboww!! :D").val('rainbow'));
+            
+            $(".nifti_chooser")[0].style.display = "";
+            if (config.niftis) {
+                config.niftis.forEach(nifti => {
+                    nifti_select_el.append($("<option/>").text(nifti.filename).val(nifti.url));
                 });
-
-                if (mesh) {
-                    //update
-                    mesh.geometry = geometry;
-                    mesh.material = material;
-                    return mesh;
+            }
+            
+            nifti_select_el.on('change', function() {
+                if (nifti_select_el.val().startsWith("user_uploaded|")) {
+                    var buffer = user_uploaded_files[nifti_select_el.val().substring(("user_uploaded|").length)];
+                    // TODO check if file is already re-inflated (not .nii.gz but instead just .nii)
+                    processDeflatedNiftiBuffer(buffer);
+                } else if (nifti_select_el.val() == 'none') {// || nifti_select_el.val() == 'rainbow') {
+                    color_map = undefined;
+                    
+                    recalculateMaterials();
+                    destroyPlot();
+                    reselectAll();
                 } else {
-                    //new
-                    mesh = new THREE.LineSegments( geometry, material );
-                    mesh = new THREE.LineSegments( geometry, material );
-                    mesh._normal_material = material;
-                    mesh._highlight_material = highlight_material;
-                    this.config.tracts[geometry.tract_index].mesh = mesh;
-                    return mesh;
-                }
-            }
-
-            let color;
-            let mul = 2.0;
-            if (Array.isArray(geometry.tract.color)) {
-                color = new THREE.Color(geometry.tract.color[0]*mul, geometry.tract.color[1]*mul, geometry.tract.color[2]*mul);
-            } else {
-                color = new THREE.Color(geometry.tract.color.r*mul, geometry.tract.color.g*mul, geometry.tract.color.b*mul);
-            }
-
-            let material = new THREE.LineBasicMaterial({
-                color,
-                transparent: true,
-                opacity: 0.5,
-            });
-
-            let highlight_material = new THREE.LineBasicMaterial({
-                color: "white",
-                transparent: true,
-                opacity: 0.8,
-            });
-
-            if (mesh) {
-                //update
-                mesh.geometry = geometry;
-                mesh.material = material;
-                return mesh;
-            } else {
-                //new
-                mesh = new THREE.LineSegments( geometry, material );
-                mesh._normal_material = material;
-                mesh._highlight_material = highlight_material;
-            }
-            this.config.tracts[geometry.tract_index].mesh = mesh;
-            return mesh;
-        },
-
-        recalculateMaterials: function() {
-            this.hist = [];
-            this.meshes.forEach(mesh => {
-                this.calculateMesh(mesh.geometry, mesh);
-            });
-        },
-
-        destroyPlot: function() {
-            Plotly.purge(this.$refs.hist);
-            this.$refs.hist.style.display = "none";
-        },
-
-        makePlot: function() {
-            this.destroyPlot();
-
-            var min_to_max = [];
-            for (var x = 0; x <= 100; x++) {
-                min_to_max.push(this.dataMin + (this.dataMax - this.dataMin) / 100 * x);
-                this.hist[x] = this.hist[x] || 0;
-            }
-
-            this.$refs.hist.style.display = "inline-block";
-            Plotly.plot(this.$refs.hist, [{
-                x: min_to_max,
-                y: this.hist,
-            }], {
-                xaxis: { gridcolor: '#444', tickfont: { color: '#aaa', size: 9 }, title: "Image Intensity" },
-                yaxis: { gridcolor: '#444', tickfont: { color: '#aaa', size: 9 }, title: "Number of Voxels", titlefont: { size: 12 } },
-                margin: {
-                    t: 5,
-                    b: 32,
-                    l: 40,
-                    r: 10
-                },
-                font: { color: '#ccc' },
-                titlefont: { color: '#ccc' },
-                plot_bgcolor: 'transparent',
-                paper_bgcolor: 'transparent',
-                autosize: true,
-            }, { displayModeBar: false });
-        },
-
-        upload_file: function(e) {
-            let file = e.target.files[0];
-            let reader = new FileReader();
-            reader.addEventListener('load', buffer=>{
-                this.niftis.push({ user_uploaded: true, filename: file.name, buffer: reader.result });
-                this.selectedNifti = this.niftis.length - 1;
-                this.niftiSelectChanged();
-            });
-            reader.readAsArrayBuffer(file);
-        },
-
-        niftiSelectChanged: function() {
-            if (this.selectedNifti === null) {
-                this.color_map = undefined;
-
-                this.recalculateMaterials();
-                this.destroyPlot();
-                this.showAll();
-            } else {
-                let nifti = this.niftis[this.selectedNifti];
-                if (nifti.user_uploaded) this.processDeflatedNiftiBuffer(nifti.buffer);
-                else {
-                    fetch(nifti.url)
+                    fetch(nifti_select_el.val())
                         .then(res => res.arrayBuffer())
-                        .then(this.processDeflatedNiftiBuffer)
-                        .catch(err => console.error);
+                        .then(processDeflatedNiftiBuffer)
+                    .catch(err => console.error);
                 }
-            }
-        },
-
-        showAll: function() {
-            this.meshes.forEach(m => m.visible = true);
-        },
-
-        processDeflatedNiftiBuffer: function(buffer) {
+            });
+        }
+        
+        function processDeflatedNiftiBuffer(buffer) {
             var raw = pako.inflate(buffer);
             var N = nifti.parse(raw);
 
-            this.color_map_head = nifti.parseHeader(raw);
-            this.color_map = ndarray(N.data, N.sizes.slice().reverse());
+            color_map_head = nifti.parseHeader(raw);
+            color_map = ndarray(N.data, N.sizes.slice().reverse());
 
-            this.color_map.sum = 0;
-            this.dataMin = null;
-            this.dataMax = null;
-
+            color_map.sum = 0;
             N.data.forEach(v=>{
-                if (!isNaN(v)) {
-                    if (this.dataMin == null) this.dataMin = v;
-                    else this.dataMin = v < this.dataMin ? v : this.dataMin;
-                    if (this.dataMax == null) this.dataMax = v;
-                    else this.dataMax = v > this.dataMax ? v : this.dataMax;
-
-                    this.color_map.sum+=v;
-                }
+                color_map.sum+=v;
             });
-            this.color_map.mean = this.color_map.sum / N.data.length;
+            color_map.mean = color_map.sum / N.data.length;
 
             //compute sdev
-            this.color_map.dsum = 0;
+            color_map.dsum = 0;
             N.data.forEach(v=>{
-                if (!isNaN(v)) {
-                    var d = v - this.color_map.mean;
-                    this.color_map.dsum += d*d;
-                }
+                var d = v - color_map.mean;
+                color_map.dsum += d*d;
             });
-            this.color_map.sdev = Math.sqrt(this.color_map.dsum/N.data.length);
+            color_map.sdev = Math.sqrt(color_map.dsum/N.data.length);
 
             //set min/max
-            this.sdev_m5 = this.color_map.mean - this.color_map.sdev*5;
-            this.sdev_5 = this.color_map.mean + this.color_map.sdev*5;
+            dataMin_value = color_map.mean - color_map.sdev;
+            dataMax_value = color_map.mean + color_map.sdev*5;
 
-            this.recalculateMaterials();
-            this.makePlot();
-            this.showAll();
-        },
-
-        surface_color(surface) {
-            let color;
-            if(surface.left) color = surface.left.color;
-            if(surface.right) color = surface.right.color;
-            if(Array.isArray(color)) {
-                return `rgb(${128+color[0]*256/2},${128+color[1]*256/2},${128+color[2]*256/2})`;
-            } else {
-                return `rgb(${128+color.r/2},${128+color.g/2},${128+color.b/2})`;
-            }
-        },
-
-        tract_color(tract) {
-            let color;
-            if(tract.left) color = tract.left.color;
-            if(tract.right) color = tract.right.color;
-            if(Array.isArray(color)) {
-                return `rgb(${128+color[0]*256/2},${128+color[1]*256/2},${128+color[2]*256/2})`;
-            } else {
-                return `rgb(${128+color.r/2},${128+color.g/2},${128+color.b/2})`;
-            }
-        },
-
-        check(obj, left) {
-            if(left) {
-                obj.left.mesh.visible = obj.left_check;
-            } else {
-                obj.right.mesh.visible = obj.right_check;
-            }
-            this.updateEndStartVisibility();
-        },
-
-        mouseenter(obj) {
-            //if(!obj) return;
-            if(obj.left && obj.left.mesh) {
-                obj.left.mesh.material = obj.left.mesh._highlight_material;
-                obj.left.mesh.visible = true;
-            }
-            if(obj.right && obj.right.mesh) {
-                obj.right.mesh.material = obj.right.mesh._highlight_material;
-                obj.right.mesh.visible = true;
-            }
-            this.updateEndStartVisibility();
-
-            this.hovered_obj = obj;
-        },
-
-        mouseleave(obj) {
-            //if(!obj) return;
-            if(obj.left && obj.left.mesh) {
-                obj.left.mesh.material = obj.left.mesh._normal_material;
-                if(!obj.left_check) {
-                    obj.left.mesh.visible = false;
-                }
-            }
-            if(obj.right && obj.right.mesh) {
-                obj.right.mesh.material = obj.right.mesh._normal_material;
-                if(!obj.right_check) {
-                    obj.right.mesh.visible = false;
-                }
-            }
-            this.updateEndStartVisibility();
-
-            //restore original material.opacity
-            if(this.hovered_obj.left && this.hovered_obj.left.mesh) {
-                this.hovered_obj.left.mesh.opacity = this.hovered_obj.left.mesh._normal_material.opacity;
-            }
-            if(this.hovered_obj.right && this.hovered_obj.right.mesh) {
-                this.hovered_obj.right.mesh.opacity = this.hovered_obj.right.mesh._normal_material.opacity;
-            }
-            this.hovered_obj = null;
-        },
-
-        findSurface(event) {
-            const mouse = new THREE.Vector2();
-            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-            this.raycaster.setFromCamera( mouse, this.camera );
-            const intersects = this.raycaster.intersectObjects(this.scene.children.filter(c=>c.visible && c._surface));
-
-            //find the find intersect
-            if(!intersects.length) return null;
-            return intersects[0].object;
+            // console.log("color map");
+            // console.dir(color_map);
             
-        },
+            recalculateMaterials();
+            makePlot();
+            
+            reselectAll();
+        }
+        
+        function populateHtml(element) {
+            element.html(`
+                <div class="container">
+                    <!-- Main Connectome View -->
+                    <div id="conview" class="conview"></div>
 
-        mousemove(event) {
-            if(event.buttons) return; //ignore dragging
-    
-            //restore previously hovered surface
-            if(this.hovered_surface) this.hovered_surface.material = this.hovered_surface._normal_material;
-    
-            //check to see if we are still hovering, or hovering on new surface
-            let obj = this.findSurface(event);
-            if(obj) obj.material = obj._highlight_material;
+                    <!-- Tiny Brain to Show Orientation -->
+                    <div id="tinybrain" class="tinybrain"></div>
 
-            this.hovered_surface = obj;
-        },
+                    <div id="controls" class="controls">
+                        <div style="display:flex;">
+                            <!-- Hide/Show Panel -->
+                            <div id="hide_show" class="hide_show">
+                                <div class="table">
+                                    <div class="cell">
+                                        <div class="rotated" id="hide_show_text"></div>
+                                    </div>
+                                </div>
+                            </div>
 
-        mouseup(event) {
-            if(this.pushed_surface) {
-                this.pushed_surface.material = this.pushed_surface._highlight_material;
-                this.pushed_surface = null;
-            }
-        },
-        mousedown(event) {
-            let obj = this.findSurface(event);
-            if(obj) {
-                this.pushed_surface = obj;
-                obj.material = obj._xray_material;
-            }
-        },
+                            <!-- Fascicle Toggling -->
+                            <div class="container_toggles" id="container_toggles">
+                                <table class="tract_toggles" id="tract_toggles"></table>
 
-        updateEndStartVisibility() {
-            for(let name in this.tracts) {
-                let tract = this.tracts[name];
-                if(tract.left && tract.left.mesh) {
-                    tract.left.start.visible = tract.left.mesh.visible && this.showStart;
-                    tract.left.end.visible = tract.left.mesh.visible && this.showEnd;
-                }
-                if(tract.right && tract.right.mesh) {
-                    tract.right.start.visible = tract.right.mesh.visible && this.showStart;
-                    tract.right.end.visible = tract.right.mesh.visible && this.showEnd;
-                }
-            }
-        },
-    },
-
-    computed: {
-        sorted_tracts: function() {
-            if(!this.tracts) return [];
-            return Object.keys(this.tracts).sort();
-        },
-    },
-
-    watch: {
-        all_left: function(v) {
-            for(let name in this.tracts) {
-                let tract = this.tracts[name];
-                if(tract.left) {
-                    tract.left_check = v;   
-                    tract.left.mesh.visible = v;
-                }
-            }
-            this.updateEndStartVisibility();
-        },
-
-        all_right: function(v) {
-            for(let name in this.tracts) {
-                let tract = this.tracts[name];
-                if(tract.right) {
-                    tract.right_check = v;  
-                    tract.right.mesh.visible = v;
-                }
-            }
-            this.updateEndStartVisibility();
-        },
-
-        showStart: function() {
-            this.updateEndStartVisibility();
-        },
-        showEnd: function() {
-            this.updateEndStartVisibility();
-        },
-    },
-
-    template: `
-    <div class="container">
-        <div ref="stats" v-show="show_stats"/>
-        <div id="conview" class="conview" ref="view" style="position:absolute; width: 100%; height:100%;"
-            @mousemove="mousemove" @mousedown="mousedown" @mouseup="mouseup"/>
-        <div id="tinybrain" class="tinybrain" style="width:100px;height:100px;" ref="tinybrain"></div>
-        <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
-
-        <div class="controls" style="left: 0;" v-if="config.surfaces">
-            <div class="control-row" style="margin: 8px 0px; position: relative;">
-                <b class="check check-left">&nbsp;L&nbsp;</b>
-                <b class="check check-right">&nbsp;R&nbsp;</b>
-                <h2>Brain Regions</h2>
-            </div>
-            <div class="scrollable" ref="surfaces">
-                <div v-if="surfaces">
-                    <div v-for="name in Object.keys(surfaces)" :style="{color: surface_color(surfaces[name])}" class="control-row" style="position: relaive;"
-                        @mouseenter="mouseenter(surfaces[name])" @mouseleave="mouseleave(surfaces[name])">
-                        {{name}}
-                        <input v-if="surfaces[name].left && surfaces[name].left.mesh" type='checkbox' class="check check-left" @change="check(surfaces[name], true)" v-model='surfaces[name].left_check' />
-                        <input v-if="surfaces[name].right && surfaces[name].right.mesh" type='checkbox' class="check check-right" @change="check(surfaces[name], false)" v-model='surfaces[name].right_check' />
+                                <!-- Nifti Choosing -->
+                                <div class="nifti_chooser" style="display:none;">
+                                    <div><label style="color:#ccc; width: 120px;">Background Gamma</label> <input type="number" min=".0001" value="1" step=".1" id="gamma_input" class="gamma_input"></input></div>
+                                    <div><label style="color:#ccc; width: 120px;">Overlay</label> <select id="nifti_select" class="nifti_select"></select></div>
+                                    <div class="upload_div">
+                                        <label for="upload_nifti">Upload Overlay Image (.nii.gz)</label>
+                                        <input type="file" style="visibility:hidden;max-height:0;" name="upload_nifti" id="upload_nifti"></input>
+                                    </div>
+                                    <div class="plots" id="plots"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <br>
-        </div>
 
-        <div class="controls" style="right: 0">
-            <div class="controls-help">
-                <span>Rotate</span>
-                <span>Zoom</span>
-                <span>Pan</span>
-                <br>
-                <img src="controls.png" height="40px"/>
-            </div>
-            <div class="rotateControl" v-if="controls">
-                <input type="checkbox" v-model="controls.autoRotate"> Auto-Rotate</input>
-                &nbsp;
-                <input type="checkbox" v-model="showStart">
-                    <span style="color: #58f">Show Fiber Startpoint</span> 
-                </input>
-                &nbsp;
-                <input type="checkbox" v-model="showEnd">
-                    <span style="color: #f55">Show Fiber Endpoint</span>
-                </input>
-                &nbsp;
-            </div>
-            <div class="control-row" style="margin: 8px 0px; position: relative;">
-                <b class="check check-left">&nbsp;L&nbsp;</b>
-                <b class="check check-right">&nbsp;R&nbsp;</b>
-                <h2>White Matter Tracts</h2>
-            </div>
-            <div class="scrollable" ref="tracts" style="left: inherit; right: 0">
-                <div v-if="tracts">
-                    <div class="control-row" style="border-bottom: 1px solid #fff3; padding-bottom: 5px; margin-bottom: 5px;">
-                        <b style="opacity: 0.3; position: relative;">All</b>
-                        <input type='checkbox' v-model='all_left' class="check check-left"/>
-                        <input type='checkbox' v-model='all_right' class="check check-right"/>
-                    </div>
+                <style scoped>
+                .container {
+                    width: 100%;
+                    height: 100%;
+                    padding: 0px;
+                }
+                
+                .conview {
+                    width:100%;
+                    height: 100%;
+                }
+                .tinybrain {
+                    position:absolute;
+                    pointer-events:none;
+                    left:0;
+                    bottom:0;
+                    width:100px;
+                    height:100px;
+                }
 
-                    <div v-for="name in sorted_tracts" :style="{color: tract_color(tracts[name])}" class="control-row" style="position: relative;"
-                        @mouseenter="mouseenter(tracts[name])" @mouseleave="mouseleave(tracts[name])">
-                        {{name}}
-                        <input v-if="tracts[name].left && tracts[name].left.mesh" type='checkbox' class="check check-left" @change="check(tracts[name], true)" v-model='tracts[name].left_check' />
-                        <input v-if="tracts[name].right && tracts[name].right.mesh" type='checkbox' class="check check-right" @change="check(tracts[name], false)" v-model='tracts[name].right_check' />
-                    </div>
+                .controls {
+                    display:inline-block;
+                    position:absolute;
+                    right:0;
+                    top:0;
+                    width:auto;
+                    height:auto;
+                    max-height:100%;
+                    padding-left: 1px;
+                    overflow-x:hidden;
+                    overflow-y:auto;
+                    white-space:nowrap;
+                    font-family:Roboto;
+                    font-size:12px;
+                    background:rgba(0, 0, 0, .7);
+                }
 
-                    <div class="nifti_chooser" style="display:inline-block; max-width:300px; margin-top:5px;">
-                        <div style="display:inline-block;" v-if="niftis.length > 0">
-                            <label style="color:#ccc; width: 120px;">Overlay</label> 
-                            <select id="nifti_select" class="nifti_select" ref="upload_input" @change="niftiSelectChanged" v-model="selectedNifti">
-                            <option :value="null">(No Overlay)</option>
-                            <option v-for="(n, i) in niftis" :value="i">{{n.filename}}</option>
-                            </select>
-                        </div>
-                        <br />
-                        <div class="upload_div">
-                            <label for="upload_nifti">Upload Overlay Image (.nii.gz)</label>
-                            <input type="file" style="visibility:hidden;max-height:0;max-width:5px;" name="upload_nifti" id="upload_nifti" @change="upload_file"></input>
-                        </div>
-                        <div class="plots" id="plots" ref="hist"></div>
-                    </div>
-                </div>
-            </div>
-            <br>
-        </div>
-    </div>            
-    `
-})
+                .hide_show {
+                    display:inline-block;
+                    position:relative;
+                    vertical-align:top;
+                    text-align:left;
+                    width:auto;
+                    flex:1;
+                    color: #777;
+                    overflow:hidden;
+                    cursor:default;
+                    transition:background 1s, color 1s;
+                }
+                .hide_show:hover {
+                    background:black;
+                    color:white;
+                }
 
-function getHashValue(key) {
-    var matches = window.parent.location.hash.match(new RegExp(key+'=([^&]*)'));
-    return matches ? decodeURIComponent(matches[1]) : null;
-}
+                /* Hide/Show Vertical Alignment */
+                .parent {
+                    padding-right:4px;
+                }
+                .list-group-item.table {
+                    height:auto !important;
+                }
+                .table {
+                    display:table;
+                    height:100%;
+                    margin-bottom:0 !important;
+                }
+                .cell {
+                    display:table-cell;
+                    vertical-align:middle;
+                }
 
+                .hide_show .rotated {
+                    display:inline-block;
+                    min-width:16px;
+                    max-width:16px;
+                    vertical-align:middle;
+                    transform:rotate(-90deg);
+                }
+
+                .container_toggles {
+                    display:inline-block;
+                    max-width:500px;
+                    width:auto;
+                    height:auto;
+                    max-height:100%;
+                    padding: 4px 0px;
+                    overflow:auto;
+                    transition:max-width .5s, opacity .5s, padding .5s;
+                }
+                
+                .nifti_chooser {
+                    padding-left:4px;
+                    display:inline-block;
+                }
+                
+                .gamma_input {
+                    width: 55px;
+                }
+                
+                .plots {
+                    display:none;
+                    width:300px;
+                    height:200px;
+                }
+                
+                .nifti_select {
+                    margin-bottom:4px;
+                }
+                
+                .upload_div {
+                    color:#9cc;
+                }
+                
+                .upload_div:hover {
+                    color:#aff;
+                }
+
+                label {
+                    font-weight:100;
+                    font-size:12px;
+                }
+                tr.header {
+                    color:white;
+                    text-align:center;
+                    margin:0;
+                }
+                tr.header label {
+                    margin-right:4px;
+                    cursor:pointer;
+                }
+
+                input[type="checkbox"] {
+                    vertical-align:middle;
+                    margin:0;
+                    cursor:pointer;
+                }
+
+                td.label {
+                    text-overflow:ellipsis;
+                }
+
+                tr.row.disabled {
+                    opacity:.5;
+                }
+                tr.row label {
+                    color:#ccc;
+                }
+                tr.row.active label {
+                    color:#fff;
+                }
+                </style>
+            `);
+        }
+    }
+
+};
+
+module.exports = TractView;

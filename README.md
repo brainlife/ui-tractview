@@ -4,6 +4,7 @@ HTML5 White Matter Tractography Viewer - Used to visualize output from white mat
 
 [Demo at brainlife.io](https://brainlife.io/ui/tractview/demo.html) | [brainlife.io DOI](https://doi.org/10.25663/brainlife.ui.2)
 
+<<<<<<< HEAD
 ### Authors
 - Soichi Hayashi (hayashis@iu.edu)
 - Steven O'Riley (stevengeeky@gmail.com)
@@ -22,9 +23,46 @@ brainlife.io is publicly funded and for the sustainability of the project it is 
 
 ### Citations
 We kindly ask that you cite the following articles when publishing papers or code using this code. 
+=======
+Install for general purpose use (visualize a set of tracts with optional 3-dimensional nifti masks)
+
+```
+git clone https://github.com/brain-life/ui-tractview.git
+cd ui-tractview && npm install
+```
+
+Or via npm (might be old)
+
+```bash
+npm install ui-tractview
+```
+
+Get browserify so that you can use `require` locally:
+
+```bash
+npm install -g browserify
+```
+
+Include script dependencies in your index.html file:
+
+```html
+<!-- Dep Scripts -->
+<script type="text/javascript" src="node_modules/ui-tractview/node_modules/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="node_modules/ui-tractview/node_modules/three/build/three.min.js"></script>
+<script type="text/javascript" src="node_modules/ui-tractview/node_modules/three/examples/js/loaders/VTKLoader.js"></script>
+<script type="text/javascript" src="node_modules/ui-tractview/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="node_modules/ui-tractview/node_modules/panning-orbit-controls/dist/panning-orbit-controls.js"></script>
+
+<script type="text/javascript" src="node_modules/ui-tractview/node_modules/pako/dist/pako_inflate.min.js"></script>
+
+<!-- Main Scripts -->
+<!-- bundle.js will be generated from a later step -->
+<script type="text/javascript" src="bundle.js"></script>
+>>>>>>> 73bb6a93477a1366cdb9c4d21869c186f2e33e94
 
 1. Avesani, P., McPherson, B., Hayashi, S. et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. Sci Data 6, 69 (2019). [https://doi.org/10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
 
+<<<<<<< HEAD
 #### MIT Copyright (c) 2020 brainlife.io The University of Texas at Austin and Indiana University
 
 ![Preview Image](https://raw.githubusercontent.com/brain-life/brainlife.github.io/master/images/ui-logos/tractview.png)
@@ -87,11 +125,63 @@ The `config` prop used above has the following layout:
   "layers": [{
     "name": "faStd",
     "url": "url/path/to/faStd.nii.gz" }/*, ...*/]
+=======
+Make an element to hook the tractviewer onto:
+
+```html
+<div id="tractview" style="height: 100%;"></div>
+```
+
+Make a main javascript file which we will denote as `main.js` for this demonstration. Then require `tractview` inside it:
+
+```javascript
+$(function() {
+    var tractview = require('./node_modules/ui-tractview/tractview.js');
+
+    var config = {/* read below */};
+
+    tractview.init({
+        selector: '#tractview',
+        preview_scene_path: 'node_modules/ui-tractview/models/brain.json',
+        tracts: config.tracts,  // read below
+        niftis: config.niftis   // read below
+    });
+});
+```
+
+The `config` value used above has the following layout:
+
+```javascript
+{
+    "tracts": [{
+        "name": "Left IFOF",
+        "color": [0.1465684211,0.7597421053,0.6797052632],
+        "url": "file/path/to/tract1.json" }/*, ...*/],
+    "niftis": [{
+        "name": "faStd",
+        "url": "file/path/to/faStd.nii.gz" }/*, ...*/]
 }
 ```
 
 The list of tracts contains a set of objects which each specify what the name of a given tract is, what its color should be represented as in tractview ([r, g, b], each ranging from 0 to 1), and what file or url path leads to the tract's json file, which should look like this:
 
+```javascript
+{
+    "coords": [[
+            // x coords
+            [-21.69491386, -21.64446831, -21.4675293/*, ...*/],
+            // y coords
+            [43.13895035, 42.14380264, 41.15979385/*, ...*/],
+            // z coords
+            [1.224040627, 1.165375113, 1.165637732/*, ...*/]
+        ]/*, ...*/]
+>>>>>>> 73bb6a93477a1366cdb9c4d21869c186f2e33e94
+}
+```
+
+The list of tracts contains a set of objects which each specify what the name of a given tract is, what its color should be represented as in tractview ([r, g, b], each ranging from 0 to 1), and what file or url path leads to the tract's json file, which should look like this:
+
+<<<<<<< HEAD
 ```javascript
 {
   "coords": [[
@@ -107,6 +197,8 @@ The list of tracts contains a set of objects which each specify what the name of
 
 If you are generating an output from AFQ in Matlab, you can use `savejson` and a script similar to the following in order to create a list of output json files:
 
+=======
+>>>>>>> 73bb6a93477a1366cdb9c4d21869c186f2e33e94
 ```matlab
 [fg_classified,~,classification] = AFQ_SegmentFiberGroups(config.dt6, fg, [], [], false);
 tracts = fg2Array(fg_classified);
@@ -121,6 +213,7 @@ for it = 1:length(tracts)
 end
 ```
 
+<<<<<<< HEAD
 Once you have main.js and your configuration set up, you're ready to go!
 
 ### Generating Data
@@ -130,3 +223,12 @@ Once you have main.js and your configuration set up, you're ready to go!
 * surfaces/
 
 mri_convert $fsdir/mri/aparc+aseg.mgz --out_orientation RAS aparc+aseg.nii.g
+=======
+After you have set up your main javascript file, simply run
+
+```bash
+browserify main.js > bundle.js
+```
+
+And all of your code will be assembled into a single file (in this case `bundle.js`) which can be run standalone on a local machine.
+>>>>>>> 73bb6a93477a1366cdb9c4d21869c186f2e33e94
