@@ -435,13 +435,21 @@ export default defineComponent({
                     right = true;
                     name = surface.name.substring(2);
                 }
-                if(name.startsWith('ctx-lh-')) {
+                if(name.includes('-lh-')) {
                     left = true;
-                    name = surface.name.substring(7);
+                    name = surface.name.replace("-lh-", "-");
                 }
-                if(name.startsWith('ctx-rh-')) {
+                if(name.includes('-rh-')) {
                     right = true;
-                    name = surface.name.substring(7);
+                    name = surface.name.replace("-rh-", "-");
+                }
+                if(name.includes('_lh_')) {
+                    left = true;
+                    name = surface.name.replace("_lh_", "-");
+                }
+                if(name.includes('_rh_')) {
+                    right = true;
+                    name = surface.name.replace("_rh_", "-");
                 }
 
                 //if it's not left nor right, pretend that it's left
