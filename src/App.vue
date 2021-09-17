@@ -138,7 +138,7 @@ export default defineComponent({
             if(!this.config.tracts) return;
 
             const textureLoader = new THREE.TextureLoader();
-            const pointSprite = textureLoader.load('/point.png');
+            const pointSprite = textureLoader.load('point.png');
 
             let idx = 0;
             let tracts = new THREE.Object3D();
