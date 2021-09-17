@@ -1,12 +1,12 @@
+[![Run on Brainlife.io](https://img.shields.io/badge/brainlife-ui.tractview-blue.svg)](https://brainlife.io/ui/tractview)
+
 # ui-tractview
 
-Web-based White Matter Tractography and surfaces viewer
+Web-based White Matter Tractography and Surfaces Viewer for brainlife.io.
 
-![Preview Image](https://raw.githubusercontent.com/brain-life/brainlife.github.io/master/images/ui-logos/tractview.png)
+![Preview Image](https://raw.githubusercontent.com/brainlife/brainlife.github.io/master/images/ui-logos/tractview.pngg)
 
 This App is used to visualize brainlife's [neuro/wmc datatype](https://brainlife.io/datatype/5cc1d64c44947d8aea6b2d8b) (white matter tractography) object.
-
-[Demo at brainlife.io](https://brainlife.io/ui/tractview/demo.html) | [brainlife.io DOI](https://doi.org/10.25663/brainlife.ui.2)
 
 ### Authors
 - [Soichi Hayashi](hayashis@iu.edu)
