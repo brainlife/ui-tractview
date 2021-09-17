@@ -67,7 +67,7 @@ export default defineComponent({
         let config = window.parent.config || window.config;
 
         if(config) {
-            //handle a case where there is only 1 surface / tract object
+            //normalize a case where there is only 1 surface / tract object (some app does that..)
             if(config.tracts && !Array.isArray(config.tracts)) config.tracts = [config.tracts];
             if(config.surfaces && !Array.isArray(config.surfaces)) config.surfaces = [config.surfaces];
 
@@ -110,7 +110,7 @@ export default defineComponent({
             THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
             THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
-            //show framerate
+            //initialize Stats to show debug info (FPS, etc..) 
             if(this.config.debug) {
                 this.stats = new Stats();
                 this.stats.dom.style.top = 'inherit';
@@ -121,7 +121,8 @@ export default defineComponent({
                 this.stats.showPanel(0);
             }
 
-            this.organize();
+            this.normalizeColor();
+            this.organizeLR();
             this.initScene();
             this.animate(); //start animating before all data is loaded
             
@@ -270,48 +271,53 @@ export default defineComponent({
                 this.loading = surface.name;
                 this.load_percentage = (idx++) / this.config.surfaces.length;
                 //await this.loadSurface(surface);
-                const geometry = await vtkloader.loadAsync(surface.url);
-                geometry.computeVertexNormals(); //for smooth shading
+                try {
+                    const geometry = await vtkloader.loadAsync(surface.url);
+                    geometry.computeVertexNormals(); //for smooth shading
 
-                // @ts-ignore
-                if(geometry.computeBoundsTree) geometry.computeBoundsTree(); //for BVH
+                    // @ts-ignore
+                    if(geometry.computeBoundsTree) geometry.computeBoundsTree(); //for BVH
 
-                let back_material = new THREE.MeshLambertMaterial({
-                    //color: new THREE.Color(surface.color).multiplyScalar(2),
-                    color: surface.color,
-                    transparent: true,
-                    opacity: 0.2,
-                    depthTest: false,
-                });
-                let back_mesh = new THREE.Mesh( geometry, back_material );
-                back_mesh.rotation.x = -Math.PI/2;
-                three.back_scene.add(back_mesh);
+                    let back_material = new THREE.MeshLambertMaterial({
+                        //color: new THREE.Color(surface.color).multiplyScalar(2),
+                        color: surface.color,
+                        transparent: true,
+                        opacity: 0.2,
+                        depthTest: false,
+                    });
+                    let back_mesh = new THREE.Mesh( geometry, back_material );
+                    back_mesh.rotation.x = -Math.PI/2;
+                    three.back_scene.add(back_mesh);
 
-                let mesh = new THREE.Mesh( geometry );
-                mesh.rotation.x = -Math.PI/2;
-                mesh.visible = false;
-                surface.mesh = mesh;
+                    let mesh = new THREE.Mesh( geometry );
+                    mesh.rotation.x = -Math.PI/2;
+                    mesh.visible = false;
+                    surface.mesh = mesh;
 
-                //store other surfaces
-                surface.normal_material = new THREE.MeshLambertMaterial({
-                    color: new THREE.Color(surface.color),
-                    transparent: true,
-                    opacity: 0.8,
-                });
-                surface.highlight_material = new THREE.MeshPhongMaterial({
-                    color: new THREE.Color(surface.color).multiplyScalar(1.25),
-                    transparent: true,
-                    opacity: 1,
-                    shininess: 80,
-                });
-                surface.xray_material = new THREE.MeshLambertMaterial({
-                    color: new THREE.Color(surface.color).multiplyScalar(1.25),
-                    transparent: true,
-                    opacity: 0.2,
-                    depthTest: false, //need this to show tracts on top
-                });
-                mesh.material = surface.normal_material;
-                three.scene.add(mesh);
+                    //store other surfaces
+                    surface.normal_material = new THREE.MeshLambertMaterial({
+                        color: new THREE.Color(surface.color),
+                        transparent: true,
+                        opacity: 0.8,
+                    });
+                    surface.highlight_material = new THREE.MeshPhongMaterial({
+                        color: new THREE.Color(surface.color).multiplyScalar(1.25),
+                        transparent: true,
+                        opacity: 1,
+                        shininess: 80,
+                    });
+                    surface.xray_material = new THREE.MeshLambertMaterial({
+                        color: new THREE.Color(surface.color).multiplyScalar(1.25),
+                        transparent: true,
+                        opacity: 0.2,
+                        depthTest: false, //need this to show tracts on top
+                    });
+                    mesh.material = surface.normal_material;
+                    three.scene.add(mesh);
+                } catch (err) {
+                    console.error("failed to load surface", surface.url);
+                    console.error(err);
+                }
             }
         },
 
@@ -327,27 +333,35 @@ export default defineComponent({
                 this.config.tracts = data;
                 if(this.config.tracts) this.config.tracts.forEach((tract:ITractConfig)=>{
                     tract.url = dataurl+"/tracts/"+tract.filename;
-                    // @ts-ignore
-                    tract.color = new THREE.Color(tract.color[0]/2+0.5, tract.color[1]/2+0.5, tract.color[2]/2+0.5); //always array?
                 });
                 fetch(dataurl+"/surfaces/index.json").then(res=>res.json()).then(data=>{
                     if(!Array.isArray(data)) data = [data];
                     this.config.surfaces = data;
                     if(this.config.surfaces) this.config.surfaces.forEach((surface:ISurfaceConfig)=>{
                         surface.url = dataurl+"/surfaces/"+surface.filename;
-                        surface.color = new THREE.Color(surface.color.r/512+0.5,  surface.color.g/512+0.5,  surface.color.b/512+0.5);  
                     });
                     this.init();
                 }).catch(err=>{
+                    //probably no surfacess.. but it's ok
                     console.error(err);
-                    console.log("not using surfaces");
                     this.init();
                 });
             });
         },
 
+        //convert color info stored in JSON to THREE.Color.
+        normalizeColor()  {
+            if(this.config.tracts) this.config.tracts.forEach((tract:ITractConfig)=>{
+                // @ts-ignore
+                tract.color = new THREE.Color(tract.color[0]/2+0.5, tract.color[1]/2+0.5, tract.color[2]/2+0.5); //always array?
+            });
+            if(this.config.surfaces) this.config.surfaces.forEach((surface:ISurfaceConfig)=>{
+                surface.color = new THREE.Color(surface.color.r/512+0.5,  surface.color.g/512+0.5,  surface.color.b/512+0.5);  
+            });
+        },
+
         //from the config tracts/surfaces, setup this.tracts and this.surfaces with left/right separated (no mesh yet)
-        organize() {
+        organizeLR() {
             this.tracts = {};
             if(this.config.tracts) this.config.tracts.forEach((tract:ITractConfig)=>{
                 let left = false;
@@ -435,13 +449,8 @@ export default defineComponent({
                     right_check: false,
                 }
 
-                if(left) {
-                    this.surfaces[name].left = surface;
-                }
-                if(right) {
-                    this.surfaces[name].right = surface;
-                }
-
+                if(left) this.surfaces[name].left = surface;
+                if(right) this.surfaces[name].right = surface;
             });
         },
 
