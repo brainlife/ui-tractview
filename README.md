@@ -6,7 +6,9 @@ Web-based White Matter Tractography and Surfaces Viewer for brainlife.io.
 
 ![Preview Image](https://raw.githubusercontent.com/brainlife/brainlife.github.io/master/images/ui-logos/tractview.png)
 
-This App is used to visualize brainlife's [neuro/wmc datatype](https://brainlife.io/datatype/5cc1d64c44947d8aea6b2d8b) (white matter tractography) object.
+## Abstract
+
+The white matter of the human brain can be found in subcortical areas of the brain, and it allows distal parts of the brain to communicate and transmit information. As the role of white matter is to interact with various parts of the brain, it is important to visualize white matter together with both cortical and subcortical areas of the brain. Although it is possible to visualize white-matter tracts with segmented brain surfaces simultaneously using existing tools, they often require advanced expertise in data preprocessing and visualization techniques to correctly visualize them. Combined with an easy-to-use neuroimaging platform called brainlife.io, Tractview provides a simple yet effective web-based visualizer for white matter tractography and brain surfaces. It enables researchers to quickly gain preliminary insights on the data being processed on bralinlife.io before a more thorough analysis can be performed. 
 
 ### Authors
 - [Soichi Hayashi](hayashis@iu.edu)
@@ -17,48 +19,22 @@ This App is used to visualize brainlife's [neuro/wmc datatype](https://brainlife
 ### Project Director
 - [Franco Pestilli](frakkopesto@gmail.com)
 
-## Project Initialization
+# Installation / Running locally
 
-This project was initialized using Vite
+This App is used to visualize brainlife's [neuro/wmc datatype](https://brainlife.io/datatype/5cc1d64c44947d8aea6b2d8b) (white matter tractography) object. The easiest way to run it to run it on brainlife.io. If you'd like to run it locally (maybe for development purpose), you can run the following command inside the git cloned repo.
 
->  npm init vite-app tractview
+> Dependencies
 
-## Local Installation
-
-
-
-
-### Funding Acknowledgement
-brainlife.io is publicly funded and for the sustainability of the project it is helpful to Acknowledge the use of the platform. We kindly ask that you acknowledge the funding below in your publications and code reusing this code.
-
-[![NSF-BCS-1734853](https://img.shields.io/badge/NSF_BCS-1734853-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1734853)
-[![NSF-BCS-1636893](https://img.shields.io/badge/NSF_BCS-1636893-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1636893)
-[![NSF-ACI-1916518](https://img.shields.io/badge/NSF_ACI-1916518-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1916518)
-[![NSF-IIS-1912270](https://img.shields.io/badge/NSF_IIS-1912270-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1912270)
-[![NIH-NIBIB-R01EB029272](https://img.shields.io/badge/NIH_NIBIB-R01EB029272-green.svg)](https://grantome.com/grant/NIH/R01-EB029272-01)
-
-### Citations
-We kindly ask that you cite the following articles when publishing papers or code using this code. 
-
-1. Avesani, P., McPherson, B., Hayashi, S. et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. Sci Data 6, 69 (2019). [https://doi.org/10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
-
-#### MIT Copyright (c) 2020 brainlife.io The University of Texas at Austin and Indiana University
-
-## Dependencies
-
-* npm
-* nodejs
-
-## Installation
+    * nodejs (>14.17.1)
+    * npm (>6.14.13)
+    * tsc (>4.4.2)
 
 ```
 git clone https://github.com/brain-life/ui-tractview.git
 cd ui-tractview && npm install
 ```
 
-## Running Locally
-
-This visualizer is available through brainlife.io. The easiest way to run it to run it on brainlife.io. If you'd like to run it locally (maybe for development purpose), you can run the following command inside the git cloned repo.
+To launch the UI run..
 
 ```
 $ npm run dev
@@ -82,82 +58,26 @@ You can click on the localhost host link to launch a web browser and tractview s
 
 Instead of using the demo data, you can provide your own data to visualize. 
 
-Include script dependencies in your index.html file:
+> TODO
 
-```html
-<!-- Dep Scripts -->
-<script type="text/javascript" src="node_modules/ui-tractview/node_modules/three/build/three.min.js"></script>
-<script type="text/javascript" src="node_modules/ui-tractview/node_modules/three/examples/js/loaders/VTKLoader.js"></script>
-<script type="text/javascript" src="node_modules/ui-tractview/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="node_modules/ui-tractview/node_modules/panning-orbit-controls/dist/panning-orbit-controls.js"></script>
-<script type="text/javascript" src="node_modules/ui-tractview/node_modules/pako/dist/pako_inflate.min.js"></script>
-<script type="text/javascript" src="node_modules/ui-tractview/node_modules/vue/dist/vue.min.js"></script>
+### Funding Acknowledgement
+brainlife.io is publicly funded and for the sustainability of the project it is helpful to Acknowledge the use of the platform. We kindly ask that you acknowledge the funding below in your publications and code reusing this code.
 
-<!-- element to bind to the tract viewer -->
-<div id="tractview">
+[![NSF-BCS-1734853](https://img.shields.io/badge/NSF_BCS-1734853-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1734853)
+[![NSF-BCS-1636893](https://img.shields.io/badge/NSF_BCS-1636893-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1636893)
+[![NSF-ACI-1916518](https://img.shields.io/badge/NSF_ACI-1916518-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1916518)
+[![NSF-IIS-1912270](https://img.shields.io/badge/NSF_IIS-1912270-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1912270)
+[![NIH-NIBIB-R01EB029272](https://img.shields.io/badge/NIH_NIBIB-R01EB029272-green.svg)](https://grantome.com/grant/NIH/R01-EB029272-01)
 
-<!-- Main Scripts -->
-<script type="text/javascript" src="node_modules/ui-tractview/tractview.js"></script>
-<script type="text/javascript" src="main.js"></script>
+### Citations
+We kindly ask that you cite the following articles when publishing papers or code using this code. 
 
-<!-- Dep Styles -->
-<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
-```
+1. Avesani, P., McPherson, B., Hayashi, S. et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. Sci Data 6, 69 (2019). [https://doi.org/10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
 
-Initialize your main script after your target element to use with the tractviewer. The tractviewer is simply a Vue component that you can initialize in a few lines of JavaScript:
+#### MIT Copyright (c) 2020 brainlife.io The University of Texas at Austin and Indiana University
 
-```javascript
-new Vue({
-  el: '#tractview',
-  components: ['tractview'],
-  template: `<tractview :config='config'></tractview>`
-});
-```
+## Technical Notes
 
-The `config` prop used above has the following layout:
+This project was initialized using `vite`. 
 
-```javascript
-{
-  "tracts": [{
-    "name": "Left IFOF",
-    "color": [0.1465684211,0.7597421053,0.6797052632],
-    "url": "file/path/to/tract1.json" }/*, ...*/],
-  "layers": [{
-    "name": "faStd",
-    "url": "url/path/to/faStd.nii.gz" }/*, ...*/]
-}
-```
-
-The list of tracts contains a set of objects which each specify what the name of a given tract is, what its color should be represented as in tractview ([r, g, b], each ranging from 0 to 1), and what file or url path leads to the tract's json file, which should look like this:
-
-```javascript
-{
-  "coords": [[
-      // x coords
-      [-21.69491386, -21.64446831, -21.4675293/*, ...*/],
-      // y coords
-      [43.13895035, 42.14380264, 41.15979385/*, ...*/],
-      // z coords
-      [1.224040627, 1.165375113, 1.165637732/*, ...*/]
-    ]/*, ...*/]
-}
-```
-
-If you are generating an output from AFQ in Matlab, you can use `savejson` and a script similar to the following in order to create a list of output json files:
-
-```matlab
-[fg_classified,~,classification] = AFQ_SegmentFiberGroups(config.dt6, fg, [], [], false);
-tracts = fg2Array(fg_classified);
-mkdir('tracts');
-cm = parula(length(tracts));
-
-for it = 1:length(tracts)
-  tract.name   = tracts(it).name;
-  tract.color  = cm(it,:);
-  tract.coords = tracts(it).fibers;
-  savejson('', tract, fullfile('tracts',sprintf('%i.json',it)));
-end
-```
-
-Once you have main.js and your configuration set up, you're ready to go!
-
+>  npm init vite-app tractview
