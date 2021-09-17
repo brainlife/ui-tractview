@@ -82,7 +82,11 @@ export default defineComponent({
             if(jwt && this.config.surfaces) this.config.surfaces.forEach((surface:ISurfaceConfig)=>{
                 surface.url += "?at="+jwt;
             });
-            this.init();
+
+            //let vue initialize the main with now that we have this.config.tracts
+            this.$nextTick(()=>{
+                this.init();
+            });
         } else {
             this.loadDemoConfig();
         }
