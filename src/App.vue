@@ -57,6 +57,8 @@ export default defineComponent({
             
             hoveredLR: null as ISurfaceLR|ITractLR|null,//on the list
 
+            tooltip: "",
+            tooltipBounce: null as null|ReturnType<typeof setTimeout>,
         }
     },
 
@@ -539,6 +541,7 @@ export default defineComponent({
                 this.pushed_surface.mesh.material = this.pushed_surface.normal_material;
                 this.pushed_surface = null;
             }
+            this.tooltip = "";
         },
 
         mousedown(event: MouseEvent) {
@@ -547,6 +550,19 @@ export default defineComponent({
                 this.pushed_surface = obj;
                 obj.mesh.material = obj.xray_material;
             }
+        },
+
+        mousemove(event: MouseEvent) {
+            this.tooltip = "";
+            if(this.tooltipBounce) clearTimeout(this.tooltipBounce);
+            this.tooltipBounce = setTimeout(()=>{
+                let obj = this.findSurface(event);
+                if(obj) {
+                    this.tooltip = obj.name;
+                    (this.$refs.tooltip as HTMLElement).style.left = event.x+"px";
+                    (this.$refs.tooltip as HTMLElement).style.top = (event.y-30)+"px";
+                }
+            }, 300)
         },
 
         findSurface(event: MouseEvent): ISurfaceConfig|null {
@@ -606,9 +622,9 @@ export default defineComponent({
 
 <template>
 <span class="loading" v-if="!config.tracts">Loading Config</span>
-<div id="app" v-if="config.tracts">
-
-    <div class="mainview" ref="view" @mousedown="mousedown" @mouseup="mouseup"/>
+<div v-if="config.tracts" class="main">
+    <div class="tooltip" ref="tooltip" v-show="tooltip">{{tooltip}}</div>
+    <div class="view" ref="view" @mousedown="mousedown" @mouseup="mouseup" @mousemove="mousemove"/>
 
     <div v-if="load_percentage < 1" id="loading" class="loading">Loading... {{loading}} ({{Math.round(load_percentage*100)}}%)</div>
 
@@ -653,37 +669,8 @@ html, body {
     height: 100%;
     margin: 0;
     font-family: Roboto;
-    font-size:12px;
+    font-size: 12px;
     color: white;
-}
-#app {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-.error {
-    position:relative;
-    width:100%;
-    height:100%;
-    background:black;
-    color:white;
-    padding:10px;
-    font-size:20px;
-}
-
-.container {
-    display:inline-block;
-    position:relative;
-    width: 100%;
-    height: 100%;
-    padding: 0px;
-}
-
-.mainview {
-    position:absolute; 
-    width:100%;
-    height: 100%;
-    background: #333;
 }
 
 .controls {
@@ -695,6 +682,37 @@ html, body {
     background:rgba(0, 0, 0, .3);
     color: #fff;
     user-select: none;
+
+    h2 {
+        font-size: 13pt;
+        opacity: 0.5;
+        color: white;
+        margin-bottom: 3px;
+    }
+
+    .control-row {
+        height: 17px;
+        padding-left: 10px;
+
+    }
+
+    .control-row:hover {
+        background-color: rgba(0,0,0,0.3);
+        color: white !important;
+    }
+
+    .check {
+        position: absolute;
+        opacity: 0.6;
+    }
+
+    .check-left {
+        right: 35px;
+    }
+
+    .check-right {
+        right: 15px;
+    }
 }
 
 .scrollable {
@@ -704,32 +722,37 @@ html, body {
     bottom: 0;
 }
 
-.controls h2 {
-    font-size: 13pt;
-    opacity: 0.5;
-    color: white;
-    margin-bottom: 3px;
+#app {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
-.controls .control-row {
-    height: 17px;
-    padding-left: 10px;
+</style>
 
+<style lang="scss" scoped>
+
+.main {
+    width: 100%;
+    height: 100%;
 }
 
-.controls .control-row:hover {
-    background-color: rgba(0,0,0,0.3);
-    color: white !important;
+.error {
+    position:relative;
+    width:100%;
+    height:100%;
+    background:black;
+    color:white;
+    padding:10px;
+    font-size:20px;
 }
-.controls .check {
-    position: absolute;
-    opacity: 0.6;
-}
-.controls .check-left {
-    right: 35px;
-}
-.controls .check-right {
-    right: 15px;
+
+.view {
+    width: 100%;
+    height: 100%;
+    background: #333;
+    position: absoute;
 }
 
 input[type="checkbox"] {
@@ -762,20 +785,6 @@ input[type="checkbox"] {
     font-size: 200%;
 }
 
-.show_hide_button {
-    color: white;
-    font-size:17px;
-    position:fixed;
-    top: 0px;
-    right:0px;
-    cursor:pointer;
-    z-index: 10;
-    padding: 3px;
-    color: #ddd;
-}
-.show_hide_button:hover {
-    background-color: black;
-}
 .rotateControl {
     position: fixed;
     bottom: 5px;
@@ -793,6 +802,14 @@ input[type="checkbox"] {
     width: 27px;
     display: inline-block;
     text-align: center;
+}
+.tooltip {
+    position: absolute;
+    z-index: 1;
+    opacity: 0.5;
+    background-color: #0008;
+    display: inline-block;
+    padding: 5px;
 }
 
 </style>

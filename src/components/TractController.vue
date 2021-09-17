@@ -119,4 +119,5 @@ export default defineComponent({
 .controls {
     right: 0;
 }
+
 </style>
