@@ -27,8 +27,6 @@ const three = {
     camera: new THREE.PerspectiveCamera(45, 2.0, 1, 5000), //will be resized in initScene()
     camera_light: new THREE.PointLight(0xffffff, 0.9),
     raycaster: new THREE.Raycaster(),
-
-    stats: new Stats(), //for fps
 }
 
 export default defineComponent({
@@ -59,6 +57,7 @@ export default defineComponent({
 
             tooltip: "",
             tooltipBounce: null as null|ReturnType<typeof setTimeout>,
+            stats: null as null | typeof Stats, //for fps
         }
     },
 
@@ -113,12 +112,13 @@ export default defineComponent({
 
             //show framerate
             if(this.config.debug) {
-                three.stats.dom.style.top = 'inherit';
-                three.stats.dom.style.bottom = '0px';
-                three.stats.dom.style.left = 'inherit';
-                three.stats.dom.style.right = '0px';
-                document.body.appendChild(three.stats.dom);
-                three.stats.showPanel(0);
+                this.stats = new Stats();
+                this.stats.dom.style.top = 'inherit';
+                this.stats.dom.style.bottom = '0px';
+                this.stats.dom.style.left = 'inherit';
+                this.stats.dom.style.right = '0px';
+                document.body.appendChild(this.stats.dom);
+                this.stats.showPanel(0);
             }
 
             this.organize();
@@ -316,7 +316,7 @@ export default defineComponent({
         },
 
         loadDemoConfig() {
-            let dataurl = "/testdata/optic"; //production demo data
+            let dataurl = "/ui/tractview/testdata/0001"; //production demo data
             if(this.config.debug) {
                 dataurl = "https://brainlife.io/ui/tractview/testdata/0001";
             }
@@ -482,7 +482,7 @@ export default defineComponent({
         },
 
         animate() {
-            if(this.config.debug) three.stats.begin();
+            if(this.stats) this.stats.begin();
 
             if(this.controls.orbit) this.controls.orbit.update();
 
@@ -498,7 +498,7 @@ export default defineComponent({
             three.renderer.clearDepth();
             three.renderer.render(three.scene, three.camera);
 
-            if(this.config.debug) three.stats.end();
+            if(this.stats) this.stats.end();
 
             requestAnimationFrame(this.animate);
         },
