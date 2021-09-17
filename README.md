@@ -4,7 +4,7 @@
 
 Web-based White Matter Tractography and Surfaces Viewer for brainlife.io.
 
-![Preview Image](https://raw.githubusercontent.com/brainlife/brainlife.github.io/master/images/ui-logos/tractview.pngg)
+![Preview Image](https://raw.githubusercontent.com/brainlife/brainlife.github.io/master/images/ui-logos/tractview.png)
 
 This App is used to visualize brainlife's [neuro/wmc datatype](https://brainlife.io/datatype/5cc1d64c44947d8aea6b2d8b) (white matter tractography) object.
 
