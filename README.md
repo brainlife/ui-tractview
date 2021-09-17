@@ -25,9 +25,9 @@ This App is used to visualize brainlife's [neuro/wmc datatype](https://brainlife
 
 > Dependencies
 
-    * nodejs (>14.17.1)
-    * npm (>6.14.13)
-    * tsc (>4.4.2)
+* nodejs (>14.17.1)
+* npm (>6.14.13)
+* tsc (>4.4.2)
 
 > Installation
 
@@ -62,9 +62,9 @@ To visualize your own data in stead of the demo data, you will have to prepare [
 
 The `neuro/wmc` basically contains 2 directories (`tracts` and `surfaces`) that are used by tractview. `classification.mat` contains the actual classification of the tracts but it is not used by this visualizer.
 
-> How to organize data inside `tracts` and `surfaces` is beyond the scope of this README, but please feel free to contact us if you would like to have an assistance.
+How to organize data inside `tracts` and `surfaces` is beyond the scope of this README, but please feel free to contact us if you would like to have an assistance.
 
-Create a directory named `testdata` under `./public` directory of the repo, and add the following `<script>` content in the `.//index.html` right above `<script src="/src/main.ts"></script>`
+Create a directory named `testdata` under `./public` directory of the repo, and add the following `<script>` content in the `./index.html` right above `<script src="/src/main.ts"></script>`
 
 ```
   <script>
