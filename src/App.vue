@@ -130,8 +130,11 @@ export default defineComponent({
             this.initScene();
             this.animate(); //start animating before all data is loaded
             
-            await this.loadTracts();
-            await this.loadSurfaces();
+            //load tracts and surfaces in parallel
+            await Promise.all([
+                this.loadTracts(), 
+                this.loadSurfaces()
+            ]);
 
             //remove loading indicator
             this.loading = null;
