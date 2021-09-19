@@ -293,16 +293,20 @@ export default defineComponent({
                     // @ts-ignore
                     if(geometry.computeBoundsTree) geometry.computeBoundsTree(); //for BVH
 
-                    let back_material = new THREE.MeshLambertMaterial({
-                        //color: new THREE.Color(surface.color).multiplyScalar(2),
-                        color: surface.color,
-                        transparent: true,
-                        opacity: 0.015,
-                        depthTest: false,
-                    });
-                    let back_mesh = new THREE.Mesh( geometry, back_material );
-                    back_mesh.rotation.x = -Math.PI/2;
-                    three.scene.add(back_mesh);
+                    if(surface.name.toLowerCase().includes("cerebral")) {
+                        let back_material = new THREE.MeshLambertMaterial({
+                            //color: new THREE.Color(surface.color).multiplyScalar(0),
+                            //color: surface.color,
+                            color: new THREE.Color(0,0,0),
+                            transparent: true,
+                            opacity: 0.2,
+                            depthTest: false,
+                        });
+                        let back_mesh = new THREE.Mesh( geometry, back_material );
+                        back_mesh.rotation.x = -Math.PI/2;
+                        back_mesh.renderOrder = -1; //requires depthTest:false
+                        three.scene.add(back_mesh);
+                    }
 
                     let mesh = new THREE.Mesh( geometry );
                     mesh.rotation.x = -Math.PI/2;
@@ -501,8 +505,8 @@ export default defineComponent({
             this.controls.orbit.enableDamping = true;
             this.controls.orbit.dampingFactor = 0.25;
     
-            const axesHelper = new THREE.AxesHelper( 10 );
-            three.scene.add( axesHelper );
+            three.scene.add( new THREE.AxesHelper( 100 ) );
+            //three.scene.add( new THREE.GridHelper(200, 20) );
         
             window.addEventListener("resize", this.resize);
             this.resize();
