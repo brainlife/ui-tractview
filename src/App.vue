@@ -22,10 +22,10 @@ import * as Stats from 'stats.js/build/stats.min.js'
 //we can't store threejs elements here as vue3's proxied object interfares with threejs's proxied object
 const three = {
     scene: new THREE.Scene(),
-    back_scene: new THREE.Scene(),
+    //back_scene: new THREE.Scene(),
     renderer: new THREE.WebGLRenderer({ alpha: true, antialias: true }),
     camera: new THREE.PerspectiveCamera(45, 2.0, 1, 5000), //will be resized in initScene()
-    camera_light: new THREE.PointLight(0xffffff, 0.9),
+    camera_light: new THREE.PointLight(0xffeedd, 0.7),
     raycaster: new THREE.Raycaster(),
 }
 
@@ -172,8 +172,12 @@ export default defineComponent({
 
                 //create start point particles
                 const startPointMaterial = new THREE.PointsMaterial( { 
-                    size: 2, map: pointSprite, 
-                    blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+                    size: 2, 
+                    opacity: 0.5,
+                    map: pointSprite, 
+                    blending: THREE.AdditiveBlending, 
+                    depthTest: false, 
+                    transparent: true } );
                 startPointMaterial.color.setHSL( 0.5, 0.5, 0.3 ); //blue
                 const startPoints = new THREE.Points(startPointGeometry, startPointMaterial);
                 startPoints.visible = false; //tract.show || false;
@@ -183,8 +187,12 @@ export default defineComponent({
                 
                 //create end point particles
                 const endPointMaterial = new THREE.PointsMaterial( { 
-                    size: 2, map: pointSprite, 
-                    blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+                    size: 2, 
+                    opacity: 0.5,
+                    map: pointSprite, 
+                    blending: THREE.AdditiveBlending, 
+                    depthTest: false, 
+                    transparent: true } );
                 endPointMaterial.color.setHSL( 0, 0.5, 0.3 ); //red
                 const endPoints = new THREE.Points(endPointGeometry, endPointMaterial);
                 endPoints.visible = false; //tract.show || false;
@@ -289,12 +297,12 @@ export default defineComponent({
                         //color: new THREE.Color(surface.color).multiplyScalar(2),
                         color: surface.color,
                         transparent: true,
-                        opacity: 0.2,
+                        opacity: 0.015,
                         depthTest: false,
                     });
                     let back_mesh = new THREE.Mesh( geometry, back_material );
                     back_mesh.rotation.x = -Math.PI/2;
-                    three.back_scene.add(back_mesh);
+                    three.scene.add(back_mesh);
 
                     let mesh = new THREE.Mesh( geometry );
                     mesh.rotation.x = -Math.PI/2;
@@ -331,7 +339,9 @@ export default defineComponent({
         loadDemoConfig() {
             let dataurl = "/ui/tractview/testdata/0001"; //production demo data
             if(this.config.debug) {
-                dataurl = "https://brainlife.io/ui/tractview/testdata/0001";
+                //dataurl = "https://brainlife.io/ui/tractview/testdata/0001";
+                dataurl = "testdata/0001";
+                //dataurl = "testdata/empty";
             }
 
             console.log("loading demo tracts.json from", dataurl + "/tracts/tracts.json")
@@ -481,9 +491,10 @@ export default defineComponent({
             this.$refs.view.appendChild(three.renderer.domElement);
 
             three.camera.position.z = 200;
-            three.back_scene.add(new THREE.AmbientLight(0x303030));
+            //three.back_scene.add(new THREE.AmbientLight(0xffffff));
+            //three.back_scene.add(three.camera_light);
 
-            three.scene.add(new THREE.AmbientLight(0x303030));
+            three.scene.add(new THREE.AmbientLight(0x808080));
             three.scene.add(three.camera_light);
 
             this.controls.orbit = new OrbitControls(three.camera, three.renderer.domElement);
@@ -516,10 +527,10 @@ export default defineComponent({
             if(this.hoveredLR?.right?.mesh) this.animateMesh(this.hoveredLR.right.mesh);       
 
             three.camera_light.position.copy(three.camera.position);
-            three.renderer.clear();
 
-            three.renderer.render(three.back_scene, three.camera);
-            three.renderer.clearDepth();
+            three.renderer.clear();
+            //three.renderer.render(three.back_scene, three.camera);
+            //three.renderer.clearDepth();
             three.renderer.render(three.scene, three.camera);
 
             if(this.stats) this.stats.end();
@@ -830,7 +841,6 @@ input[type="checkbox"] {
 .tooltip {
     position: absolute;
     z-index: 1;
-    opacity: 0.5;
     background-color: #0008;
     display: inline-block;
     padding: 5px;
