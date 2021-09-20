@@ -128,7 +128,6 @@ export default defineComponent({
             this.normalizeColor();
             this.organizeLR();
             this.initScene();
-            this.animate(); //start animating before all data is loaded
             
             //load tracts and surfaces in parallel
             await Promise.all([
@@ -318,12 +317,14 @@ export default defineComponent({
                         color: new THREE.Color(surface.color),
                         transparent: true,
                         opacity: 0.8,
+                        //depthTest: false, //need this to show tracts on top
                     });
                     surface.highlight_material = new THREE.MeshPhongMaterial({
                         color: new THREE.Color(surface.color).multiplyScalar(1.25),
                         transparent: true,
-                        opacity: 1,
-                        shininess: 80,
+                        //opacity: 1,
+                        //shininess: 80,
+                        //depthTest: false, //need this to show tracts on top
                     });
                     surface.xray_material = new THREE.MeshLambertMaterial({
                         color: new THREE.Color(surface.color).multiplyScalar(1.25),
@@ -505,11 +506,13 @@ export default defineComponent({
             this.controls.orbit.enableDamping = true;
             this.controls.orbit.dampingFactor = 0.25;
     
-            three.scene.add( new THREE.AxesHelper( 100 ) );
+            three.scene.add( new THREE.AxesHelper( 50 ) );
             //three.scene.add( new THREE.GridHelper(200, 20) );
-        
+
             window.addEventListener("resize", this.resize);
             this.resize();
+
+            three.renderer.setAnimationLoop(this.animate); //start animating before all data is loaded
         },
 
         resize() {
@@ -539,7 +542,7 @@ export default defineComponent({
 
             if(this.stats) this.stats.end();
 
-            requestAnimationFrame(this.animate);
+            //requestAnimationFrame(this.animate);
         },
 
         animateMesh(mesh : THREE.Mesh) {

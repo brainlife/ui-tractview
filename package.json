@@ -6,14 +6,13 @@
     "build": "vue-tsc --noEmit && vite build --base=/ui/tractview/"
   },
   "dependencies": {
-    "axios": "^0.21.4",
     "perfect-scrollbar": "^1.5.2",
     "simple-web-worker": "^1.2.0",
     "stats.js": "^0.17.0",
     "three": "^0.132.2",
     "three-mesh-bvh": "^0.4.3",
-    "vue": "^3.2.10",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.2",
+    "vue": "^3.2.10"
   },
   "devDependencies": {
     "@types/node": "^16.9.2",
