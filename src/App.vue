@@ -347,6 +347,7 @@ export default defineComponent({
                 //dataurl = "https://brainlife.io/ui/tractview/testdata/0001";
                 dataurl = "testdata/0001";
                 //dataurl = "testdata/empty";
+                //dataurl = "testdata/tractseg";
             }
 
             console.log("loading demo tracts.json from", dataurl + "/tracts/tracts.json")
@@ -378,7 +379,11 @@ export default defineComponent({
                 tract.color = new THREE.Color(tract.color[0]/2+0.5, tract.color[1]/2+0.5, tract.color[2]/2+0.5); //always array?
             });
             if(this.config.surfaces) this.config.surfaces.forEach((surface:ISurfaceConfig)=>{
-                surface.color = new THREE.Color(surface.color.r/512+0.5,  surface.color.g/512+0.5,  surface.color.b/512+0.5);  
+                if(Array.isArray(surface.color)) {
+                surface.color = new THREE.Color(surface.color[0]/2+0.5, surface.color[1]/2+0.5, surface.color[2]/2+0.5); //always array?
+                } else {
+                    surface.color = new THREE.Color(surface.color.r/512+0.5,  surface.color.g/512+0.5,  surface.color.b/512+0.5);  
+                }
             });
         },
 
