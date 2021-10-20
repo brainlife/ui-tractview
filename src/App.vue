@@ -291,8 +291,8 @@ export default defineComponent({
 
                     // @ts-ignore
                     if(geometry.computeBoundsTree) geometry.computeBoundsTree(); //for BVH
-
-                    if(surface.name.toLowerCase().includes("cerebral")) {
+                    console.dir(surface.name);
+                    if(surface.name.toLowerCase().includes("cerebral") || surface.name == "CC") {
                         let back_material = new THREE.MeshLambertMaterial({
                             //color: new THREE.Color(surface.color).multiplyScalar(0),
                             //color: surface.color,
@@ -345,9 +345,9 @@ export default defineComponent({
             let dataurl = "/ui/tractview/testdata/0001"; //production demo data
             if(this.config.debug) {
                 //dataurl = "https://brainlife.io/ui/tractview/testdata/0001";
-                dataurl = "testdata/0001";
+                //dataurl = "testdata/0001";
                 //dataurl = "testdata/empty";
-                //dataurl = "testdata/tractseg";
+                dataurl = "testdata/tractseg";
             }
 
             console.log("loading demo tracts.json from", dataurl + "/tracts/tracts.json")

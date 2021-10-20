@@ -6,6 +6,8 @@ Web-based White Matter Tractography and Surfaces Viewer for brainlife.io.
 
 ![Preview Image](https://raw.githubusercontent.com/brainlife/brainlife.hugo/master/static/images/ui-logos/tractview.png)
 
+[Demo Instance](https://brainlife.io/ui/tractview/)
+
 ## Abstract
 
 The white matter of the human brain can be found in subcortical areas of the brain, and it allows distal parts of the brain to communicate and transmit information. As the role of white matter is to interact with various parts of the brain, it is important to visualize white matter together with both cortical and subcortical areas that each tracts interact with. Although it is possible to visualize white-matter tracts together with segmented brain surfaces  using existing tools, they often require advanced expertise in data preprocessing and visualization techniques to correctly visualize them. Combined with brainlife.io; an easy-to-use neuroimaging platform, Tractview is a simple yet effective web-based visualizer for white matter tractography and brain surfaces. It enables researchers to quickly gain preliminary insights on the data being processed on bralinlife.io before a more thorough analysis can be performed. 
