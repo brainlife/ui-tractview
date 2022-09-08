@@ -1,6 +1,5 @@
 .vscode
 node_modules
-package-lock.json
 remove.sh
 public/testdata
 dist
