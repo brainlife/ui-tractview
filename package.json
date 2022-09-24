@@ -15,10 +15,10 @@
     "vue": "^3.2.10"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^3.1.0",
     "@types/node": "^18.7.16",
     "@types/stats.js": "^0.17.0",
     "@types/three": "^0.131.1",
-    "@vitejs/plugin-vue": "^1.10.2",
     "@vue/compiler-sfc": "^3.2.10",
     "sass": "^1.54.9",
     "vite": "^3.1.0",
