@@ -2,6 +2,8 @@
 
 import { defineComponent, defineAsyncComponent } from 'vue'
 
+import { buildTractGeometry } from './tract-geometry'
+
 import SurfaceController from './components/SurfaceController.vue'
 import TractController from './components/TractController.vue'
 
@@ -50,6 +52,7 @@ export default defineComponent({
             //below are things that we haven't touched yet.
             load_percentage: 1,
             loading: null as (null|string),
+            loadError: null as string|null,
 
             pushed_surface: null as ISurfaceConfig|null,
             
@@ -108,6 +111,8 @@ export default defineComponent({
     methods: {
 
         async init() {
+            this.loadError = null;
+            try {
             // @ts-ignore
             THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
             // @ts-ignore
@@ -138,7 +143,11 @@ export default defineComponent({
             //remove loading indicator
             this.loading = null;
             this.load_percentage = 1;
-            
+            } catch(error) {
+                this.loadError = error instanceof Error ? error.message : "Unable to load tract data.";
+                this.loading = null;
+                this.load_percentage = 1;
+            }
         },
 
         async loadTracts() {
@@ -201,77 +210,26 @@ export default defineComponent({
             }
         },
 
-        loadTract(tract: ITractConfig) {
-
-            return new Promise((resolve, reject)=>{
-                if(!tract.url) return; //for ts..
-
-                //use web worker to parse the json.. although I still have to spend good chunk of time constructing the BufferGeometry which
-                //must happen on this thread - as they are not serializable.
-                fetch(tract.url).then(res=>res.json()).then(json=>{
-
-                    // @ts-ignore
-                    this.$worker.run((json:any)=>{
-                        let bundle = json.coords;
-
-                        //normalize data format (1>N>3>[] v.s. N>1>3>[])
-                        if(bundle.length == 1 && bundle[0][0].length == 3) bundle = bundle[0];
-
-                        //convert each bundle to threads_pos array
-                        const threads_pos = [] as number[];
-                        const starts = [] as number[];
-                        const ends = [] as number[];
-                        bundle.forEach((fascicle : number[][])=>{
-                            //normalize data type from the [ [[...]], [[...]], [[...]] ]  into > [ [...],[...],[...] ] 
-                            if (fascicle.length == 1 && fascicle[0].length == 3) {
-                                // @ts-ignore
-                                fascicle = fascicle[0]; 
-                            }
-
-                            var xs = fascicle[0];
-                            var ys = fascicle[1];
-                            var zs = fascicle[2];
-                            const l = xs.length;
-
-                            starts.push(xs[0], ys[0], zs[0]);
-                            ends.push(xs[l-1], ys[l-1], zs[l-1]);
-
-                            for(var i = 1;i < xs.length;++i) {
-                                threads_pos.push(xs[i-1]);
-                                threads_pos.push(ys[i-1]);
-                                threads_pos.push(zs[i-1]);
-                                threads_pos.push(xs[i]);
-                                threads_pos.push(ys[i]);
-                                threads_pos.push(zs[i]);
-                            }
-                        });
-
-                        return {
-                            lines: new Float32Array(threads_pos),
-                            startPoints: new Float32Array(starts),
-                            endPoints: new Float32Array(ends),
-                        }
-
-                    }, [json]).then((res:any)=>{
-                        let {lines, startPoints, endPoints} = res;
-
-                        //create LineGeometry
-                        const lineGeometry = new THREE.BufferGeometry();
-                        lineGeometry.setAttribute('position', new THREE.BufferAttribute(lines, 3));
-
-                        //start points
-                        const startPointGeometry = new THREE.BufferGeometry();
-                        startPointGeometry.setAttribute('position', new THREE.BufferAttribute(startPoints, 3));
-
-                        //end points
-                        const endPointGeometry = new THREE.BufferGeometry();
-                        endPointGeometry.setAttribute('position', new THREE.BufferAttribute(endPoints, 3));
-
-                        resolve({lineGeometry, startPointGeometry, endPointGeometry});
-                    });
-                });
-
-            });
+        async loadTract(tract: ITractConfig) {
+            if (!tract.url) throw new Error('A tract bundle is missing its file URL.');
+            let result: any;
+            try {
+                const response = await fetch(tract.url);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const json = await response.json();
+                if (tract.coordinateLayout) json.coordinateLayout = tract.coordinateLayout;
+                result = await this.$worker.run(buildTractGeometry, [json]);
+            } catch(error) {
+                // Do not include request URLs (which may contain authentication tokens).
+                throw new Error('Unable to load tract "' + tract.name + '". Check that the bundle exists and contains valid XYZ coordinates.');
+            }
+            const lineGeometry = new THREE.BufferGeometry();
+            lineGeometry.setAttribute('position', new THREE.BufferAttribute(result.lines, 3));
+            const startPointGeometry = new THREE.BufferGeometry();
+            startPointGeometry.setAttribute('position', new THREE.BufferAttribute(result.startPoints, 3));
+            const endPointGeometry = new THREE.BufferGeometry();
+            endPointGeometry.setAttribute('position', new THREE.BufferAttribute(result.endPoints, 3));
+            return {lineGeometry, startPointGeometry, endPointGeometry};
         },
 
         async loadSurfaces() {
@@ -668,7 +626,8 @@ export default defineComponent({
 </script>
 
 <template>
-<span class="loading" v-if="!config.tracts">Loading Config</span>
+<div v-if="loadError" role="alert" class="load-error">{{loadError}}</div>
+<span class="loading" v-if="!config.tracts && !loadError">Loading Config</span>
 <div v-if="config.tracts" class="main">
     <div class="tooltip" ref="tooltip" v-show="tooltip">{{tooltip}}</div>
     <div class="view" ref="view" @mousedown="mousedown" @mouseup="mouseup" @mousemove="mousemove"/>
@@ -858,4 +817,8 @@ input[type="checkbox"] {
     padding: 5px;
 }
 
+</style>
+
+<style scoped>
+.load-error { position: fixed; z-index: 100; top: 0; left: 0; right: 0; padding: 20px; background: #fff4f3; color: #a12622; }
 </style>

@@ -137,3 +137,32 @@ We kindly ask that you cite the following articles when publishing papers or cod
 This project was initialized using `vite`. 
 
 >  npm init vite-app tractview
+
+## WMC coordinate formats
+
+A bundle JSON contains `coords`, an array of streamlines. TractView accepts both
+`[[x1, x2, ...], [y1, y2, ...], [z1, z2, ...]]` (axes) and
+`[[x1, y1, z1], [x2, y2, z2], ...]` (points) for each streamline, plus legacy
+MATLAB singleton wrappers. Each streamline must contain at least two finite XYZ
+points. Invalid bundles display an error instead of leaving loading unfinished.
+
+A 3-by-3 streamline is ambiguous. The viewer follows the other streamlines in the
+bundle when possible; otherwise it retains the legacy axes interpretation.
+Exporters can set `"coordinateLayout": "points"` or `"coordinateLayout": "axes"`
+on the bundle JSON or its manifest entry to resolve this explicitly.
+
+The warehouse viewer uses `tracts/tracts.json` when present. If it is missing,
+it discovers JSON bundles through the dataset, publication, or staged-task file
+listing. It derives display names and colors from filenames; an explicit manifest
+is still preferred when descriptive names or specific colors are required.
+Surfaces remain optional. No stored dataset is modified by this fallback.
+
+Run the geometry regression tests with Node 18+:
+
+```sh
+node --test test/tract-geometry.test.cjs
+```
+
+Deployment requires both the warehouse UI bundle and this viewer's `dist/`.
+Deploy TractView first, then the warehouse UI, so discovered point-layout bundles
+are not sent to an older geometry parser.

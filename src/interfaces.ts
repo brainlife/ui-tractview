@@ -1,5 +1,6 @@
 export interface ITractConfig {
     name: string, //"forcepsMinor"
+    coordinateLayout?: "axes" | "points",
     color: THREE.Color,
     filename: string, //"1.json"
     url?: string, //created from filename and basepath like.."https://brainlife.io/ui/tractview/testdata/0001/tracts/1.json"
