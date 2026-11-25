@@ -1,4 +1,51 @@
-[![Run on Brainlife.io](https://img.shields.io/badge/brainlife-ui.tractview-blue.svg)](https://brainlife.io/ui/tractview)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/brand/brainlife-mark-on-dark.svg">
+    <img src=".github/brand/brainlife-mark-on-light.svg" alt="brainlife.io" width="140">
+  </picture>
+</p>
+
+<h1 align="center">ui-tractview</h1>
+
+<p align="center">
+  White-matter tractography and surfaces viewer (Vue + three.js, Vite) for brainlife.io datasets.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-lightgrey.svg" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/Status-maintained-blue.svg" alt="Status: maintained">
+  <a href="https://brainlife.io"><img src="https://img.shields.io/badge/brainlife.io-site-3b9fd0.svg" alt="brainlife.io"></a>
+  <a href="https://brainlife.io/docs"><img src="https://img.shields.io/badge/Docs-brainlife.io%2Fdocs-005981.svg" alt="Documentation"></a>
+  <a href="https://doi.org/10.1038/s41592-024-02237-2"><img src="https://img.shields.io/badge/DOI-10.1038%2Fs41592--024--02237--2-e57536.svg" alt="Nature Methods paper"></a>
+</p>
+
+## 🧠 At a glance
+
+| | |
+|---|---|
+| 🧭 **What** | Static web page (White-matter tractography and surfaces viewer (Vue + three.js, Vite)) that brainlife.io opens for a dataset; it reads the dataset's files through the brainlife API |
+| 🗂️ **Datatypes** | `neuro/wmc` |
+| 🕰️ **Last change** | 2026-10-26 |
+
+## 💻 Run it locally
+
+```bash
+git clone https://github.com/brainlife/ui-tractview && cd ui-tractview
+npm ci && npm run dev    # Vite dev server; npm run build for production
+```
+
+brainlife.io serves the built files under `/ui/` and passes the dataset location to the page.
+
+## 📝 Notes
+
+[Demo](https://brainlife.io/ui/tractview/). Supports both WMC coordinate layouts (2026-10).
+
+## 🔗 Related
+
+[ui-niivue](https://github.com/brainlife/ui-niivue) (current in-browser viewer) · [abcd-novnc](https://github.com/brainlife/abcd-novnc) (desktop viewer launcher) · [warehouse-next](https://github.com/brainlife/warehouse-next) (datatypes and their viewers)
+
+<details>
+<summary><b>📜 Previous README (technical details)</b></summary>
 
 # ui-tractview
 
@@ -11,15 +58,6 @@ Web-based White Matter Tractography and Surfaces Viewer for brainlife.io.
 ## Abstract
 
 The white matter of the human brain can be found in subcortical areas of the brain, and it allows distal parts of the brain to communicate and transmit information. As the role of white matter is to interact with various parts of the brain, it is important to visualize white matter together with both cortical and subcortical areas that each tracts interact with. Although it is possible to visualize white-matter tracts together with segmented brain surfaces  using existing tools, they often require advanced expertise in data preprocessing and visualization techniques to correctly visualize them. Combined with brainlife.io; an easy-to-use neuroimaging platform, Tractview is a simple yet effective web-based visualizer for white matter tractography and brain surfaces. It enables researchers to quickly gain preliminary insights on the data being processed on bralinlife.io before a more thorough analysis can be performed. 
-
-### Authors
-- [Soichi Hayashi](hayashis@iu.edu)
-
-### Contributors
-- [Steven O'Riley](stevengeeky@gmail.com)
-
-### Project Director
-- [Franco Pestilli](frakkopesto@gmail.com)
 
 # Installation / Running locally
 
@@ -116,22 +154,6 @@ Create a directory named `testdata` under `./public` directory of the repo, and 
 
 You will need to enumerate all tracts / surfaces that are stored inside the `tracts` and `surfaces` directories. 
 
-### Funding Acknowledgement
-brainlife.io is publicly funded and for the sustainability of the project it is helpful to Acknowledge the use of the platform. We kindly ask that you acknowledge the funding below in your publications and code reusing this code.
-
-[![NSF-BCS-1734853](https://img.shields.io/badge/NSF_BCS-1734853-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1734853)
-[![NSF-BCS-1636893](https://img.shields.io/badge/NSF_BCS-1636893-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1636893)
-[![NSF-ACI-1916518](https://img.shields.io/badge/NSF_ACI-1916518-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1916518)
-[![NSF-IIS-1912270](https://img.shields.io/badge/NSF_IIS-1912270-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1912270)
-[![NIH-NIBIB-R01EB029272](https://img.shields.io/badge/NIH_NIBIB-R01EB029272-green.svg)](https://grantome.com/grant/NIH/R01-EB029272-01)
-
-### Citations
-We kindly ask that you cite the following articles when publishing papers or code using this code. 
-
-1. Avesani, P., McPherson, B., Hayashi, S. et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. Sci Data 6, 69 (2019). [https://doi.org/10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
-
-#### MIT Copyright (c) 2020 brainlife.io The University of Texas at Austin and Indiana University
-
 ## Technical Notes
 
 This project was initialized using `vite`. 
@@ -166,3 +188,21 @@ node --test test/tract-geometry.test.cjs
 Deployment requires both the warehouse UI bundle and this viewer's `dist/`.
 Deploy TractView first, then the warehouse UI, so discovered point-layout bundles
 are not sent to an older geometry parser.
+
+</details>
+
+## 📚 Citing
+
+If you use brainlife.io in your work, please cite:
+
+> Hayashi S, Caron BA, Heinsfeld AS, et al. brainlife.io: a decentralized and open-source cloud platform to support neuroscience research. *Nature Methods* 21:809–813 (2024). [doi:10.1038/s41592-024-02237-2](https://doi.org/10.1038/s41592-024-02237-2)
+
+## 🤝 Contributing
+
+Issues and pull requests are welcome in this repository. For help using brainlife.io, see the [documentation](https://brainlife.io/docs).
+
+## ⚖️ License
+
+[MIT](LICENSE).
+
+<p align="center"><sub>brainlife.io · Brain data across scales. One place to analyze, share and publish it. · The University of Texas at Austin</sub></p>
